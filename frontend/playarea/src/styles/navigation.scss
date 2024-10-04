@@ -1,0 +1,81 @@
+// Zmienne kolorów
+$primary-color: #1f1f1f; // Ciemne tło
+$white-color: #ffffff;
+$highlight-color: #00d512; // Kolor podkreślenia (zielony)
+
+// Zmienne typograficzne
+$font-size-large: 28px;
+$font-size-medium: 18px;
+
+// Zmienne odstępów
+$padding-vertical: 15px;
+$padding-horizontal: 30px;
+$gap-size: 20px;
+
+// Zmienne animacji
+$transition-duration: 0.3s;
+
+/* Resetowanie marginesów i paddingów */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Styl dla nawigacji */
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $primary-color; // Ciemne tło
+  padding: $padding-vertical $padding-horizontal;
+
+  /* Styl dla logo */
+  .logo {
+    a {
+      text-decoration: none;
+    }
+
+    h1 {
+      color: $highlight-color;
+      font-size: $font-size-large;
+      font-weight: bold;
+      text-decoration: none;
+    }
+  }
+
+  /* Styl dla menu */
+  .menu {
+    display: flex;
+    gap: $gap-size;
+
+    .menu-item {
+      color: $white-color;
+      text-decoration: none;
+      font-size: $font-size-medium;
+      position: relative;
+      transition: color $transition-duration;
+
+      /* Efekt hover dla menu */
+      &::after {
+        content: "";
+        display: block;
+        width: 0%;
+        height: 2px;
+        background: $highlight-color; // Kolor podkreślenia
+        transition: width $transition-duration;
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+      }
+
+      &:hover {
+        color: $highlight-color;
+
+        &::after {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

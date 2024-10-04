@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Activate your account</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        padding: 20px;
+      }
+      .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+      a {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Hello {{ user.username }}!</h1>
+      <p>
+        Thank you for registering. Please activate your account by clicking the
+        button below:
+      </p>
+      <a href="http://localhost:8000/activate/{{ token }}">Activate Account</a>
+      <p>
+        If the above link doesn't work, copy and paste this URL into your
+        browser:
+      </p>
+      <p>http://localhost:8000/activate/{{ token }}</p>
+    </div>
+  </body>
+</html>
