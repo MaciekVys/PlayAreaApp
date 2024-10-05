@@ -1,7 +1,7 @@
 // Zmienne kolorów
-$primary-color: #1f1f1f; // Ciemne tło
-$white-color: #ffffff;
-$highlight-color: #00d512; // Kolor podkreślenia (zielony)
+$primary-color: #192122; // Ciemne tło
+$white-color: #678b7d;
+$highlight-color: #ffffff; // Kolor podkreślenia (zielony)
 
 // Zmienne typograficzne
 $font-size-large: 28px;
@@ -20,6 +20,8 @@ $transition-duration: 0.3s;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
 
 /* Styl dla nawigacji */
@@ -55,6 +57,7 @@ $transition-duration: 0.3s;
       font-size: $font-size-medium;
       position: relative;
       transition: color $transition-duration;
+      margin-top: 10px;
 
       /* Efekt hover dla menu */
       &::after {
@@ -75,6 +78,39 @@ $transition-duration: 0.3s;
         &::after {
           width: 100%;
         }
+      }
+
+      &.active {
+        color: $highlight-color;
+        content: "";
+
+        &::after {
+          width: 100%;
+        }
+      }
+    }
+
+    button {
+      background: $white-color; /* Usuwamy tło */
+      color: $highlight-color; /* Kolor tekstu zgodny z resztą menu */
+      border: none; /* Usuwamy obramowanie */
+      border-radius: 25px;
+      font-size: $font-size-medium;
+      padding: 10px;
+      cursor: pointer;
+      position: relative;
+      transition: color $transition-duration;
+
+      &::after {
+        content: "";
+        display: block;
+        width: 0%;
+        height: 2px;
+        background: $highlight-color;
+        transition: width $transition-duration;
+        position: absolute;
+        bottom: -5px;
+        left: 0;
       }
     }
   }

@@ -1,0 +1,51 @@
+$primary-color: #192122;
+$white-color: #678b7d;
+$highlight-color: #ffffff;
+
+// Zmienne typograficzne
+$font-size-large: 18px;
+$font-size-medium: 13px;
+
+// Zmienne odstępów
+$padding-vertical: 15px;
+$padding-horizontal: 30px;
+$gap-size: 20px;
+
+// Zmienne animacji
+$transition-duration: 0.3s;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+
+button {
+  background: $white-color; /* Usuwamy tło */
+  color: $highlight-color; /* Kolor tekstu zgodny z resztą menu */
+  border: none; /* Usuwamy obramowanie */
+  border-radius: 25px;
+  font-size: $font-size-medium;
+  padding: 6px;
+  cursor: pointer;
+  position: relative;
+  transition: color $transition-duration;
+
+  &::after {
+    content: "";
+    display: block;
+    width: 0%;
+    height: 2px;
+    background: $highlight-color;
+    transition: width $transition-duration;
+    left: 0;
+  }
+}
+
+.label {
+  border-radius: 25px;
+  padding: 7px;
+  margin: 5px;
+}
