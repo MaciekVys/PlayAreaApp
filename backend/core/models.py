@@ -64,7 +64,7 @@ class Match(models.Model):
     home_team = models.ForeignKey(Team, related_name='home_matches', on_delete=models.CASCADE)
     away_team = models.ForeignKey(Team, related_name='away_matches', on_delete=models.CASCADE)
     league = models.ForeignKey(League, related_name='matches', on_delete=models.CASCADE)
-    match_date = models.DateTimeField()
+    match_date = models.DateField()
     score_home = models.IntegerField(default=0)
     score_away = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled')

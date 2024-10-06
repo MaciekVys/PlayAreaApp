@@ -6,6 +6,7 @@ import LoginForm from "./components/login";
 import Navigation from "./components/navigation";
 import Home from "./components/home";
 import StartPage from "./components/StartPage";
+import Team from "./components/team";
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
@@ -23,6 +24,7 @@ function App() {
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/team" element={<Team />} />
         </Routes>
       </Router>
     </ApolloProvider>

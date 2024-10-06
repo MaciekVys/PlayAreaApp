@@ -32,6 +32,7 @@ button {
   cursor: pointer;
   position: relative;
   transition: color $transition-duration;
+  border: solid 2px black;
 
   &::after {
     content: "";
@@ -45,6 +46,7 @@ button {
 }
 
 .label {
+  border: solid 2px black;
   border-radius: 25px;
   padding: 7px;
   margin: 5px;

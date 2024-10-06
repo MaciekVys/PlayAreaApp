@@ -45,12 +45,14 @@ class LoginMutation(graphene.Mutation):
     user = graphene.Field(UserType)
     success = graphene.Boolean()
     errors = graphene.String()
+    user_id = graphene.ID()  # Add this field to return user ID
 
     @classmethod
     def mutate(cls, root, info, password, username, **kwargs):
         try:
             context = info.context
             try:
+                # If the username is actually an email, convert it to a username
                 username = ExtendUser.objects.get(email=username).username
             except:
                 pass
@@ -66,17 +68,20 @@ class LoginMutation(graphene.Mutation):
                         user=user,
                         success=True,
                         errors=None,
+                        user_id=user.id  # Return user ID here
                     )
                 else:
                     return cls(
                         user=None,
                         success=False,
                         errors="Please verify your email address",
+                        user_id=None
                     )
             else:
-                return cls(user=None, success=False, errors="Invalid credentials")
+                return cls(user=None, success=False, errors="Invalid credentials", user_id=None)
         except Exception as e:
-            return cls(success=False, errors=str(e))
+            return cls(success=False, errors=str(e), user_id=None)
+
 
 class Logout(graphene.Mutation):
     success = graphene.Boolean()

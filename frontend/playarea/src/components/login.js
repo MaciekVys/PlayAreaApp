@@ -9,6 +9,7 @@ const LOGIN_MUTATION = gql`
       errors
       user {
         username
+        id
       }
     }
   }
@@ -25,6 +26,7 @@ const LoginForm = () => {
         localStorage.setItem("isLogged", "true");
         setIsLogged(true);
         localStorage.setItem("username", data.login.user.username);
+        localStorage.setItem("userId", data.login.user.id);
       } else if (data.login.errors) {
         setErrorMessage(data.login.errors);
       }

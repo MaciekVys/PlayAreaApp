@@ -23,6 +23,7 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
     city_name = graphene.Field(CityType, name=graphene.String(required=True))
     all_teams = graphene.List(TeamType)
     all_players = graphene.List(PlayerType)
+    team_by_user_id = graphene.Field(TeamType, user_id=graphene.Int(required=True))
 
     def resolve_all_cities(root, info):
         return City.objects.all()
@@ -39,7 +40,15 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
     def resolve_all_players(self, info):
         return Player.objects.all()
     
-
+    @login_required
+    def resolve_team_by_user_id(self, info, user_id):
+        try:
+            player = Player.objects.get(user__id=user_id)
+            if player.team:
+                return player.team
+            return None
+        except Player.DoesNotExist:
+            return None
 
 
 class Mutation(AuthMutation, graphene.ObjectType):
