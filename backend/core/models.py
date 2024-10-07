@@ -48,6 +48,8 @@ class Player(models.Model):
     goals = models.IntegerField(default=0)
     assists = models.IntegerField(default=0)
     mvp = models.IntegerField(default=0)
+    weight = models.IntegerField(default=0)
+    height = models.IntegerField(default=0)
 
 
     def __str__(self):
