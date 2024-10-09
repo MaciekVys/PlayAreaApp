@@ -16,20 +16,19 @@ class CreateTeam(graphene.Mutation):
     @login_required
     def mutate(self, info, name, city_name):
         user = info.context.user
-
         try:
             city = City.objects.get(name=city_name)
-        except:
-            raise Exception("City not found")
-        
+        except City.DoesNotExist:
+            return CreateTeam(success=False, errors="City not found", team=None)
+
         team = Team(name=name, city=city, captain=user)
         team.save()
 
         player = Player(user=user, team=team)
         player.save()
 
-        return CreateTeam(success=True, team=team)
-    
+        return CreateTeam(success=True, team=team, errors=None)
+
 
 class UpdateTeam(graphene.Mutation):
     class Arguments:

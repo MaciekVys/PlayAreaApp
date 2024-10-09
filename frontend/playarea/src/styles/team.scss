@@ -1,0 +1,144 @@
+.container {
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white;
+  margin: 50px auto;
+  padding: 40px;
+  max-width: 1200px;
+  border-radius: 12px;
+  min-height: 600px;
+  overflow-y: auto;
+  border: 1px solid black;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.team-info {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+
+  img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 3px solid #57ca9e;
+    object-fit: cover;
+    margin-right: 20px;
+  }
+
+  .left-side {
+    h1 {
+      font-size: 36px;
+      color: #57ca9e;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 18px;
+      padding: 5px 0;
+    }
+  }
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.tabs button {
+  background-color: black;
+  color: #57ca9e;
+  padding: 10px 20px;
+  margin: 5px;
+  border-radius: 5px;
+  border: 2px solid white;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.tabs button.active {
+  background-color: #57ca9e;
+  color: white;
+  border-color: #57ca9e;
+}
+
+.tabs button:hover {
+  background-color: #444;
+  color: white;
+}
+
+.players-table,
+.matches-table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.players-table th,
+.matches-table th,
+.players-table td,
+.matches-table td {
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.3s ease;
+}
+
+.players-table th,
+.matches-table th {
+  background-color: #57ca9e;
+  color: white;
+  font-weight: bold;
+}
+
+.players-table tr:hover,
+.matches-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+.players-table td,
+.matches-table td {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .container {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  .team-info {
+    flex-direction: column;
+    align-items: center;
+
+    img {
+      margin-bottom: 15px;
+    }
+
+    .left-side {
+      text-align: center;
+
+      h1 {
+        font-size: 28px;
+      }
+
+      p {
+        font-size: 16px;
+      }
+    }
+  }
+
+  .tabs {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .tabs button {
+    width: 100%;
+    max-width: 300px;
+  }
+}

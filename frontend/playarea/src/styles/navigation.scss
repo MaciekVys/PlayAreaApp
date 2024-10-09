@@ -1,7 +1,7 @@
 // Zmienne kolorów
-$primary-color: #192122; // Ciemne tło
-$white-color: #678b7d;
-$highlight-color: #ffffff; // Kolor podkreślenia (zielony)
+$primary-color: #000000; // Ciemne tło
+$white-color: #ffffff;
+$highlight-color: #57ca9e; // Kolor podkreślenia (zielony)
 
 // Zmienne typograficzne
 $font-size-large: 28px;
@@ -26,6 +26,10 @@ $transition-duration: 0.3s;
 
 /* Styl dla nawigacji */
 .navigation {
+  position: sticky;
+  top: 0;
+  // width: 100%;
+  // z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -52,6 +56,7 @@ $transition-duration: 0.3s;
     gap: $gap-size;
 
     .menu-item {
+      text-transform: uppercase;
       color: $white-color;
       text-decoration: none;
       font-size: $font-size-medium;
@@ -92,7 +97,8 @@ $transition-duration: 0.3s;
 
     button {
       background: $white-color; /* Usuwamy tło */
-      color: $highlight-color; /* Kolor tekstu zgodny z resztą menu */
+      font-weight: bold;
+      color: black; /* Kolor tekstu zgodny z resztą menu */
       border: none; /* Usuwamy obramowanie */
       border-radius: 25px;
       font-size: $font-size-medium;

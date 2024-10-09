@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
+import "../styles/login.scss"; // Import pliku CSS
 
 const LOGIN_MUTATION = gql`
   mutation login($email: String!, $username: String!, $password: String!) {
@@ -37,7 +38,7 @@ const LoginForm = () => {
     if (isLogged) {
       navigate("/home");
     }
-  });
+  }, [isLogged, navigate]);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -57,7 +58,7 @@ const LoginForm = () => {
     e.preventDefault();
 
     try {
-      const response = await Login({
+      await Login({
         variables: {
           email: formData.email,
           username: formData.username,
@@ -70,10 +71,10 @@ const LoginForm = () => {
   };
 
   return (
-    <div>
-      <h2>Logowanie</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
+    <div className="login-container">
+      <form onSubmit={handleSubmit} className="login-form">
+        <h2>Zaloguj Się</h2>
+        <div className="form-group">
           <label htmlFor="email">Email:</label>
           <input
             id="email"
@@ -83,7 +84,7 @@ const LoginForm = () => {
             required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="username">Nazwa Użytkownika:</label>
           <input
             id="username"
@@ -93,7 +94,7 @@ const LoginForm = () => {
             required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="password">Hasło:</label>
           <input
             type="password"
@@ -104,9 +105,11 @@ const LoginForm = () => {
             required
           />
         </div>
-        <button type="submit">Zaloguj się</button>
+        <button type="submit" className="login-button">
+          Zaloguj się
+        </button>
         {loading && <p>Logowanie...</p>}
-        {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
       </form>
     </div>
   );

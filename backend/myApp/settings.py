@@ -78,7 +78,8 @@ SESSION_COOKIE_SECURE = False
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
 ]
-SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_NAME = "admin_sessionid"
 
 DATABASES = {
     'default': {

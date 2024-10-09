@@ -22,32 +22,57 @@ $transition-duration: 0.3s;
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
 
+/* Przyciski */
 button {
-  background: $white-color; /* Usuwamy tło */
+  background: #57ca9e; /* Usuwamy tło */
   color: $highlight-color; /* Kolor tekstu zgodny z resztą menu */
-  border: none; /* Usuwamy obramowanie */
+  border: none;
   border-radius: 25px;
-  font-size: $font-size-medium;
-  padding: 6px;
+  padding: 10px 20px; /* Zwiększyłem padding dla lepszego wyglądu */
   cursor: pointer;
   position: relative;
-  transition: color $transition-duration;
-  border: solid 2px black;
+  transition: all $transition-duration ease-in-out;
+
+  &:hover {
+    background-color: #45b384;
+    color: $primary-color; /* Zmiana koloru tekstu */
+    border-color: $highlight-color; /* Obramowanie zmienia kolor na highlight */
+  }
 
   &::after {
-    content: "";
     display: block;
     width: 0%;
     height: 2px;
     background: $highlight-color;
-    transition: width $transition-duration;
+    transition: width $transition-duration ease;
+    position: absolute;
+    bottom: 0;
     left: 0;
+  }
+
+  &:hover::after {
+    width: 100%;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px lighten($primary-color, 30%);
   }
 }
 
+/* Etykiety */
 .label {
-  border: solid 2px black;
+  border: solid 2px $white-color; /* Obramowanie w kolorze przycisku */
   border-radius: 25px;
-  padding: 7px;
+  padding: 10px;
   margin: 5px;
+  display: inline-block;
+  background-color: transparent;
+  transition: all $transition-duration ease-in-out;
+
+  &:hover {
+    background-color: lighten($white-color, 20%);
+    color: $primary-color;
+    border-color: $highlight-color;
+  }
 }

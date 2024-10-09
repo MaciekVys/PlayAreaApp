@@ -39,14 +39,6 @@ const Navigation = () => {
             mojadruzyna
           </a>
           <a
-            href="/city"
-            className={`menu-item ${
-              location.pathname === "/city" ? "active" : ""
-            }`}
-          >
-            city
-          </a>
-          <a
             href="/profile"
             className={`menu-item ${
               location.pathname === "/profile" ? "active" : ""

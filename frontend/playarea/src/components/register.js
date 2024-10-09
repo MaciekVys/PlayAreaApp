@@ -1,5 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import React, { useState } from "react";
+import "../styles/register.scss"; // Import pliku CSS
 
 const REGISTER_MUTATION = gql`
   mutation register(
@@ -74,10 +75,10 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div>
-      <h2>Formularz rejestracji</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
+    <div className="registration-container">
+      <form onSubmit={handleSubmit} className="registration-form">
+        <h2>Zarejestruj Się</h2>
+        <div className="form-group">
           <label htmlFor="username">Imię:</label>
           <input
             type="text"
@@ -88,7 +89,7 @@ const RegistrationForm = () => {
             required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="email">Email:</label>
           <input
             type="email"
@@ -99,7 +100,7 @@ const RegistrationForm = () => {
             required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="password1">Hasło:</label>
           <input
             type="password"
@@ -110,7 +111,7 @@ const RegistrationForm = () => {
             required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="password2">Powtórz Hasło:</label>
           <input
             type="password"
@@ -121,11 +122,15 @@ const RegistrationForm = () => {
             required
           />
         </div>
-        <button type="submit">Zarejestruj się</button>
+        <button type="submit" className="register-button">
+          Zarejestruj się
+        </button>
 
         {loading && <p>Rejestracja trwa...</p>}
-        {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-        {positiveMessage && <p style={{ color: "green" }}>{positiveMessage}</p>}
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
+        {positiveMessage && (
+          <p className="success-message">{positiveMessage}</p>
+        )}
       </form>
     </div>
   );

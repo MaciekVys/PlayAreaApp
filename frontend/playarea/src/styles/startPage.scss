@@ -1,0 +1,101 @@
+/* Ogólna stylizacja strony startowej */
+.start-page {
+  font-family: Arial, sans-serif;
+  margin-top: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+}
+
+/* Hero section */
+.start-page .hero2 {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.start-page .hero2::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.start-page .hero-content2 {
+  position: relative;
+  background-color: #f7f7f7f7;
+  color: #000;
+  padding: 30px;
+  border-radius: 20px;
+}
+
+.start-page .hero2 h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+  color: #57ca9e;
+}
+
+.start-page .hero2 p {
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.start-page .hero-buttons2 {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.start-page .primary-button2,
+.start-page .secondary-button2 {
+  padding: 15px 30px;
+  font-size: 18px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: 2px rgb(0, 0, 0) solid;
+}
+
+.start-page .primary-button2 {
+  background-color: #57ca9e;
+  color: white;
+}
+
+.start-page .secondary-button2 {
+  background-color: transparent;
+  color: rgb(0, 0, 0);
+  border: 2px solid rgb(0, 0, 0);
+}
+
+.start-page .primary-button2:hover {
+  background-color: #45b384;
+}
+
+.start-page .secondary-button2:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+  .start-page .hero h1 {
+    font-size: 32px;
+  }
+
+  .start-page .hero p {
+    font-size: 16px;
+  }
+
+  .start-page .primary-button2,
+  .start-page .secondary-button2 {
+    padding: 12px 25px;
+    font-size: 16px;
+  }
+}
