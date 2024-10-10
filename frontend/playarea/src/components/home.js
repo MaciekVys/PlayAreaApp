@@ -20,7 +20,7 @@ const Home = () => {
               className="primary-button"
               onClick={() => navigate("/createTeam")}
             >
-              Zarejestruj drużynę
+              Załóż drużynę
             </button>
             <button className="secondary-button">Dołącz do drużyny</button>
           </div>
@@ -66,7 +66,7 @@ const Home = () => {
           className="primary-button"
           onClick={() => navigate("/createTeam")}
         >
-          Zarejestruj drużynę
+          Załóż drużynę
         </button>
       </section>
     </div>

@@ -7,8 +7,9 @@ import Navigation from "./components/navigation";
 import Home from "./components/home";
 import Team from "./components/team";
 import PlayerProfile from "./components/playerProfile";
-import StartPage from "./components/startPage";
 import CreateTeam from "./components/createTeam";
+import StartPage from "./components/startPage";
+import City from "./components/city";
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
@@ -29,6 +30,7 @@ function App() {
           <Route path="/team" element={<Team />} />
           <Route path="/profile" element={<PlayerProfile />} />
           <Route path="/createTeam" element={<CreateTeam />} />
+          <Route path="/city" element={<City />} />
         </Routes>
       </Router>
     </ApolloProvider>

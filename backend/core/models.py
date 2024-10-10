@@ -6,9 +6,14 @@ from django.utils import timezone
 class ExtendUser(AbstractUser):
 
     email = models.EmailField(blank=False, max_length=255, verbose_name='email')
-
+    city = models.ForeignKey('City', on_delete=models.SET_NULL, null=True, blank=True)
     USERNAME_FIELD = "username"
     EMAIL_FIELD = "email"
+
+
+class League(models.Model):
+    name = models.CharField(max_length=25, unique=True)
+    level = models.IntegerField(default=1)
 
 
 class City(models.Model):
@@ -16,18 +21,12 @@ class City(models.Model):
     voivodeship = models.CharField(max_length=25)
     area = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(max_length=255, blank=True, null=True)
+    league = models.ForeignKey(League, on_delete=models.CASCADE, default=1)
 
     def __str__(self):
         return f"{self.name}"
     
 
-class League(models.Model):
-    name = models.CharField(max_length=25, unique=True)
-    level = models.IntegerField(default=1)
-    city = models.ForeignKey(City, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('name', 'city')
 
 class Team(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -65,7 +64,7 @@ class Match(models.Model):
 
     home_team = models.ForeignKey(Team, related_name='home_matches', on_delete=models.CASCADE)
     away_team = models.ForeignKey(Team, related_name='away_matches', on_delete=models.CASCADE)
-    league = models.ForeignKey(League, related_name='matches', on_delete=models.CASCADE)
+    city = models.ForeignKey(City, related_name='matches', on_delete=models.CASCADE, default=1)
     match_date = models.DateField()
     score_home = models.IntegerField(default=0)
     score_away = models.IntegerField(default=0)

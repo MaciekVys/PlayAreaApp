@@ -1,0 +1,100 @@
+/* Kontener całej strony */
+.city-container {
+  padding: 20px;
+  font-family: "Arial", sans-serif;
+  background-color: #f4f4f9;
+  margin: 70px;
+  border-radius: 20px;
+  color: #333;
+}
+
+/* Informacje o mieście */
+.city-info {
+  color: #ddd;
+  margin-bottom: 40px;
+  background-color: rgb(0, 0, 0, 0.7);
+  padding: 30px;
+}
+
+.city-info h1 {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.city-info p {
+  font-size: 18px;
+  color: #777;
+}
+
+/* Sekcja meczów */
+.matches-section {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Nagłówki tabel */
+.matches-section h2 {
+  font-size: 24px;
+  margin: 20px 0;
+  text-align: left;
+  border-bottom: 2px solid #57ca9e;
+  padding-bottom: 5px;
+  color: #333;
+}
+
+/* Tabela meczów */
+.matches-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 40px;
+}
+
+.matches-table th,
+.matches-table td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.matches-table th {
+  background-color: #57ca9e;
+  color: white;
+  font-weight: bold;
+}
+
+.matches-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.matches-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.matches-table td {
+  color: #333;
+}
+
+.matches-table th,
+.matches-table td {
+  text-align: center;
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+  .city-info h1 {
+    font-size: 28px;
+  }
+
+  .matches-section {
+    padding: 0 10px;
+  }
+
+  .matches-table th,
+  .matches-table td {
+    padding: 8px 10px;
+  }
+
+  .matches-section h2 {
+    font-size: 20px;
+  }
+}

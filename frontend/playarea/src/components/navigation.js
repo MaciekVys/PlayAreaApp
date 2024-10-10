@@ -31,6 +31,14 @@ const Navigation = () => {
       ) : (
         <div className="menu">
           <a
+            href="/city"
+            className={`menu-item ${
+              location.pathname === "/city" ? "active" : ""
+            }`}
+          >
+            City
+          </a>
+          <a
             href="/team"
             className={`menu-item ${
               location.pathname === "/team" ? "active" : ""
