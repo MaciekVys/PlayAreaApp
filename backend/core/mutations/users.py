@@ -8,32 +8,68 @@ from django.contrib.auth import authenticate, logout
 from graphql_jwt.shortcuts import create_refresh_token, get_refresh_token, get_token
 from core.models import ExtendUser
 from core.types import UserType
+from graphql_auth import mutations
+
+class AuthMutation(graphene.ObjectType):
+    refresh_token = mutations.RefreshToken.Field()
 
 
 class RefreshTokenMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        try:
+            if request.COOKIES.get("JWT-Refresh-token") is None:
+                return None
+            if request.path == "/logout/":
+                return
+            schema = graphene.Schema(mutation=AuthMutation)
+            result = schema.execute(
+                '''
+                    mutation {
+                        refreshToken(refreshToken: "'''
+                + request.COOKIES.get("JWT-Refresh-token")
+                + """")
+                                {
+                                    token
+                                    refreshToken
+                                    success
+                                    errors
+                                    }
+                                }
+                            """
+            )
+            
+            if result.errors:
+                print("GraphQL errors:", result.errors)
+                return
+            
+            refresh_data = result.data.get("refreshToken")
+            if refresh_data and refresh_data.get("success"):
+                # Pobierz nowy token i refresh token
+                request.jwt_token = refresh_data.get("token")
+                request.refresh_token = refresh_data.get("refreshToken")
+                print("Nowy JWT token:", request.jwt_token)
+                print("Nowy Refresh token:", request.refresh_token)
+            else:
+                print("Błąd odświeżania tokena:", refresh_data.get("errors"))
+        except Exception as e:
+            print(e)
+
+
     def process_response(self, request, response):
-        try:   
-            content = json.loads(response.content.decode('utf-8'))
+        # Ustawienie nowych tokenów w ciasteczkach (jeśli są)
+        if hasattr(request, 'jwt_token'):
+            response.set_cookie('JWT', request.jwt_token, httponly=True, path='/')
+        if hasattr(request, 'refresh_token'):
+            response.set_cookie('JWT-Refresh-token', request.refresh_token, httponly=True, path='/')
 
-            if 'refreshToken' in content.get('data', {}).get('tokenAuth',{}):
-                refresh_token = content['data']['tokenAuth']['refreshToken']
-                response.set_cookie(
-                    'JWT-Refresh-token',
-                    refresh_token,
-                    httponly=True,
-                    secure=True,
-                    samesite='Strict'
-                )
-
-        except (json.JSONDecodeError, AttributeError):
-            pass
-
-        # Add this block to delete cookies if the flag is set
-        if getattr(request, 'delete_jwt_cookies', False):
-            response.delete_cookie('JWT-Refresh-token')
+        # Usuwanie ciasteczek po wylogowaniu
+        if hasattr(request, 'delete_jwt_cookies') and request.delete_jwt_cookies:
             response.delete_cookie('JWT')
-
+            response.delete_cookie('JWT-Refresh-token')
         return response
+    
+
+
 
 class LoginMutation(graphene.Mutation):
     # Define mutation fields
