@@ -1,0 +1,84 @@
+$primary-color: #57ca9e; // Główny kolor (zielony)
+$secondary-color: #f44336; // Drugi kolor (czerwony)
+$text-color: black; // Kolor tekstu
+$background-color: rgba(0, 0, 0, 0.55); // Ciemne tło kontenera
+$table-header-color: #f1f1f1; // Kolor nagłówka tabeli
+$table-border-color: #ccc; // Kolor granicy tabeli
+
+.check-match-container {
+  padding: 20px;
+  background-color: $background-color;
+  //   border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    color: $primary-color; // Kolor nagłówka
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    color: #57ca9e; // Kolor podnagłówków
+    font-size: 1.5rem;
+    margin: 15px 0;
+  }
+
+  p {
+    font-size: 1.1rem;
+    margin: 10px 0;
+    color: $text-color; // Kolor tekstu
+  }
+
+  .team-section {
+    background-color: white; // Białe tło dla sekcji zespołu
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 0 15px;
+    flex: 1; // Umożliwia równą przestrzeń dla zespołów
+
+    img {
+      max-width: 150px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+
+      thead {
+        background-color: $table-header-color; // Kolor nagłówka tabeli
+
+        th {
+          padding: 10px;
+          text-align: left;
+          border: 1px solid $table-border-color; // Kolor granicy nagłówka
+          font-weight: bold;
+          color: $text-color; // Kolor tekstu w nagłówku
+        }
+      }
+
+      tbody {
+        tr {
+          border: 1px solid $table-border-color; // Kolor granicy wierszy
+
+          td {
+            padding: 10px;
+            border: 1px solid $table-border-color; // Kolor granicy komórek
+            color: $text-color; // Kolor tekstu w komórkach
+          }
+
+          &:nth-child(even) {
+            background-color: #f9f9f9; // Kolor dla co drugiego wiersza
+          }
+        }
+      }
+    }
+  }
+
+  .teams-container {
+    display: flex; // Użycie flexbox do układu poziomego
+    justify-content: space-between; // Rozmieszczenie zespołów
+  }
+}

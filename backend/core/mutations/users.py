@@ -7,8 +7,14 @@ from graphql_jwt.exceptions import JSONWebTokenError
 from django.contrib.auth import authenticate, logout
 from graphql_jwt.shortcuts import create_refresh_token, get_refresh_token, get_token
 from core.models import ExtendUser
-from core.types import UserType
+from core.types import PlayerType, ExtendUserType
 from graphql_auth import mutations
+from ..models import City, Player
+from graphql import GraphQLError
+from graphql_jwt.decorators import login_required
+
+
+
 
 class AuthMutation(graphene.ObjectType):
     refresh_token = mutations.RefreshToken.Field()
@@ -78,7 +84,7 @@ class LoginMutation(graphene.Mutation):
         email = graphene.String()
         password = graphene.String(required=True)
 
-    user = graphene.Field(UserType)
+    user = graphene.Field(ExtendUserType)
     success = graphene.Boolean()
     errors = graphene.String()
     user_id = graphene.ID()  # Add this field to return user ID
@@ -149,4 +155,58 @@ class Logout(graphene.Mutation):
         request.delete_jwt_cookies = True
 
         return Logout(success=True)
+
+
+class UpdateUserProfile(graphene.Mutation):
+    class Arguments:
+        first_name = graphene.String(required=False)
+        last_name = graphene.String(required=False)
+        city_name = graphene.String(required=False)
+        position = graphene.String(required=False)
+        weight = graphene.Int(required=False)
+        height = graphene.Int(required=False)
+        number = graphene.Int(required=False)
+
+    user = graphene.Field(lambda: ExtendUserType)  # Zwracamy użytkownika
+    player = graphene.Field(lambda: PlayerType)  # Zwracamy gracza
+
+    def mutate(self, info, email=None, first_name=None, last_name=None, city_name=None,
+               position=None, weight=None, height=None, number=None):
+        user = info.context.user
+        
+        if not user.is_authenticated:
+            raise GraphQLError("Nie jesteś zalogowany!")
+
+        if first_name:
+            user.first_name = first_name
+        if last_name:
+            user.last_name = last_name
+
+        # Sprawdzanie i aktualizacja miasta
+        if city_name:
+            city = City.objects.filter(name=city_name).first()  # Sprawdza, czy miasto istnieje
+            if city is None:
+                raise GraphQLError("Miasto o podanej nazwie nie istnieje.")  # Można rzucić wyjątek, jeśli miasto nie istnieje
+            user.city = city  # Przypisanie istniejącego miasta do użytkownika
+
+        user.save()  # Zapisujemy zmiany w profilu użytkownika
+
+        # Aktualizacja danych gracza
+        try:
+            player = Player.objects.get(user=user)
+            if position:
+                player.position = position
+            if weight is not None:  # Upewniamy się, że waga jest podana
+                player.weight = weight
+            if height is not None:  # Upewniamy się, że wzrost jest podany
+                player.height = height
+            if number is not None:  # Upewniamy się, że numer jest podany
+                player.number = number
+
+            player.save()  # Zapisujemy zmiany w profilu gracza
+
+        except Player.DoesNotExist:
+            raise GraphQLError("Profil gracza nie został znaleziony.")
+
+        return UpdateUserProfile(user=user, player=player)
 

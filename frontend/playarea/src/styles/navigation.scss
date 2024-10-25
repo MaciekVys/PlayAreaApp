@@ -28,12 +28,10 @@ $transition-duration: 0.3s;
 .navigation {
   position: sticky;
   top: 0;
-  // width: 100%;
-  // z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: $primary-color; // Ciemne tło
+  background-color: $primary-color;
   padding: $padding-vertical $padding-horizontal;
 
   /* Styl dla logo */
@@ -64,13 +62,18 @@ $transition-duration: 0.3s;
       transition: color $transition-duration;
       margin-top: 10px;
 
+      a {
+        text-decoration: none;
+        color: #ffffff;
+      }
+
       /* Efekt hover dla menu */
       &::after {
         content: "";
         display: block;
         width: 0%;
         height: 2px;
-        background: $highlight-color; // Kolor podkreślenia
+        background: $highlight-color;
         transition: width $transition-duration;
         position: absolute;
         bottom: -5px;
@@ -87,7 +90,6 @@ $transition-duration: 0.3s;
 
       &.active {
         color: $highlight-color;
-        content: "";
 
         &::after {
           width: 100%;
@@ -95,28 +97,77 @@ $transition-duration: 0.3s;
       }
     }
 
-    button {
-      background: $white-color; /* Usuwamy tło */
-      font-weight: bold;
-      color: black; /* Kolor tekstu zgodny z resztą menu */
-      border: none; /* Usuwamy obramowanie */
-      border-radius: 25px;
-      font-size: $font-size-medium;
-      padding: 10px;
-      cursor: pointer;
+    /* Styl dla rozwijanego menu */
+    .profile {
       position: relative;
-      transition: color $transition-duration;
+      cursor: pointer;
 
-      &::after {
-        content: "";
-        display: block;
-        width: 0%;
-        height: 2px;
-        background: $highlight-color;
-        transition: width $transition-duration;
+      .dropdown-menu {
+        display: none; // Domyślnie ukryte
         position: absolute;
-        bottom: -5px;
-        left: 0;
+        top: 40px;
+        right: 0;
+        background-color: $primary-color;
+        border: 1px solid $highlight-color;
+        border-radius: 8px;
+        padding: 10px;
+        list-style: none;
+        min-width: 150px;
+        z-index: 100;
+
+        /* Dodajemy strzałkę przed menu */
+        &::before {
+          content: "";
+          position: absolute;
+          top: -10px; // Pozycjonowanie strzałki nad menu
+          right: 10px; // Dopasuj, aby strzałka znajdowała się blisko elementu menu
+          border-width: 0 10px 10px 10px; // Kształt trójkąta
+          border-style: solid;
+          border-color: transparent transparent $highlight-color transparent; // Kolor strzałki taki jak tło menu
+          z-index: 1;
+        }
+
+        li {
+          padding: 10px 20px;
+          cursor: pointer;
+          border-bottom: 1px solid $highlight-color;
+          transition: color $transition-duration;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          a {
+            color: $white-color;
+            text-decoration: none;
+            transition: color $transition-duration;
+
+            &:hover,
+            &:focus,
+            &:active {
+              color: $highlight-color;
+            }
+          }
+
+          button {
+            background: none;
+            color: $white-color;
+            border: none;
+            font-size: $font-size-medium;
+            cursor: pointer;
+            text-align: left;
+            padding: 0;
+            transition: color $transition-duration;
+
+            &:hover {
+              color: $highlight-color;
+            }
+          }
+        }
+      }
+
+      &.open .dropdown-menu {
+        display: block;
       }
     }
   }

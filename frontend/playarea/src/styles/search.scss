@@ -30,7 +30,6 @@ button {
   border-radius: 25px;
   padding: 10px 20px; /* Zwiększyłem padding dla lepszego wyglądu */
   cursor: pointer;
-  position: relative;
   transition: all $transition-duration ease-in-out;
 
   &:hover {

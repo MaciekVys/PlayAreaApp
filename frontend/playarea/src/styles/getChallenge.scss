@@ -1,0 +1,85 @@
+/* Kontener dla formularza wyzwania drużyny */
+.challenge-team-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  margin-top: 20px;
+
+  h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 2px #000000 solid;
+  }
+}
+
+.challenge-form {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #333;
+}
+
+.form-group select,
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: #f9f9f9;
+  transition: border 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #57ca9e;
+  outline: none;
+}
+
+/* Styl dla przycisku wysyłania formularza */
+.challenge-button {
+  width: 100%;
+  padding: 10px 15px;
+  background-color: #57ca9e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.challenge-button:hover {
+  background-color: #45b384;
+}
+
+/* Styl dla wiadomości o błędzie */
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
+
+/* Media query dla mniejszych ekranów */
+@media (max-width: 600px) {
+  .challenge-form {
+    width: 90%;
+  }
+}

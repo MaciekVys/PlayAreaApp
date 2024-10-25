@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import React, { useState } from "react";
 import "../styles/createTeam.scss";
+import { useNavigate } from "react-router-dom";
 
 const ALL_CITIES = gql`
   query MyQuery {
@@ -24,7 +25,21 @@ const CREATE_TEAM = gql`
 `;
 
 const CreateTeam = () => {
-  const [createTeam] = useMutation(CREATE_TEAM);
+  const [errorMessage, setErrorMessage] = useState();
+  const navigate = useNavigate();
+  const [createTeam, refetch] = useMutation(CREATE_TEAM, {
+    onCompleted: (data) => {
+      if (data.createTeam.success) {
+        navigate("/team");
+      } else if (data.createTeam.errors) {
+        setErrorMessage(data.createTeam.errors);
+      }
+      refetch();
+    },
+    onError: (data) => {
+      setErrorMessage("An error occurred while creating the team.");
+    },
+  });
   const { data } = useQuery(ALL_CITIES);
   const [cityName, setCityName] = useState("");
   const [teamName, setTeamName] = useState("");
@@ -75,6 +90,7 @@ const CreateTeam = () => {
           <button className="submit-button" type="submit">
             Zarejestruj Drużynę
           </button>
+          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
         </form>
       </div>
     </div>

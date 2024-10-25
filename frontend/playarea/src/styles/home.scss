@@ -157,3 +157,51 @@
     width: 100%;
   }
 }
+/* Kontener dla sekcji rankingu miast */
+.cta-section.city-container {
+  background-color: #f4f4f9;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 20px;
+}
+
+/* Tytuł sekcji rankingowej */
+.cta-section h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Tabela z rankingiem miast */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.table th {
+  background-color: #57ca9e;
+  color: black;
+}
+
+.table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+  color: #333;
+}
+
+.table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.table tr:hover {
+  background-color: #f1f1f1;
+  font-weight: bolder;
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+  .cta-section h2 {
+    font-size: 20px;
+  }
+}

@@ -90,7 +90,7 @@
 .players-table th,
 .matches-table th {
   background-color: #57ca9e;
-  color: white;
+  color: black;
   font-weight: bold;
 }
 
@@ -140,5 +140,54 @@
   .tabs button {
     width: 100%;
     max-width: 300px;
+  }
+}
+.no-team-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 40%;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: rgb(0, 0, 0, 0.7);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+
+  // h1 {
+  //   font-size: 2rem;
+  //   color: #ffffff;
+  //   margin-bottom: 20px;
+  // }
+
+  .primary-button,
+  .secondary-button {
+    padding: 15px 30px;
+    margin: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .primary-button {
+    background-color: #57ca9e;
+    color: white;
+  }
+
+  .secondary-button {
+    background-color: #ffffff;
+    color: #57ca9e;
+    border: 2px solid #57ca9e;
+  }
+
+  .primary-button:hover {
+    background-color: #45b384;
+  }
+
+  .secondary-button:hover {
+    background-color: #f0f0f0;
   }
 }

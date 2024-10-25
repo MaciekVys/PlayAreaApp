@@ -1,18 +1,30 @@
-import React from "react";
+// Search.js
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/search.scss";
 
 const Search = () => {
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    navigate(`/search/${search}`);
+  };
+
   return (
-    <div>
+    <form className="Search" onSubmit={handleSubmit}>
       <input
-        className="label"
+        name="q"
         type="text"
-        id="search"
-        name="search"
-        placeholder="Gracz, drużyna, miasto"
+        className="label"
+        placeholder="miasto, gracz, drużyna..."
+        onChange={(e) => setSearch(e.target.value)}
       />
-      <button className="button">Szukaj</button>
-    </div>
+      <button className="button" disabled={search === ""}>
+        Szukaj
+      </button>
+    </form>
   );
 };
 export default Search;

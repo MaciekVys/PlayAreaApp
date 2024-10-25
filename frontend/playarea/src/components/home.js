@@ -1,9 +1,38 @@
 import React from "react";
+import { useQuery } from "@apollo/client";
+import gql from "graphql-tag";
 import "../styles/home.scss"; // Import pliku CSS do stylizacji
 import { useNavigate } from "react-router-dom";
 
+const ALL_CITIES = gql`
+  query MeQuery {
+    allCities {
+      image
+      name
+      id
+      league {
+        name
+        level
+      }
+    }
+  }
+`;
+
 const Home = () => {
   const navigate = useNavigate();
+  const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
+
+  const {
+    data: citiesData,
+    loading: citiesLoading,
+    error: citiesError,
+  } = useQuery(ALL_CITIES);
+
+  if (citiesLoading) return <p>Ładowanie danych...</p>;
+  if (citiesError)
+    return <p>Błąd podczas ładowania miast: {citiesError.message}</p>;
+
+  const rankCities = citiesData.allCities;
 
   return (
     <div className="home-container">
@@ -56,18 +85,57 @@ const Home = () => {
       </section>
 
       {/* Sekcja z rejestracją */}
-      <section className="cta-section">
-        <h2>Dołącz do największej społeczności piłkarskiej na orlikach!</h2>
-        <p>
-          Zgłoś swoją drużynę lub dołącz do istniejącej i zacznij grać już
-          teraz. Na co czekasz?
-        </p>
-        <button
-          className="primary-button"
-          onClick={() => navigate("/createTeam")}
-        >
-          Załóż drużynę
-        </button>
+      <section className="cta-section city-container">
+        <div>
+          <h2>Ranking miast</h2>
+          <table className="table">
+            <thead>
+              <tr>
+                <th></th>
+                <th
+                  style={{
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  Nazwa miasta
+                </th>
+                <th>Liga</th>
+              </tr>
+            </thead>
+            <tbody>
+              {citiesData?.allCities?.map((city, index) => (
+                <tr key={index}>
+                  <td style={{ maxWidth: "30px" }}>
+                    {city.image && (
+                      <img
+                        src={`${MEDIA_URL}${city.image}`}
+                        alt={`${city.image} logo`}
+                        style={{
+                          width: "50px",
+                          height: "auto",
+                          float: "left",
+                        }}
+                      />
+                    )}
+                  </td>
+                  <td
+                    style={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                    onClick={() => navigate(`/city/${city.name}`)}
+                  >
+                    {city.name}
+                  </td>
+                  <td>{city.league?.name || "Brak ligi"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   );

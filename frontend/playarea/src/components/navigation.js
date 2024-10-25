@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import "../styles/navigation.scss";
 import { Logout } from "./logout";
@@ -10,6 +10,12 @@ const Navigation = () => {
   const username = localStorage.getItem("username");
   const { logout } = Logout();
   const location = useLocation();
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setDropdownOpen((prevState) => !prevState);
+  };
 
   return (
     <nav className="navigation">
@@ -46,15 +52,30 @@ const Navigation = () => {
           >
             mojadruzyna
           </a>
-          <a
-            href="/profile"
-            className={`menu-item ${
-              location.pathname === "/profile" ? "active" : ""
-            }`}
+          <div
+            className={`menu-item profile ${dropdownOpen ? "open" : ""}`}
+            onClick={toggleDropdown} // Wywołanie funkcji przy kliknięciu
           >
             {username}
-          </a>
-          <button onClick={logout}>Wyloguj</button>
+            <ul className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}>
+              <li>
+                <a href="/profile">profil gracza</a>
+              </li>
+              <li>
+                <a href="/getChallenge">wyzwij mecz</a>
+              </li>
+
+              <li>
+                <a href="/notification">Powiadomienia</a>
+              </li>
+              <li>
+                <a href="/settings">ustawienia</a>
+              </li>
+              <li>
+                <button onClick={logout}>Wyloguj</button>
+              </li>
+            </ul>
+          </div>
         </div>
       )}
     </nav>

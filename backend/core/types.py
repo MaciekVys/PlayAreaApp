@@ -1,23 +1,43 @@
 import graphene
-from .models import City, Team, Player, ExtendUser, League, Match
+from .models import City, MatchResult, Notification, PlayerStatistics, Ranking, Team, Player, ExtendUser, League, Match
 from graphene_django import DjangoObjectType
+from graphene import Node
+
+class CustomNode(Node):
+    @classmethod
+    def get_node(cls, info, id):
+        return cls._meta.model.objects.get(pk=id)
 
 
-class UserType(DjangoObjectType):
+class ExtendUserType(DjangoObjectType):
+
+    id = graphene.ID(required=True)
+
     class Meta:
         model = ExtendUser
+        interfaces = (CustomNode,) 
+
         fields = "__all__"
 
+    def resolve_id(self, info):
+        return self.pk 
+    
 
 class CityType(DjangoObjectType):
     class Meta:
         model = City
+        interfaces = (CustomNode,) 
+
         fields = "__all__"
 
     teams_count = graphene.Int()
+    id = graphene.ID(required=True)
 
     def resolve_teams_count(self, info):
         return self.teams_in_city.count()
+    
+    def resolve_id(self, info):
+        return self.pk 
 
 
 class LeagueType(DjangoObjectType):
@@ -39,7 +59,7 @@ class PlayerType(DjangoObjectType):
         model = Player
         fields = "__all__"
 
-    user = graphene.Field(UserType)
+    user = graphene.Field(ExtendUserType)
 
     def resolve_uder(self, info):
         return self.user
@@ -49,6 +69,7 @@ class PlayerType(DjangoObjectType):
 class TeamType(DjangoObjectType):
     class Meta:
         model = Team
+        interfaces = (CustomNode,) 
         fields = "__all__"
 
     name = graphene.String()
@@ -56,9 +77,11 @@ class TeamType(DjangoObjectType):
     matches_count = graphene.Int()
     city = graphene.Field(CityType)
     league = graphene.Field(LeagueType)
-    captain = graphene.Field(UserType)
+    captain = graphene.Field(ExtendUserType)
     players = graphene.List(PlayerType)
-    matches = graphene.List(lambda: MatchType)  # Użycie lambda
+    matches = graphene.List(lambda: MatchType)
+    id = graphene.ID(required=True)
+
 
     def resolve_players_count(self, info):
         return self.players.count()
@@ -83,6 +106,10 @@ class TeamType(DjangoObjectType):
         away_matches = self.away_matches.all()
         all_matches = home_matches | away_matches
         return all_matches.order_by('match_date')
+    
+    def resolve_id(self, info):
+        return self.pk 
+
 
 
 class MatchType(DjangoObjectType):
@@ -111,3 +138,67 @@ class MatchType(DjangoObjectType):
             return self.away_team.name
         else:
             return "draw"
+
+
+class RankingType(DjangoObjectType):
+    class Meta:
+        model = Ranking
+        fields = (
+            'id',
+            'league',
+            'team',
+            'points',
+            'match_played',
+            'wins',
+            'draws',
+            'losses',
+            'goals_for',
+            'goals_against',
+        )
+
+
+class NotificationType(DjangoObjectType):
+    class Meta:
+        model = Notification
+
+    id = graphene.Int()
+    isRead = graphene.Boolean()
+    recipient = graphene.Field(ExtendUserType) 
+    message = graphene.String()
+    createdAt = graphene.DateTime()
+    statusMessage = graphene.String()
+    isResponded = graphene.Boolean() 
+
+    def resolve_statusMessage(self, info):
+        if self.match:
+            if self.match.status == 'scheduled':
+                return "Mecz zaplanowany."
+            elif self.match.status == 'canceled':
+                return "Mecz został odwołany."
+            else:
+                return None  # Inne statusy meczu, jeśli nie są obsługiwane
+        return None  # Powiadomienia, które nie dotyczą meczu   
+
+    def resolve_isResponded(self, info):
+        if self.match:  # Jeśli powiadomienie dotyczy meczu
+            return self.match.is_responded  # Zwracamy, czy odpowiedziano na mecz
+        return False  # Powiadomienia, które nie dotyczą meczu
+    
+    
+class MatchResultType(DjangoObjectType):
+    class Meta:
+        model = MatchResult
+
+class PlayerStatisticsType(DjangoObjectType):
+    class Meta:
+        model = PlayerStatistics
+        fields = "__all__"
+
+
+class PlayerStatisticsSummaryType(graphene.ObjectType):
+    user = graphene.Field(ExtendUserType)  # Typ użytkownika, jeśli masz go zdefiniowanego
+    id = graphene.ID()
+    position = graphene.String()  # Upewnij się, że masz pole `position` w modelu Player
+    total_goals = graphene.Int()
+    total_assists = graphene.Int()
+    total_mvps = graphene.Int()

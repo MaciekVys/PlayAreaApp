@@ -53,6 +53,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'myApp.urls'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -78,6 +82,10 @@ SESSION_COOKIE_SECURE = False
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
 ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
 SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_NAME = "admin_sessionid"
 
