@@ -7,9 +7,9 @@ from graphql_jwt.exceptions import JSONWebTokenError
 from django.contrib.auth import authenticate, logout
 from graphql_jwt.shortcuts import create_refresh_token, get_refresh_token, get_token
 from core.models import ExtendUser
-from core.types import PlayerType, ExtendUserType
+from core.types import  ExtendUserType
 from graphql_auth import mutations
-from ..models import City, Player
+from ..models import City
 from graphql import GraphQLError
 from graphql_jwt.decorators import login_required
 
@@ -162,15 +162,14 @@ class UpdateUserProfile(graphene.Mutation):
         first_name = graphene.String(required=False)
         last_name = graphene.String(required=False)
         city_name = graphene.String(required=False)
-        position = graphene.String(required=False)
-        weight = graphene.Int(required=False)
-        height = graphene.Int(required=False)
-        number = graphene.Int(required=False)
+        position = graphene.String(required=False)  # Jeśli model gracza nie istnieje, to można to pominąć
+        weight = graphene.Int(required=False)  # Jeśli model gracza nie istnieje, to można to pominąć
+        height = graphene.Int(required=False)  # Jeśli model gracza nie istnieje, to można to pominąć
+        number = graphene.Int(required=False)  # Jeśli model gracza nie istnieje, to można to pominąć
 
-    user = graphene.Field(lambda: ExtendUserType)  # Zwracamy użytkownika
-    player = graphene.Field(lambda: PlayerType)  # Zwracamy gracza
+    user = graphene.Field(ExtendUserType)  # Zwracamy użytkownika
 
-    def mutate(self, info, email=None, first_name=None, last_name=None, city_name=None,
+    def mutate(self, info, first_name=None, last_name=None, city_name=None,
                position=None, weight=None, height=None, number=None):
         user = info.context.user
         
@@ -191,22 +190,7 @@ class UpdateUserProfile(graphene.Mutation):
 
         user.save()  # Zapisujemy zmiany w profilu użytkownika
 
-        # Aktualizacja danych gracza
-        try:
-            player = Player.objects.get(user=user)
-            if position:
-                player.position = position
-            if weight is not None:  # Upewniamy się, że waga jest podana
-                player.weight = weight
-            if height is not None:  # Upewniamy się, że wzrost jest podany
-                player.height = height
-            if number is not None:  # Upewniamy się, że numer jest podany
-                player.number = number
+        # Jeśli chcesz zaktualizować inne informacje o graczu, ale nie masz modelu `Player`, pomiń te operacje
+        # Jeśli model gracza byłby w przyszłości, można by je uwzględnić tutaj.
 
-            player.save()  # Zapisujemy zmiany w profilu gracza
-
-        except Player.DoesNotExist:
-            raise GraphQLError("Profil gracza nie został znaleziony.")
-
-        return UpdateUserProfile(user=user, player=player)
-
+        return UpdateUserProfile(user=user)  # Zwracamy zaktualizowanego użytkownika

@@ -1,5 +1,5 @@
 import graphene
-from .models import City, MatchResult, Notification, PlayerStatistics, Ranking, Team, Player, ExtendUser, League, Match
+from .models import City, MatchResult, Notification, PlayerStatistics, Ranking, Team, ExtendUser, League, Match
 from graphene_django import DjangoObjectType
 from graphene import Node
 
@@ -10,7 +10,8 @@ class CustomNode(Node):
 
 
 class ExtendUserType(DjangoObjectType):
-
+    username = graphene.String()
+    position = graphene.String()
     id = graphene.ID(required=True)
 
     class Meta:
@@ -54,22 +55,11 @@ class LeagueType(DjangoObjectType):
         return self.matches.count()
     
 
-class PlayerType(DjangoObjectType):
-    class Meta:
-        model = Player
-        fields = "__all__"
-
-    user = graphene.Field(ExtendUserType)
-
-    def resolve_uder(self, info):
-        return self.user
-
-
         
 class TeamType(DjangoObjectType):
     class Meta:
         model = Team
-        interfaces = (CustomNode,) 
+        interfaces = (CustomNode,)
         fields = "__all__"
 
     name = graphene.String()
@@ -78,16 +68,18 @@ class TeamType(DjangoObjectType):
     city = graphene.Field(CityType)
     league = graphene.Field(LeagueType)
     captain = graphene.Field(ExtendUserType)
-    players = graphene.List(PlayerType)
     matches = graphene.List(lambda: MatchType)
     id = graphene.ID(required=True)
-
+    players = graphene.List(ExtendUserType)
 
     def resolve_players_count(self, info):
-        return self.players.count()
+        return self.players_in_team.count()
+
+    def resolve_players(self, info):
+        return self.players_in_team.all()
 
     def resolve_matches_count(self, info):
-        return self.home_matches.count() + self.away_matches.count()
+        return self.home_matches.count() + self.away_matches.count()  # Liczba meczów
 
     def resolve_city(self, info):
         return self.city
@@ -98,17 +90,14 @@ class TeamType(DjangoObjectType):
     def resolve_captain(self, info):
         return self.captain
 
-    def resolve_players(self, info):
-        return self.players.all()
-
     def resolve_matches(self, info):
         home_matches = self.home_matches.all()
         away_matches = self.away_matches.all()
         all_matches = home_matches | away_matches
         return all_matches.order_by('match_date')
-    
+
     def resolve_id(self, info):
-        return self.pk 
+        return self.pk
 
 
 
@@ -170,24 +159,33 @@ class NotificationType(DjangoObjectType):
     isResponded = graphene.Boolean() 
 
     def resolve_statusMessage(self, info):
+        if self.notification_type == 'join_request':
+            if self.is_responded:
+                return "Zaakceptowano prośbę!"
+            else:
+                return "Odrzucono prośbę!"
+        
         if self.match:
             if self.match.status == 'scheduled':
                 return "Mecz zaplanowany."
             elif self.match.status == 'canceled':
                 return "Mecz został odwołany."
             else:
-                return None  # Inne statusy meczu, jeśli nie są obsługiwane
-        return None  # Powiadomienia, które nie dotyczą meczu   
+                return None  
+        return None  
 
     def resolve_isResponded(self, info):
-        if self.match:  # Jeśli powiadomienie dotyczy meczu
-            return self.match.is_responded  # Zwracamy, czy odpowiedziano na mecz
-        return False  # Powiadomienia, które nie dotyczą meczu
+        if self.match:  
+            return self.match.is_responded  
+        elif self.notification_type == 'join_request':
+            return self.is_responded  
+        return False 
     
     
 class MatchResultType(DjangoObjectType):
     class Meta:
         model = MatchResult
+
 
 class PlayerStatisticsType(DjangoObjectType):
     class Meta:

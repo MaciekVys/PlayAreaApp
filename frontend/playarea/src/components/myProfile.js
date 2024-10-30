@@ -3,36 +3,43 @@ import gql from "graphql-tag";
 import React from "react";
 import "../styles/playerProfile.scss";
 
-const PLAYER_PROFILE = gql`
-  query profile {
-    playerProfile {
-      user {
-        username
-        firstName
-        lastName
-        city {
-          name
-        }
-      }
-      team {
-        logo
-        name
-        league {
-          name
-        }
-      }
+const USER_PROFILE = gql`
+  query userProfile {
+    userProfile {
+      username
+      firstName
+      lastName
       id
-      position
+      email
       weight
       height
       number
+      photo
+      city {
+        name
+      }
+      team {
+        name
+        captain {
+          username
+        }
+        league {
+          name
+        }
+        logo
+      }
+      playerstatisticsSet {
+        goals
+        assists
+        isMvp
+      }
     }
   }
 `;
 
 const PLAYER_STATISTICS_SUMMARY_QUERY = gql`
-  query playerStatisticsSummary($playerId: ID!) {
-    playerStatisticsSummary(playerId: $playerId) {
+  query playerStatisticsSummary($userId: ID!) {
+    playerStatisticsSummary(userId: $userId) {
       totalMvps
       totalGoals
       totalAssists
@@ -45,59 +52,65 @@ const PlayerProfile = () => {
     data: profileData,
     loading: loadingProfile,
     error: errorProfile,
-  } = useQuery(PLAYER_PROFILE);
+  } = useQuery(USER_PROFILE);
   const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
 
-  const playerId = profileData?.playerProfile?.id;
+  const userId = profileData?.userProfile?.id;
+  console.log("User ID:", userId);
 
   const {
     data: summaryData,
     loading: loadingSummary,
     error: errorSummary,
   } = useQuery(PLAYER_STATISTICS_SUMMARY_QUERY, {
-    skip: !playerId,
-    variables: { playerId },
+    skip: !userId,
+    variables: { userId: userId },
   });
 
   if (loadingProfile || loadingSummary) return <div>Loading...</div>;
   if (errorProfile || errorSummary)
-    return <p>Błąd: {errorProfile.message || errorSummary.message}</p>;
+    return <p>Error: {errorProfile?.message || errorSummary?.message}</p>;
 
-  const player = profileData.playerProfile;
+  const user = profileData?.userProfile;
   const statistics = summaryData?.playerStatisticsSummary;
 
   return (
     <>
       <div className="container-player">
-        {player ? (
+        {user ? (
           <>
             <div className="user">
               <h1>
-                {player.user.firstName} {player.user.lastName}
-                <br />"{player.user.username}"
+                {user.firstName} {user.lastName}
+                <br />"{user.username}"
               </h1>
-              <img />
+              {user.photo && (
+                <img src={`${MEDIA_URL}${user.photo}`} alt="Player" />
+              )}
             </div>
             <div className="stats">
-              <p>Drużyna: {player.team.name}</p>
-              <p>Miasto: {player.user.city.name}</p>
-              <p>Pozycja: {player.position}</p>
-              <p>Numer: {player.number}</p>
-              <p>Waga: {player.weight} kg</p>
-              <p>Wzrost: {player.height} cm</p>
+              <p>Drużyna: {user.team?.name || "Brak drużyny"}</p>
+              <p>Miasto: {user.city?.name || "Brak miasta"}</p>
+              <p>
+                Pozycja:{" "}
+                {user.playerstatisticsSet[0]?.position || "Brak pozycji"}
+              </p>
+              <p>Numer: {user.number || "Brak numeru"}</p>
+              <p>Waga: {user.weight ? `${user.weight} kg` : "Brak danych"}</p>
+              <p>Wzrost: {user.height ? `${user.height} cm` : "Brak danych"}</p>
             </div>
             <div className="user">
-              <h1>{player.team.name}</h1>
-              {player.team.logo && (
+              <h1>{user.team?.name || "Brak drużyny"}</h1>
+              {user.team?.logo && (
                 <img
-                  src={`${MEDIA_URL}${player.team.logo}`}
-                  alt={`${player.team.name} logo`}
+                  src={`${MEDIA_URL}${user.team.logo}`}
+                  alt={`${user.team.name} logo`}
                 />
               )}
             </div>
           </>
         ) : (
-          <div className="alert">Brak danych o profilu gracza</div>
+          <div className="alert">Brak danych o profilu użytkownika</div>
         )}
       </div>
       <div>
@@ -113,10 +126,8 @@ const PlayerProfile = () => {
           </thead>
           <tbody>
             <tr>
-              <td>{player.team.name}</td>
-              <td>
-                {player.team.league ? player.team.league.name : "Brak ligi"}
-              </td>
+              <td>{user.team?.name || "Brak drużyny"}</td>
+              <td>{user.team?.league?.name || "Brak ligi"}</td>
               <td>{statistics?.totalGoals || 0}</td>
               <td>{statistics?.totalAssists || 0}</td>
               <td>{statistics?.totalMvps || 0}</td>

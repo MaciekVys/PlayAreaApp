@@ -1,7 +1,7 @@
 from django.db import IntegrityError
 import graphene # type: ignore
 from ..types import TeamType
-from ..models import City, League, Ranking, Team, Player
+from ..models import City, League, Ranking, Team
 from graphql_jwt.decorators import login_required # type: ignore
 from core.models import Match, Team
 from core.services import send_match_invite
@@ -52,10 +52,6 @@ class CreateTeam(graphene.Mutation):
         )
         ranking.save()  # Zapisujemy rekord w tabeli rankingowej
 
-        # Create the player and associate it with the team
-        player = Player(user=user, team=team)
-        player.save()
-
         return CreateTeam(success=True, team=team, errors=None)
 
 
@@ -85,6 +81,7 @@ class UpdateTeam(graphene.Mutation):
         
         if name:
             team.name = name
+
 
 class ChallengeTeamToMatch(graphene.Mutation):
     class Arguments:
@@ -137,33 +134,39 @@ class ChallengeTeamToMatch(graphene.Mutation):
         except Exception as e:
             return ChallengeTeamToMatch(success=False, message=str(e))
 
+class LeaveTeam(graphene.Mutation):
+    class Arguments:
+        team_id = graphene.ID(required=True)
 
+    success = graphene.Boolean()
+    message = graphene.String()
 
-# class AddTeamToLeagueMutation(graphene.Mutation):
-#     class Arguments:
-#         team_id = graphene.Int()
-#         league_id = graphene.Int()
+    def mutate(self, info, team_id):
+        user = info.context.user
 
-#     status = graphene.String()
+        # Sprawdź, czy użytkownik jest zalogowany
+        if not user.is_authenticated:
+            return LeaveTeam(success=False, message="Musisz być zalogowany, aby opuścić drużynę.")
 
-#     def mutate(self, info, team_id, league_id):
-#         team = Team.objects.get(id=team_id)
-#         league = League.objects.get(id=league_id)
+        # Sprawdź, czy drużyna istnieje
+        try:
+            team = Team.objects.get(pk=team_id)
+        except Team.DoesNotExist:
+            return LeaveTeam(success=False, message="Drużyna nie istnieje.")
+
+        # Sprawdź, czy użytkownik jest członkiem drużyny
+        if not team.players_in_team.filter(pk=user.pk).exists():
+            return LeaveTeam(success=False, message="Użytkownik nie jest członkiem tej drużyny.")
         
-#         result = add_team_to_league(team, league)
-        
-#         return AddTeamToLeagueMutation(status=result)
-    
-# class JoinTeamMutation(graphene.Mutation):
-#     class Arguments:
-#         team_id = graphene.Int()
+        # Sprawdź, czy użytkownik jest kapitanem
+        if user == team.captain:
+            # Wybierz nowego kapitana, jeśli jest to możliwe
+            new_captain = team.players_in_team.exclude(pk=user.pk).first()  # Wybierz pierwszego gracza, który nie jest kapitanem
+            if new_captain:
+                team.captain = new_captain
+                team.save()
 
-#     status = graphene.String()
+        # Usuń użytkownika z drużyny
+        team.players_in_team.remove(user)
 
-#     def mutate(self, info, team_id):
-#         user = info.context.user
-#         team = Team.objects.get(id=team_id)
-        
-#         result = join_team(user, team)
-        
-#         return JoinTeamMutation(status=result)
+        return LeaveTeam(success=True, message="Użytkownik został usunięty z drużyny.")

@@ -6,32 +6,40 @@ import { useParams } from "react-router-dom";
 const PLAYER_BY_ID = gql`
   query PlayerProfile($userId: ID!) {
     playerById(userId: $userId) {
-      user {
-        username
-        firstName
-        lastName
-        city {
-          name
-        }
-      }
+      username
+      firstName
+      lastName
       id
-      team {
-        logo
+      email
+      weight
+      height
+      number
+      photo
+      city {
         name
+      }
+      team {
+        name
+        captain {
+          username
+        }
         league {
           name
         }
+        logo
       }
-      position
-      weight
-      height
+      playerstatisticsSet {
+        goals
+        assists
+        isMvp
+      }
     }
   }
 `;
 
 const PLAYER_STATISTICS_SUMMARY_QUERY = gql`
-  query playerStatisticsSummary($playerId: ID!) {
-    playerStatisticsSummary(playerId: $playerId) {
+  query playerStatisticsSummary($userId: ID!) {
+    playerStatisticsSummary(userId: $userId) {
       totalMvps
       totalGoals
       totalAssists
@@ -46,19 +54,18 @@ const UserProfile = () => {
   });
 
   const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
-  const playerId = data?.playerById?.id;
-  console.log(playerId);
 
   const {
     data: summaryData,
     loading: loadingSummary,
     error: errorSummary,
   } = useQuery(PLAYER_STATISTICS_SUMMARY_QUERY, {
-    variables: { playerId },
+    variables: { userId: id },
   });
 
   if (loading || loadingSummary) return <p>Ładowanie danych...</p>;
-  if (error || errorSummary) return <p>Błąd: {error.message}</p>;
+  if (error || errorSummary)
+    return <p>Błąd: {error?.message || errorSummary?.message}</p>;
 
   const statistics = summaryData?.playerStatisticsSummary;
   const player = data?.playerById;
@@ -70,28 +77,35 @@ const UserProfile = () => {
           <>
             <div className="user">
               <h1>
-                {player.user.firstName} {player.user.lastName}
-                <br />"{player.user.username}"
+                {player.firstName} {player.lastName}
+                <br />"{player.username}"
               </h1>
-              <img />
+              {player.photo && (
+                <img
+                  src={`${MEDIA_URL}${player.photo}`}
+                  alt={`${player.username} photo`}
+                  className="player-photo"
+                />
+              )}
             </div>
             <div className="stats">
-              <p>Drużyna: {player.team.name}</p>
-              <p>
-                Miasto:{" "}
-                {player.user.city ? player.user.city.name : "Nie podano"}
-              </p>
-              <p>Pozycja: {player.position}</p>
+              <p>Drużyna: {player.team?.name || "Brak drużyny"}</p>
+              <p>Miasto: {player.city?.name || "Nie podano"}</p>
               <p>Numer: {player.number || "Brak numeru"}</p>
-              <p>Waga: {player.weight} kg</p>
-              <p>Wzrost: {player.height} cm</p>
+              <p>
+                Waga: {player.weight ? `${player.weight} kg` : "Brak danych"}
+              </p>
+              <p>
+                Wzrost: {player.height ? `${player.height} cm` : "Brak danych"}
+              </p>
             </div>
             <div className="user">
-              <h1>{player.team.name}</h1>
-              {player.team.logo && (
+              <h1>{player.team?.name}</h1>
+              {player.team?.logo && (
                 <img
                   src={`${MEDIA_URL}${player.team.logo}`}
                   alt={`${player.team.name} logo`}
+                  className="team-logo"
                 />
               )}
             </div>
@@ -113,10 +127,8 @@ const UserProfile = () => {
           </thead>
           <tbody>
             <tr>
-              <td>{player.team.name}</td>
-              <td>
-                {player.team.league ? player.team.league.name : "Brak ligi"}
-              </td>
+              <td>{player.team?.name || "Brak drużyny"}</td>
+              <td>{player.team?.league?.name || "Brak ligi"}</td>
               <td>{statistics?.totalGoals || 0}</td>
               <td>{statistics?.totalAssists || 0}</td>
               <td>{statistics?.totalMvps || 0}</td>
@@ -127,4 +139,5 @@ const UserProfile = () => {
     </>
   );
 };
+
 export default UserProfile;

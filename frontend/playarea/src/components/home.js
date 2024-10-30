@@ -51,7 +51,12 @@ const Home = () => {
             >
               Załóż drużynę
             </button>
-            <button className="secondary-button">Dołącz do drużyny</button>
+            <button
+              className="secondary-button"
+              onClick={() => navigate("/search")}
+            >
+              Dołącz do drużyny
+            </button>
           </div>
         </div>
       </section>

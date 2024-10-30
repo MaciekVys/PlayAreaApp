@@ -4,10 +4,18 @@ from django.utils import timezone
 
 
 class ExtendUser(AbstractUser):
-
     email = models.EmailField(blank=False, max_length=255, verbose_name='email')
     city = models.ForeignKey('City', on_delete=models.SET_NULL, null=True, blank=True)
-    player = models.OneToOneField('Player', on_delete=models.CASCADE, null=True, blank=True, related_name='extend_user')
+    team = models.ForeignKey('Team', on_delete=models.CASCADE, related_name="players_in_team", null=True, blank=True)
+    position = models.CharField(max_length=50, blank=True, null=True)
+    weight = models.IntegerField(default=0)
+    height = models.IntegerField(default=0)
+    number = models.IntegerField(default=0)
+    photo = models.ImageField(upload_to='users/', null=True, blank=True)
+    is_member = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.team.name}"
 
     USERNAME_FIELD = "username"
     EMAIL_FIELD = "email"
@@ -34,31 +42,18 @@ class City(models.Model):
         return f"{self.name}"
     
 
-
 class Team(models.Model):
     name = models.CharField(max_length=255, unique=True)
     create_time = models.DateTimeField(default=timezone.now)
-    captain = models.OneToOneField(ExtendUser, on_delete=models.SET_NULL, null=True, blank=True)
+    captain = models.OneToOneField(ExtendUser, on_delete=models.SET_NULL, null=True, blank=True,related_name="captain_of_team")
     league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='teams_in_league', default=1)
-    logo = models.ImageField(upload_to='teams/', null=True, blank=True)  # Dodanie pola do logo drużyny
-
+    logo = models.ImageField(upload_to='teams/', null=True, blank=True)
+    players = models.ManyToManyField(ExtendUser, related_name="teams", blank=True) 
 
     class Meta:
         unique_together = ('name', 'league')
+        
      
-
-class Player(models.Model):
-    user = models.OneToOneField(ExtendUser, on_delete=models.CASCADE, related_name='player_profile') 
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="players")
-    position = models.CharField(max_length=50, blank=True, null=True)
-    weight = models.IntegerField(default=0)
-    height = models.IntegerField(default=0)
-    number = models.IntegerField(default=0)
-    photo = models.ImageField(upload_to='players/', null=True, blank=True)  # Dodanie pola do zdjęcia gracza
-
-    def __str__(self):
-        return f"{self.user.username} - {self.team.name}"
-
 
 class Match(models.Model):
     STATUS_CHOICES = (
@@ -89,7 +84,7 @@ class MatchResult(models.Model):
         return self.home_team_confirmed and self.away_team_confirmed
     
 class PlayerStatistics(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    player = models.ForeignKey(ExtendUser, on_delete=models.CASCADE)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     goals = models.IntegerField(default=0)
     assists = models.IntegerField(default=0)
@@ -122,15 +117,18 @@ class Notification(models.Model):
         ('match_invite', 'Match Invite'),
         ('message', 'Message'),
         ('match_result', 'Match Result'),
+        ('join_request', 'Join Request'),  # Typ powiadomienia o prośbie o dołączenie
     )
 
-    recipient = models.ForeignKey(ExtendUser, on_delete=models.CASCADE, related_name="notifications")
+    sender = models.ForeignKey(ExtendUser, on_delete=models.CASCADE, related_name="sent_notifications", null=True, blank=True)  # Nowe pole dla nadawcy
+    recipient = models.ForeignKey(ExtendUser, on_delete=models.CASCADE, related_name="received_notifications")  # Pole dla adresata
     notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
     match = models.ForeignKey(Match, on_delete=models.CASCADE, null=True, blank=True, related_name="match_notifications")
     message = models.TextField(null=True, blank=True)
     is_read = models.BooleanField(default=False)
+    is_responded = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.get_notification_type_display()} for {self.recipient}"
+        return f"{self.get_notification_type_display()} from {self.sender} to {self.recipient}"
     

@@ -23,29 +23,15 @@
 
   li {
     background-color: #f1f1f1;
-
+    position: relative;
     padding: 20px;
     margin-bottom: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s;
 
-    &:hover {
-      background-color: #b9b9b9;
-    }
-
     p {
       margin: 5px 0;
-    }
-
-    .notification-username {
-      font-weight: bold;
-      color: #444;
-    }
-
-    .notification-message {
-      font-size: 16px;
-      color: #555;
     }
 
     .notification-status {
@@ -62,39 +48,35 @@
 
     .notification-actions {
       margin-top: 15px;
+    }
+  }
+  button.delete {
+    height: 60px;
+    width: 60px;
+    position: absolute;
+    top: 30%;
+    right: 60px;
+    background-color: #ff6767;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 14px;
+    transition: background-color 0.2s;
 
-      button {
-        padding: 10px 15px;
-        border: none;
-        border-radius: 5px;
-        font-size: 14px;
-        cursor: pointer;
-        margin-right: 10px;
-
-        &:hover {
-          opacity: 0.9;
-        }
-
-        &.accept {
-          background-color: #57ca9e;
-          color: #ffffff;
-        }
-
-        &.reject {
-          background-color: #ff6b6b;
-          color: #ffffff;
-        }
-      }
+    &:hover {
+      background-color: #ff3333;
     }
 
-    /* Stylizacja przeczytanych powiadomień */
-    &.read {
-      background-color: #e8e8e8;
+    &.accept {
+      background-color: #57ca9e;
+      color: #ffffff;
+    }
 
-      .notification-username,
-      .notification-message {
-        color: #999;
-      }
+    &.reject {
+      background-color: #ff6767;
+      color: #ffffff;
     }
   }
 }

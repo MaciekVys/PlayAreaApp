@@ -1,6 +1,6 @@
 import graphene
 from graphene_django.types import DjangoObjectType
-from ..models import Match, PlayerStatistics, Player, MatchResult, Team
+from ..models import Match, PlayerStatistics,MatchResult, Team
 
 class PlayerStatisticsInput(graphene.InputObjectType):
     player_id = graphene.Int(required=True)

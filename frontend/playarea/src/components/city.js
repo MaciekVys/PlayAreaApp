@@ -121,10 +121,10 @@ const City = () => {
     );
   }
 
-  const city = data.cityName;
-  const league = city.league; // league might be null
-  const matches = city.matches; // Ensure matches is assigned
-  const rankings = league ? league.rankings : []; // Default to an empty array if league is null
+  const city = data?.cityName;
+  const league = city?.league; // league might be null
+  const matches = city?.matches; // Ensure matches is assigned
+  const rankings = league ? league.rankings : [];
   const userId = localStorage.getItem("userId");
 
   return (
@@ -192,59 +192,54 @@ const City = () => {
                           <td
                             style={{ cursor: "pointer" }}
                             onClick={() =>
+                              match.homeTeam &&
                               navigate(`/team/${match.homeTeam.id}`)
                             }
                           >
                             <div
                               style={{ padding: "5px", alignItems: "center" }}
                             >
-                              {match.homeTeam.name}
-                              <img
-                                style={{
-                                  width: "20px",
-                                  height: "auto",
-                                  marginLeft: "0",
-                                  float: "right",
-                                }}
-                                src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                                alt={`${match.homeTeam.logo} logo`}
-                              />
+                              {match.homeTeam?.name}
+                              {match.homeTeam?.logo && (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "right",
+                                  }}
+                                  src={`${MEDIA_URL}${match.homeTeam.logo}`}
+                                  alt={`${match.homeTeam.logo} logo`}
+                                />
+                              )}
                             </div>
                           </td>
                           <td>-</td>
                           <td
                             style={{ cursor: "pointer" }}
                             onClick={() =>
+                              match.awayTeam &&
                               navigate(`/team/${match.awayTeam.id}`)
                             }
                           >
                             <div
                               style={{ padding: "5px", alignItems: "center" }}
                             >
-                              <img
-                                style={{
-                                  width: "20px",
-                                  height: "auto",
-                                  marginLeft: "0",
-                                  float: "left",
-                                }}
-                                src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                                alt={`${match.awayTeam.logo} logo`}
-                              />
-                              {match.awayTeam.name}
+                              {match.awayTeam?.logo && (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "left",
+                                  }}
+                                  src={`${MEDIA_URL}${match.awayTeam.logo}`}
+                                  alt={`${match.awayTeam.logo} logo`}
+                                />
+                              )}
+                              {match.awayTeam?.name}
                             </div>
                           </td>
-                          {match.homeTeam.captain.id === userId ||
-                          match.awayTeam.captain.id === userId ? (
-                            <td
-                              style={{ cursor: "pointer" }}
-                              onClick={() => navigate("/notification")}
-                            >
-                              GO{" "}
-                            </td>
-                          ) : (
-                            <td></td>
-                          )}
                         </tr>
                       ))}
                   </tbody>
@@ -280,7 +275,7 @@ const City = () => {
                                 alignItems: "center",
                               }}
                             >
-                              {match.homeTeam.name}
+                              {match?.homeTeam?.name}
                               <img
                                 style={{
                                   width: "20px",
@@ -288,8 +283,8 @@ const City = () => {
                                   marginLeft: "0",
                                   float: "right",
                                 }}
-                                src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                                alt={`${match.homeTeam.logo} logo`}
+                                src={`${MEDIA_URL}${match?.homeTeam?.logo}`}
+                                alt={`${match?.homeTeam?.logo} logo`}
                               />
                             </div>
                           </td>
@@ -319,8 +314,8 @@ const City = () => {
                               {match.awayTeam.name}
                             </div>
                           </td>
-                          {match.homeTeam.captain.id === userId ||
-                          match.awayTeam.captain.id === userId ? (
+                          {match?.homeTeam?.captain?.id === userId ||
+                          match?.awayTeam?.captain?.id === userId ? (
                             <td
                               style={{ cursor: "pointer" }}
                               onClick={() =>
@@ -518,28 +513,31 @@ const City = () => {
                 </thead>
                 <tbody>
                   {rankings
-                    .slice() // Tworzy kopię danych, żeby nie modyfikować oryginału
-                    .sort((a, b) => b.points - a.points) // Sortowanie od największej ilości punktów
+                    .slice()
+                    .sort((a, b) => b.points - a.points)
                     .map((ranking, index) => (
                       <tr key={index}>
-                        <td style={{ fontWeight: "bold" }}>{index + 1}</td>{" "}
-                        {/* Numer miejsca */}
+                        <td style={{ fontWeight: "bold" }}>{index + 1}</td>
                         <td
                           style={{ cursor: "pointer" }}
-                          onClick={() => navigate(`/team/${ranking.team.id}`)}
+                          onClick={() =>
+                            ranking.team && navigate(`/team/${ranking.team.id}`)
+                          }
                         >
                           <div style={{ padding: "5px", alignItems: "center" }}>
-                            {ranking.team.name}
-                            <img
-                              style={{
-                                width: "20px",
-                                height: "auto",
-                                marginLeft: "0",
-                                float: "right",
-                              }}
-                              src={`${MEDIA_URL}${ranking.team.logo}`}
-                              alt={`${ranking.team.logo} logo`}
-                            />
+                            {ranking.team?.name}
+                            {ranking.team?.logo && (
+                              <img
+                                style={{
+                                  width: "20px",
+                                  height: "auto",
+                                  marginLeft: "0",
+                                  float: "right",
+                                }}
+                                src={`${MEDIA_URL}${ranking.team.logo}`}
+                                alt={`${ranking.team.logo} logo`}
+                              />
+                            )}
                           </div>
                         </td>
                         <td>{ranking.wins}</td>

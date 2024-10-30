@@ -28,7 +28,7 @@ const ChallengeTeam = () => {
     awayTeam: "",
     matchDate: "",
   });
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState({ text: "", type: "" });
   const { data, loading, error } = useQuery(GET_TEAMS_IN_USER_LEAGUE);
   const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
 
@@ -54,17 +54,26 @@ const ChallengeTeam = () => {
       });
 
       if (data.challengeTeamToMatch.success) {
-        setMessage(`Success: ${data.challengeTeamToMatch.message}`);
+        setMessage({
+          text: `Success: ${data.challengeTeamToMatch.message}`,
+          type: "success",
+        });
       } else {
-        setMessage(`Error: ${data.challengeTeamToMatch.message}`);
+        setMessage({
+          text: `Error: ${data.challengeTeamToMatch.message}`,
+          type: "error",
+        });
       }
     } catch (error) {
-      setMessage(`An error occurred: ${error.message}`);
+      setMessage({
+        text: `An error occurred: ${error.message}`,
+        type: "error",
+      });
     }
   };
 
   if (loading) return <p>Ładowanie drużyn...</p>;
-  if (error) return <p>Błąd: {error.message}</p>;
+  if (error) return <p className="error-message">{error.message}</p>;
 
   return (
     <div className="challenge-team-container">
@@ -83,15 +92,9 @@ const ChallengeTeam = () => {
             <option value="" disabled>
               Wybierz drużynę
             </option>
-            {data.teamsInUserLeague.map((team) => (
+            {data?.teamsInUserLeague?.map((team) => (
               <option key={team.id} value={team.id}>
                 {team.name}
-                {team.logo && (
-                  <img
-                    src={`${MEDIA_URL}${team.logo}`}
-                    alt={`${team.logo} logo`}
-                  />
-                )}
               </option>
             ))}
           </select>
@@ -113,7 +116,15 @@ const ChallengeTeam = () => {
           Challenge Team
         </button>
       </form>
-      {message && <p className="message">{message}</p>}
+      {message.text && (
+        <p
+          className={`message ${
+            message.type === "success" ? "success-message" : "error-message"
+          }`}
+        >
+          {message.text}
+        </p>
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import gql from "graphql-tag";
 import React, { useState } from "react";
 import "../styles/myTeam.scss";
@@ -10,28 +10,33 @@ const MY_TEAM_QUERY = gql`
       id
       name
       logo
-      captain {
-        username
-        id
-      }
       league {
         name
+        id
         level
         city {
           name
         }
       }
-      players {
-        user {
-          username
-          id
-        }
-        id
-        position
-      }
-      playersCount
       matchesCount
+      captain {
+        username
+        id
+      }
+      players {
+        id
+        username
+        position
+        height
+        weight
+      }
       matches {
+        id
+        matchDate
+        scoreHome
+        scoreAway
+        status
+        winner
         homeTeam {
           logo
           name
@@ -42,12 +47,6 @@ const MY_TEAM_QUERY = gql`
           name
           id
         }
-        id
-        matchDate
-        scoreHome
-        scoreAway
-        status
-        winner
       }
     }
   }
@@ -66,35 +65,58 @@ const TEAM_STATISTICS_SUMMARY_QUERY = gql`
   }
 `;
 
+// Define the leaveTeam mutation
+const LEAVE_TEAM_MUTATION = gql`
+  mutation leaveTeam($teamId: ID!) {
+    leaveTeam(teamId: $teamId) {
+      success
+      message
+    }
+  }
+`;
+
 const Team = () => {
   const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
-
   const [tabs, setTabs] = useState("squad");
   const navigate = useNavigate();
 
+  // Query to get team data
   const {
     data: teamData,
     loading: loadingTeam,
     error: errorTeam,
   } = useQuery(MY_TEAM_QUERY);
-
   const team = teamData?.teamByUser;
+  const teamId = team?.id;
 
-  const teamId = team?.id; // Ensure teamId is defined after team is retrieved
-  console.log("Team ID:", teamId); // Debugging: Check if teamId is being fetched correctly
-
+  // Query to get team statistics
   const {
     data: statsData,
     loading: loadingStats,
     error: errorStats,
   } = useQuery(TEAM_STATISTICS_SUMMARY_QUERY, {
-    variables: { teamId: teamId },
+    variables: { teamId },
     skip: !teamId,
   });
 
+  // Mutation hook for leaving the team
+  const [leaveTeam, { loading: loadingLeave, data: leaveData }] = useMutation(
+    LEAVE_TEAM_MUTATION,
+    {
+      variables: { teamId },
+      onCompleted: (data) => {
+        if (data.leaveTeam.success) {
+          alert(data.leaveTeam.message);
+          navigate("/search"); // Redirect the user after leaving the team
+        } else {
+          alert(`Error: ${data.leaveTeam.message}`);
+        }
+      },
+    }
+  );
+
   if (loadingTeam) return <p>Ładowanie danych...</p>;
   if (errorTeam) return <p>Błąd: {errorTeam.message}</p>;
-  console.log(teamId);
 
   if (!team)
     return (
@@ -107,7 +129,12 @@ const Team = () => {
           >
             Załóż drużynę
           </button>
-          <button className="secondary-button">Dołącz do drużyny</button>
+          <button
+            className="secondary-button"
+            onClick={() => navigate("/search")}
+          >
+            Dołącz do drużyny
+          </button>
         </div>
       </div>
     );
@@ -133,13 +160,27 @@ const Team = () => {
         )}
         <div className="left-side">
           <h1>{team.name}</h1>
-          <p>Liczba graczy: {team.playersCount}</p>
+          <p>Liczba graczy: {team.players.length}</p>
           <p>Liczba meczów: {team.matchesCount}</p>
           <p>Miasto: {team.league.city.name}</p>
           <p>Liga: {team.league.name}</p>
-          <p>Kapitan: {team.captain.username}</p>
+          <p>Kapitan: {team?.captain?.username}</p>
         </div>
       </div>
+
+      {/* Button to leave the team */}
+      <button
+        className="leave-button"
+        onClick={() => {
+          if (window.confirm("Czy na pewno chcesz opuścić drużynę?")) {
+            leaveTeam();
+          }
+        }}
+        disabled={loadingLeave}
+      >
+        {loadingLeave ? "Opuszczanie drużyny..." : "Opuść drużynę"}
+      </button>
+
       <div className="tabs">
         <button
           className={tabs === "squad" ? "active" : ""}
@@ -154,6 +195,7 @@ const Team = () => {
           Mecze
         </button>
       </div>
+
       {tabs === "squad" && (
         <>
           <h1>Gracze:</h1>
@@ -180,15 +222,14 @@ const Team = () => {
                 </tr>
               ) : (
                 team.players.map((player) => {
-                  const playerStats =
-                    playerStatsMap[player.user.username] || {};
+                  const playerStats = playerStatsMap[player.username] || {};
                   return (
                     <tr key={player.id}>
                       <td
                         style={{ cursor: "pointer" }}
-                        onClick={() => navigate(`/profile/${player.user.id}`)}
+                        onClick={() => navigate(`/profile/${player.id}`)}
                       >
-                        {player.user.username}
+                        {player.username}
                       </td>
                       <td>{player.position}</td>
                       <td>{playerStats.totalGoals || 0}</td>
@@ -224,12 +265,7 @@ const Team = () => {
                     style={{ cursor: "pointer" }}
                     onClick={() => navigate(`/team/${match.homeTeam.id}`)}
                   >
-                    <div
-                      style={{
-                        padding: "5px",
-                        alignItems: "center",
-                      }}
-                    >
+                    <div style={{ padding: "5px", alignItems: "center" }}>
                       {match.homeTeam.name}
                       <img
                         style={{
@@ -239,7 +275,7 @@ const Team = () => {
                           float: "right",
                         }}
                         src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                        alt={`${match.homeTeam.logo} logo`}
+                        alt={`${match.homeTeam.name} logo`}
                       />
                     </div>
                   </td>
@@ -250,12 +286,7 @@ const Team = () => {
                     style={{ cursor: "pointer" }}
                     onClick={() => navigate(`/team/${match.awayTeam.id}`)}
                   >
-                    <div
-                      style={{
-                        padding: "5px",
-                        alignItems: "center",
-                      }}
-                    >
+                    <div style={{ padding: "5px", alignItems: "center" }}>
                       {match.awayTeam.name}
                       <img
                         style={{
@@ -265,7 +296,7 @@ const Team = () => {
                           float: "left",
                         }}
                         src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                        alt={`${match.awayTeam.logo} logo`}
+                        alt={`${match.awayTeam.name} logo`}
                       />
                     </div>
                   </td>
@@ -273,7 +304,7 @@ const Team = () => {
                     style={{ cursor: "pointer" }}
                     onClick={() => navigate(`/checkMatch/${match.id}`)}
                   >
-                    GO{" "}
+                    GO
                   </td>
                 </tr>
               ))}

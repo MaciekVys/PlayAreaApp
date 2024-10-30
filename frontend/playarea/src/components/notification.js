@@ -5,8 +5,8 @@ import "../styles/notification.scss";
 
 // Zapytanie GraphQL do pobierania powiadomień
 const MY_NOTIFICATIONS = gql`
-  query ($unread: Boolean!) {
-    myNotifications(unread: $unread) {
+  query {
+    myNotifications {
       id
       recipient {
         username
@@ -39,6 +39,15 @@ const RESPOND_TO_MATCH_INVITE = gql`
   }
 `;
 
+const RESPOND_TO_JOIN_TEAM = gql`
+  mutation RespondToJoinRequest($notificationId: ID!, $accept: Boolean!) {
+    respondToJoinRequest(notificationId: $notificationId, accept: $accept) {
+      success
+      message
+    }
+  }
+`;
+
 const DELETE_NOTIFICATION = gql`
   mutation DeleteNotification($notificationId: Int!) {
     deleteNotification(notificationId: $notificationId) {
@@ -54,11 +63,12 @@ const Notification = () => {
   });
 
   const [respondToMatchInvite] = useMutation(RESPOND_TO_MATCH_INVITE);
+  const [respondToJoinTeam] = useMutation(RESPOND_TO_JOIN_TEAM);
   const [deleteNotification] = useMutation(DELETE_NOTIFICATION);
   const [statusMessages, setStatusMessages] = useState({});
 
   // Obsługa odpowiedzi na zaproszenie do meczu
-  const handleResponse = async (accept, matchId) => {
+  const handleResponseMatchInvite = async (accept, matchId) => {
     try {
       const { data } = await respondToMatchInvite({
         variables: { accept, matchId },
@@ -73,6 +83,24 @@ const Notification = () => {
         refetch();
       } else {
         alert(data.respondToMatchInvite.message);
+      }
+    } catch (error) {
+      alert("Wystąpił błąd: " + error.message);
+    }
+  };
+
+  // Obsługa odpowiedzi na zaproszenie do drużyny
+  const handleResponseJoinTeam = async (accept, notificationId) => {
+    try {
+      const { data } = await respondToJoinTeam({
+        variables: { notificationId, accept },
+      });
+
+      if (data.respondToJoinRequest.success) {
+        alert(data.respondToJoinRequest.message);
+        refetch();
+      } else {
+        alert(data.respondToJoinRequest.message);
       }
     } catch (error) {
       alert("Wystąpił błąd: " + error.message);
@@ -117,7 +145,11 @@ const Notification = () => {
               className={notification.isRead ? "read" : ""}
             >
               <p className="notification-username">
-                {notification.recipient.username}: {notification.message}
+                {"Nadawca: "}
+                {notification.recipient.username}
+                <br />
+                {"Wiadomość: "}
+                {notification.message}
               </p>
               <p className="notification-status">
                 Status: {notification.isRead ? "Przeczytane" : "Nieprzeczytane"}
@@ -129,7 +161,7 @@ const Notification = () => {
                   {notification.match.awayTeam.name}
                 </p>
               ) : (
-                <p>Brak powiązanego meczu</p>
+                <p></p>
               )}
 
               {notification.notificationType === "MATCH_INVITE" && (
@@ -139,7 +171,7 @@ const Notification = () => {
                       <button
                         className="accept"
                         onClick={() =>
-                          handleResponse(true, notification.match.id)
+                          handleResponseMatchInvite(true, notification.match.id)
                         }
                       >
                         Akceptuj
@@ -147,7 +179,10 @@ const Notification = () => {
                       <button
                         className="reject"
                         onClick={() =>
-                          handleResponse(false, notification.match.id)
+                          handleResponseMatchInvite(
+                            false,
+                            notification.match.id
+                          )
                         }
                       >
                         Odrzuć
@@ -155,6 +190,33 @@ const Notification = () => {
                     </>
                   ) : (
                     <p>{notification.statusMessage}</p>
+                  )}
+                </div>
+              )}
+
+              {notification.notificationType === "JOIN_REQUEST" && (
+                <div className="notification-actions">
+                  {notification.isResponded ? (
+                    <p>{notification.statusMessage}</p>
+                  ) : (
+                    <>
+                      <button
+                        className="accept"
+                        onClick={() =>
+                          handleResponseJoinTeam(true, notification.id)
+                        }
+                      >
+                        Akceptuj
+                      </button>
+                      <button
+                        className="reject"
+                        onClick={() =>
+                          handleResponseJoinTeam(false, notification.id)
+                        }
+                      >
+                        Odrzuć
+                      </button>
+                    </>
                   )}
                 </div>
               )}

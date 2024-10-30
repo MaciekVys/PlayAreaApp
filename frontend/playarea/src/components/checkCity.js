@@ -201,8 +201,8 @@ const CheckCity = () => {
                               />
                             </div>
                           </td>
-                          {match.homeTeam.captain.id === userId ||
-                          match.awayTeam.captain.id === userId ? (
+                          {match?.homeTeam?.captain?.id === userId ||
+                          match?.awayTeam?.captain?.id === userId ? (
                             <td
                               style={{ cursor: "pointer" }}
                               onClick={() => navigate("/notification")}
@@ -286,8 +286,8 @@ const CheckCity = () => {
                               />
                             </div>
                           </td>
-                          {match.homeTeam.captain.id === userId ||
-                          match.awayTeam.captain.id === userId ? (
+                          {match?.homeTeam?.captain?.id === userId ||
+                          match?.awayTeam?.captain?.id === userId ? (
                             <td
                               style={{ cursor: "pointer" }}
                               onClick={() => navigate("/notification")}

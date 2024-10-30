@@ -3,11 +3,11 @@ from graphql import GraphQLError
 from graphql_auth.schema import UserQuery, MeQuery
 from graphql_auth import mutations
 from graphql_jwt.decorators import login_required
-from .types import CityType, ExtendUserType, PlayerStatisticsSummaryType, PlayerStatisticsType, RankingType, TeamType, PlayerType, MatchType, NotificationType
-from .models import City, ExtendUser, MatchResult, PlayerStatistics, Ranking, Team, Player, Match, Notification
-from .mutations.team import ChallengeTeamToMatch, CreateTeam
+from .types import CityType, ExtendUserType, PlayerStatisticsSummaryType, PlayerStatisticsType, RankingType, TeamType,  MatchType, NotificationType
+from .models import City, ExtendUser, MatchResult, PlayerStatistics, Ranking, Team,  Match, Notification
+from .mutations.team import ChallengeTeamToMatch, CreateTeam, LeaveTeam
 from .mutations.users import Logout, LoginMutation, UpdateUserProfile
-from .mutations.notification import DeleteNotification, RespondToMatchInvite
+from .mutations.notification import DeleteNotification, RespondToJoinRequest, RespondToMatchInvite, SendJoinRequest
 from .mutations.matches import ConfirmMatchResult
 from graphene_django.filter import DjangoFilterConnectionField
 from .filters import ExtendUserFilter, CityFilter, TeamFilter
@@ -31,18 +31,18 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
     all_cities = graphene.List(CityType)
     city_name = graphene.Field(CityType, name=graphene.String(required=True))
     team_by_id = graphene.Field(TeamType, id=graphene.ID(required=True))
-    player_by_id = graphene.Field(PlayerType, user_id=graphene.ID(required=True))
+    player_by_id = graphene.Field(ExtendUserType, user_id=graphene.ID(required=True))
     team_by_user = graphene.Field(TeamType)
-    playerProfile = graphene.Field(PlayerType)
+    user_profile = graphene.Field(ExtendUserType)
     user_city = graphene.Field(CityType)
     matches = graphene.List(MatchType)
     all_rankings = graphene.List(RankingType)
     ranking = graphene.Field(RankingType, id=graphene.ID(required=True))
-    my_notifications = graphene.List(NotificationType, unread=graphene.Boolean())
+    my_notifications = graphene.List(NotificationType)
     teams_in_user_league = graphene.List(TeamType)
     match = graphene.Field(MatchType, id=graphene.ID(required=True))
     player_statistics_for_match = graphene.List(PlayerStatisticsType,match_id=graphene.ID())
-    player_statistics_summary = graphene.Field(PlayerStatisticsSummaryType, player_id=graphene.ID(required=True))
+    player_statistics_summary = graphene.Field(PlayerStatisticsSummaryType, user_id=graphene.ID(required=True))
     team_statistics_summary = graphene.List(PlayerStatisticsSummaryType, team_id=graphene.ID(required=True))
     search_users = DjangoFilterConnectionField(ExtendUserType, filterset_class=ExtendUserFilter)
     search_cities = DjangoFilterConnectionField(CityType, filterset_class=CityFilter)
@@ -62,25 +62,26 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
         return Team.objects.get(pk=id)
     
     def resolve_player_by_id(self, info, user_id):
-        return Player.objects.get(user_id=user_id)
+        return ExtendUser.objects.get(pk=user_id)
     
     @login_required
     def resolve_team_by_user(self, info):
         user = info.context.user
         try:
-            player = Player.objects.get(user=user)
-            return player.team
-        except Player.DoesNotExist:
+            extend_user = ExtendUser.objects.get(id=user.id)
+            return extend_user.team
+        except ExtendUser.DoesNotExist:
             return None
+
     
     @login_required
-    def resolve_playerProfile(self, info):
+    def resolve_user_profile(self, info):
         user = info.context.user
         try:
-            player = Player.objects.get(user=user)
-            return player
-        except Player.DoesNotExist:
-             raise GraphQLError("Player profile does not exist.")
+            extend_user = ExtendUser.objects.get(pk=user.pk)
+            return extend_user
+        except ExtendUser.DoesNotExist:
+            raise GraphQLError("User profile does not exist.")
     
     @login_required
     def resolve_user_city(self, info):
@@ -114,45 +115,44 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
     def resolve_ranking(root, info, id):
         return Ranking.objects.get(pk=id)
     
-    def resolve_my_notifications(self, info, unread=None):
+    def resolve_my_notifications(self, info):
         user = info.context.user
+        
         notifications = Notification.objects.filter(recipient=user)
 
-        if unread is not None:
-            notifications = notifications.filter(is_read=not unread)
         for notification in notifications:
             if notification.match:
- 
                 if notification.match.status == "scheduled":
                     notification.status_message = "Mecz zaplanowany."
                 elif notification.match.status == "canceled":
                     notification.status_message = "Mecz został odwołany."
-                else:
-                    notification.status_message = None 
-                notification.is_responded = notification.match.is_responded
             else:
-                notification.status_message = None 
-                notification.is_responded = False 
+                notification.status_message = None
 
         return notifications
     
     def resolve_teams_in_user_league(self, info):
         user = info.context.user
 
-        # Sprawdzamy, czy użytkownik jest zalogowany
         if not user.is_authenticated:
             raise Exception("Not authenticated!")
 
-        # Znajdujemy drużynę użytkownika
-        user_team = Team.objects.filter(captain=user).first()
-        if not user_team:
-            raise Exception("User does not belong to any team.")
+        # Znajdź drużynę, do której należy użytkownik, bez ograniczania się do bycia kapitanem
+        user_team = Team.objects.filter(players_in_team=user).first()
 
-        # Znajdujemy ligę użytkownika na podstawie drużyny
+        if not user_team:
+            raise Exception("Nie należysz do żadnej drużyny!")
+
+        # Sprawdź, czy użytkownik jest kapitanem
+        if user != user_team.captain:
+            raise Exception("Nie jesteś kapitanem żadnej drużyny!")
+
+        # Znajdź ligę użytkownika na podstawie drużyny
         user_league = user_team.league
 
-        # Zwracamy wszystkie drużyny z tej ligi
+        # Zwróć wszystkie drużyny z tej ligi
         return Team.objects.filter(league=user_league)
+
     
     def resolve_match(self, info, id):
         try:
@@ -164,12 +164,12 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
         return PlayerStatistics.objects.filter(match_id=match_id)
     
     @login_required
-    def resolve_player_statistics_summary(self, info, player_id):
+    def resolve_player_statistics_summary(self, info, user_id):
         # Upewniamy się, że gracz istnieje
         try:
-            player = Player.objects.get(pk=player_id)
-        except Player.DoesNotExist:
-            raise GraphQLError("Player does not exist.")
+            player = ExtendUser.objects.get(id=user_id)
+        except ExtendUser.DoesNotExist:
+            return None
         
         # Agregacja statystyk
         statistics = PlayerStatistics.objects.filter(player=player)
@@ -194,7 +194,7 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
         summaries = []
 
         # Pobierz graczy z drużyny
-        players = team.players.all()  # Zakładam, że masz relację między drużyną a graczami
+        players = ExtendUser.objects.filter(team=team)  # Używamy relacji z ExtendUser
 
         for player in players:
             # Agregacja statystyk dla danego gracza
@@ -205,7 +205,7 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
 
             # Dodaj sumaryczne statystyki do listy
             summaries.append(PlayerStatisticsSummaryType(
-                user=player.user, 
+                user=player,  # Przekazujemy instancję ExtendUser
                 id=player.id,
                 position=player.position,
                 total_goals=total_goals,
@@ -214,7 +214,8 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
             ))
 
         return summaries
-    
+
+
     def resolve_search_users(root, info, **kwargs):
         return ExtendUser.objects.all()
 
@@ -235,6 +236,10 @@ class Mutation(AuthMutation, graphene.ObjectType):
     update_user_profile = UpdateUserProfile.Field()  # Dodanie mutacji edycji profilu
     confirm_match_result = ConfirmMatchResult.Field()
     delete_notification = DeleteNotification.Field()
+    send_join_request = SendJoinRequest.Field()
+    respond_to_join_request = RespondToJoinRequest.Field()
+    leave_team = LeaveTeam.Field()
+
 
 
     # update_notification_status = UpdateNotificationStatus.Field()

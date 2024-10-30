@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useMutation, gql } from "@apollo/client";
+import { useQuery, useMutation, gql } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import "../styles/editProfile.scss";
 
@@ -35,6 +35,15 @@ const UPDATE_USER_PROFILE = gql`
   }
 `;
 
+const GET_ALL_CITIES = gql`
+  query GetAllCities {
+    allCities {
+      id
+      name
+    }
+  }
+`;
+
 const EditProfile = () => {
   const navigate = useNavigate();
 
@@ -52,6 +61,9 @@ const EditProfile = () => {
     updateUserProfile,
     { data: updateData, loading: loadingUpdate, error: errorUpdate },
   ] = useMutation(UPDATE_USER_PROFILE);
+  const { data: citiesData } = useQuery(GET_ALL_CITIES);
+
+  console.log(citiesData);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,6 +84,7 @@ const EditProfile = () => {
 
   if (loadingUpdate) return <p>Aktualizacja profilu...</p>;
   if (errorUpdate) return <p>Błąd: {errorUpdate.message}</p>;
+  const cityOptions = citiesData?.allCities || [];
 
   return (
     <div className="profile-edit-container">
@@ -149,7 +162,21 @@ const EditProfile = () => {
             name="cityName"
             value={formData.cityName}
             onChange={handleChange}
+            list="city-options"
           />
+          <datalist id="city-options">
+            {cityOptions.length > 0 ? (
+              cityOptions.map((city) => (
+                <option key={city.id} value={city.name}>
+                  {city.name}
+                </option>
+              ))
+            ) : (
+              <option value="Brak dostępnych miast">
+                Brak dostępnych miast
+              </option>
+            )}
+          </datalist>
         </div>
 
         <button type="submit" className="submit-btn">
