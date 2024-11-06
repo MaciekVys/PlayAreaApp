@@ -3,6 +3,13 @@ import gql from "graphql-tag";
 import React, { useState } from "react";
 import "../styles/myTeam.scss";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faRightFromBracket,
+  faUsers,
+  faFutbol,
+  faCircleRight,
+} from "@fortawesome/free-solid-svg-icons";
 
 const MY_TEAM_QUERY = gql`
   query team {
@@ -79,6 +86,7 @@ const Team = () => {
   const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
   const [tabs, setTabs] = useState("squad");
   const navigate = useNavigate();
+  const userId = localStorage.getItem("userId");
 
   // Query to get team data
   const {
@@ -150,169 +158,182 @@ const Team = () => {
     });
   }
 
+  // Check if the current user is the captain of the team
+  const isCaptain = team.captain.id === userId;
+
   return (
-    <div className="container">
-      <div className="team-info">
-        {team.logo ? (
-          <img src={`${MEDIA_URL}${team.logo}`} alt={`${team.name} logo`} />
-        ) : (
-          <div className="placeholder-logo">Brak logo</div>
-        )}
-        <div className="left-side">
-          <h1>{team.name}</h1>
-          <p>Liczba graczy: {team.players.length}</p>
-          <p>Liczba meczów: {team.matchesCount}</p>
-          <p>Miasto: {team.league.city.name}</p>
-          <p>Liga: {team.league.name}</p>
-          <p>Kapitan: {team?.captain?.username}</p>
+    <>
+      <div className="container">
+        <div className="team-info">
+          {team.logo ? (
+            <img src={`${MEDIA_URL}${team.logo}`} alt={`${team.name} logo`} />
+          ) : (
+            <div className="placeholder-logo">Brak logo</div>
+          )}
+          <div className="left-side">
+            <h1>{team.name}</h1>
+            <p>Liczba graczy: {team.players.length}</p>
+            <p>Liczba meczów: {team.matchesCount}</p>
+            <p>Miasto: {team.league.city.name}</p>
+            <p>Liga: {team.league.name}</p>
+            <p>Kapitan: {team?.captain?.username}</p>
+          </div>
+          <button
+            className="leave-button"
+            onClick={() => {
+              if (window.confirm("Czy na pewno chcesz opuścić drużynę?")) {
+                leaveTeam();
+              }
+            }}
+            disabled={loadingLeave}
+          >
+            {loadingLeave ? "Opuszczanie drużyny..." : "Opuść drużynę"}{" "}
+            <FontAwesomeIcon icon={faRightFromBracket} />
+          </button>
+
+          {isCaptain && (
+            <button onClick={() => navigate("/editTeam")}>
+              Edytuj drużynę
+            </button>
+          )}
         </div>
       </div>
-
-      {/* Button to leave the team */}
-      <button
-        className="leave-button"
-        onClick={() => {
-          if (window.confirm("Czy na pewno chcesz opuścić drużynę?")) {
-            leaveTeam();
-          }
-        }}
-        disabled={loadingLeave}
-      >
-        {loadingLeave ? "Opuszczanie drużyny..." : "Opuść drużynę"}
-      </button>
 
       <div className="tabs">
         <button
           className={tabs === "squad" ? "active" : ""}
           onClick={() => setTabs("squad")}
         >
-          Skład
+          Skład <FontAwesomeIcon icon={faUsers} />
         </button>
         <button
           className={tabs === "matches" ? "active" : ""}
           onClick={() => setTabs("matches")}
         >
-          Mecze
+          Mecze <FontAwesomeIcon icon={faFutbol} />
         </button>
       </div>
-
-      {tabs === "squad" && (
-        <>
-          <h1>Gracze:</h1>
-          <table className="players-table">
-            <thead>
-              <tr>
-                <th>Imię Użytkownika</th>
-                <th>Pozycja</th>
-                <th>Gole</th>
-                <th>Asysty</th>
-                <th>MVP</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loadingStats ? (
+      <div className="second-container">
+        {tabs === "squad" && (
+          <>
+            <h1>Gracze</h1>
+            <table className="table">
+              <thead>
                 <tr>
-                  <td colSpan="5">Ładowanie statystyk...</td>
+                  <th>Zdjęcie</th>
+                  <th>Imię Użytkownika</th>
+                  <th>Pozycja</th>
+                  <th>Gole</th>
+                  <th>Asysty</th>
+                  <th>MVP</th>
                 </tr>
-              ) : errorStats ? (
-                <tr>
-                  <td colSpan="5">
-                    Błąd w ładowaniu statystyk: {errorStats.message}
-                  </td>
-                </tr>
-              ) : (
-                team.players.map((player) => {
-                  const playerStats = playerStatsMap[player.username] || {};
-                  return (
-                    <tr key={player.id}>
-                      <td
-                        style={{ cursor: "pointer" }}
-                        onClick={() => navigate(`/profile/${player.id}`)}
-                      >
-                        {player.username}
-                      </td>
-                      <td>{player.position}</td>
-                      <td>{playerStats.totalGoals || 0}</td>
-                      <td>{playerStats.totalAssists || 0}</td>
-                      <td>{playerStats.totalMvps || 0}</td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </>
-      )}
+              </thead>
+              <tbody>
+                {loadingStats ? (
+                  <tr>
+                    <td colSpan="5">Ładowanie statystyk...</td>
+                  </tr>
+                ) : errorStats ? (
+                  <tr>
+                    <td colSpan="5">
+                      Błąd w ładowaniu statystyk: {errorStats.message}
+                    </td>
+                  </tr>
+                ) : (
+                  team.players.map((player) => {
+                    const playerStats = playerStatsMap[player.username] || {};
+                    return (
+                      <tr key={player.id}>
+                        <td>{player.im}</td>
+                        <td
+                          style={{ cursor: "pointer" }}
+                          onClick={() => navigate(`/profile/${player.id}`)}
+                        >
+                          {player.username}
+                        </td>
+                        <td>{player.position || "nieznana"}</td>
+                        <td>{playerStats.totalGoals || 0}</td>
+                        <td>{playerStats.totalAssists || 0}</td>
+                        <td>{playerStats.totalMvps || 0}</td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </>
+        )}
 
-      {tabs === "matches" && (
-        <>
-          <h1>Mecze:</h1>
-          <table className="matches-table">
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Gospodarze</th>
-                <th>Wynik</th>
-                <th>Goście</th>
-                <th>Wygrana</th>
-              </tr>
-            </thead>
-            <tbody>
-              {team.matches.map((match, index) => (
-                <tr key={index}>
-                  <td>{match.matchDate}</td>
-                  <td
-                    style={{ cursor: "pointer" }}
-                    onClick={() => navigate(`/team/${match.homeTeam.id}`)}
-                  >
-                    <div style={{ padding: "5px", alignItems: "center" }}>
-                      {match.homeTeam.name}
-                      <img
-                        style={{
-                          width: "20px",
-                          height: "auto",
-                          marginLeft: "0",
-                          float: "right",
-                        }}
-                        src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                        alt={`${match.homeTeam.name} logo`}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    {match.scoreHome} : {match.scoreAway}
-                  </td>
-                  <td
-                    style={{ cursor: "pointer" }}
-                    onClick={() => navigate(`/team/${match.awayTeam.id}`)}
-                  >
-                    <div style={{ padding: "5px", alignItems: "center" }}>
-                      {match.awayTeam.name}
-                      <img
-                        style={{
-                          width: "20px",
-                          height: "auto",
-                          marginLeft: "0",
-                          float: "left",
-                        }}
-                        src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                        alt={`${match.awayTeam.name} logo`}
-                      />
-                    </div>
-                  </td>
-                  <td
-                    style={{ cursor: "pointer" }}
-                    onClick={() => navigate(`/checkMatch/${match.id}`)}
-                  >
-                    GO
-                  </td>
+        {tabs === "matches" && (
+          <>
+            <h1>Mecze</h1>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Gospodarze</th>
+                  <th>Wynik</th>
+                  <th>Goście</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
-    </div>
+              </thead>
+              <tbody>
+                {team.matches.map((match, index) => (
+                  <tr key={index}>
+                    <td>{match.matchDate}</td>
+                    <td
+                      style={{ cursor: "pointer" }}
+                      onClick={() => navigate(`/team/${match.homeTeam.id}`)}
+                    >
+                      <div style={{ padding: "5px", alignItems: "center" }}>
+                        {match.homeTeam.name}
+                        <img
+                          style={{
+                            width: "20px",
+                            height: "auto",
+                            marginLeft: "0",
+                            float: "right",
+                          }}
+                          src={`${MEDIA_URL}${match.homeTeam.logo}`}
+                          alt={`${match.homeTeam.name} logo`}
+                        />
+                      </div>
+                    </td>
+                    <td>
+                      {match.scoreHome} : {match.scoreAway}
+                    </td>
+                    <td
+                      style={{ cursor: "pointer" }}
+                      onClick={() => navigate(`/team/${match.awayTeam.id}`)}
+                    >
+                      <div style={{ padding: "5px", alignItems: "center" }}>
+                        {match.awayTeam.name}
+                        <img
+                          style={{
+                            width: "20px",
+                            height: "auto",
+                            marginLeft: "0",
+                            float: "left",
+                          }}
+                          src={`${MEDIA_URL}${match.awayTeam.logo}`}
+                          alt={`${match.awayTeam.name} logo`}
+                        />
+                      </div>
+                    </td>
+                    <td
+                      style={{ cursor: "pointer" }}
+                      onClick={() => navigate(`/checkMatch/${match.id}`)}
+                    >
+                      <FontAwesomeIcon icon={faCircleRight} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+      </div>
+    </>
   );
 };
 

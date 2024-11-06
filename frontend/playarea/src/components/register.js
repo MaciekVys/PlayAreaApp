@@ -75,63 +75,65 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div className="registration-container">
-      <form onSubmit={handleSubmit} className="registration-form">
-        <h2>Zarejestruj Się</h2>
-        <div className="form-group">
-          <label htmlFor="username">Imię:</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password1">Hasło:</label>
-          <input
-            type="password"
-            id="password1"
-            name="password1"
-            value={formData.password1}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password2">Powtórz Hasło:</label>
-          <input
-            type="password"
-            id="password2"
-            name="password2"
-            value={formData.password2}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit" className="register-button">
-          Zarejestruj się
-        </button>
+    <div className="register-background">
+      <div className="registration-container">
+        <form onSubmit={handleSubmit} className="registration-form">
+          <h2>Zarejestruj Się</h2>
+          <div className="form-group">
+            <label htmlFor="username">Imię:</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="email">Email:</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password1">Hasło:</label>
+            <input
+              type="password"
+              id="password1"
+              name="password1"
+              value={formData.password1}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password2">Powtórz Hasło:</label>
+            <input
+              type="password"
+              id="password2"
+              name="password2"
+              value={formData.password2}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit" className="register-button">
+            Zarejestruj się
+          </button>
 
-        {loading && <p>Rejestracja trwa...</p>}
-        {errorMessage && <p className="error-message">{errorMessage}</p>}
-        {positiveMessage && (
-          <p className="success-message">{positiveMessage}</p>
-        )}
-      </form>
+          {loading && <p>Rejestracja trwa...</p>}
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
+          {positiveMessage && (
+            <p className="success-message">{positiveMessage}</p>
+          )}
+        </form>
+      </div>
     </div>
   );
 };

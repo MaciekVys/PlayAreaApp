@@ -3,6 +3,8 @@ import { useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import "../styles/home.scss"; // Import pliku CSS do stylizacji
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUserPlus, faFileSignature } from "@fortawesome/free-solid-svg-icons";
 
 const ALL_CITIES = gql`
   query MeQuery {
@@ -49,13 +51,13 @@ const Home = () => {
               className="primary-button"
               onClick={() => navigate("/createTeam")}
             >
-              Załóż drużynę
+              Załóż drużynę <FontAwesomeIcon icon={faFileSignature} />
             </button>
             <button
               className="secondary-button"
               onClick={() => navigate("/search")}
             >
-              Dołącz do drużyny
+              Dołącz do drużyny <FontAwesomeIcon icon={faUserPlus} />
             </button>
           </div>
         </div>
@@ -90,22 +92,14 @@ const Home = () => {
       </section>
 
       {/* Sekcja z rejestracją */}
-      <section className="cta-section city-container">
+      <section className="rankings">
         <div>
           <h2>Ranking miast</h2>
           <table className="table">
             <thead>
               <tr>
                 <th></th>
-                <th
-                  style={{
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  Nazwa miasta
-                </th>
+                <th>Nazwa miasta</th>
                 <th>Liga</th>
               </tr>
             </thead>
@@ -120,17 +114,12 @@ const Home = () => {
                         style={{
                           width: "50px",
                           height: "auto",
-                          float: "left",
                         }}
                       />
                     )}
                   </td>
                   <td
-                    style={{
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
+                    style={{ cursor: "pointer", fontWeight: "bold" }}
                     onClick={() => navigate(`/city/${city.name}`)}
                   >
                     {city.name}

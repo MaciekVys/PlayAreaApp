@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
 import "../styles/searchView.scss";
 
@@ -23,6 +23,7 @@ const SEARCH_CITIES = gql`
         node {
           id
           name
+          image
         }
       }
     }
@@ -36,6 +37,7 @@ const SEARCH_TEAMS = gql`
         node {
           id
           name
+          logo
         }
       }
     }
@@ -44,6 +46,8 @@ const SEARCH_TEAMS = gql`
 
 const SearchView = () => {
   const { keywords } = useParams();
+  const navigate = useNavigate();
+  const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
 
   const { data: userData, loading: loadingUsers } = useQuery(SEARCH_USERS, {
     variables: { username: keywords },
@@ -69,53 +73,89 @@ const SearchView = () => {
   const teamResults = teamData?.searchTeams.edges.length || 0;
 
   return (
-    <div className="search-container">
-      <h2>Wyniki wyszukiwania dla "{keywords}"</h2>
+    <div className="bgr">
+      <div className="search-container">
+        <h2>Wyniki wyszukiwania dla "{keywords}"</h2>
 
-      <h3>Użytkownicy</h3>
-      {userResults > 0 ? (
-        userData?.searchUsers.edges.map(({ node }) => (
-          <div key={node.id} className="result-item">
-            {node.username}
+        <h3>Użytkownicy</h3>
+        {userResults > 0 ? (
+          userData?.searchUsers.edges.map(({ node }) => (
+            <div
+              key={node.id}
+              className="result-item"
+              onClick={() => navigate(`/profile/${node.id}`)}
+            >
+              {node.username}
+            </div>
+          ))
+        ) : (
+          <div className="no-results-container">
+            <div style={{ textAlign: "center", fontSize: "20px" }}>
+              Nie znaleziono użytkowników dla "{keywords}"
+            </div>
           </div>
-        ))
-      ) : (
-        <div className="no-results-container">
-          <div style={{ textAlign: "center", fontSize: "20px" }}>
-            Nie znaleziono użytkowników dla "{keywords}"
-          </div>
-        </div>
-      )}
+        )}
 
-      <h3>Miasta</h3>
-      {cityResults > 0 ? (
-        cityData?.searchCities.edges.map(({ node }) => (
-          <div key={node.id} className="result-item">
-            {node.name}
+        <h3>Miasta</h3>
+        {cityResults > 0 ? (
+          cityData?.searchCities.edges.map(({ node }) => (
+            <div
+              key={node.id}
+              className="result-item"
+              onClick={() => navigate(`/city/${node.name}`)}
+            >
+              {node.name}{" "}
+              {node.image && (
+                <img
+                  src={`${MEDIA_URL}${node.image}`}
+                  alt={`${node.image} logo`}
+                  style={{
+                    width: "20px",
+                    height: "auto",
+                    verticalAlign: "middle",
+                  }}
+                />
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="no-results-container">
+            <div style={{ textAlign: "center", fontSize: "20px" }}>
+              Nie znaleziono miast dla "{keywords}"
+            </div>
           </div>
-        ))
-      ) : (
-        <div className="no-results-container">
-          <div style={{ textAlign: "center", fontSize: "20px" }}>
-            Nie znaleziono miast dla "{keywords}"
-          </div>
-        </div>
-      )}
+        )}
 
-      <h3>Drużyny</h3>
-      {teamResults > 0 ? (
-        teamData?.searchTeams.edges.map(({ node }) => (
-          <div key={node.id} className="result-item">
-            {node.name}
+        <h3>Drużyny</h3>
+        {teamResults > 0 ? (
+          teamData?.searchTeams.edges.map(({ node }) => (
+            <div
+              key={node.id}
+              className="result-item"
+              onClick={() => navigate(`/team/${node.id}`)}
+            >
+              {node.name}{" "}
+              {node.logo && (
+                <img
+                  src={`${MEDIA_URL}${node.logo}`}
+                  alt={`${node.logo} logo`}
+                  style={{
+                    width: "20px",
+                    height: "auto",
+                    verticalAlign: "middle",
+                  }}
+                />
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="no-results-container">
+            <div style={{ textAlign: "center", fontSize: "20px" }}>
+              Nie znaleziono drużyn dla "{keywords}"
+            </div>
           </div>
-        ))
-      ) : (
-        <div className="no-results-container">
-          <div style={{ textAlign: "center", fontSize: "20px" }}>
-            Nie znaleziono drużyn dla "{keywords}"
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

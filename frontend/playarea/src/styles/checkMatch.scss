@@ -7,20 +7,23 @@ $table-border-color: #ccc; // Kolor granicy tabeli
 
 .check-match-container {
   padding: 20px;
-  background-color: $background-color;
-  //   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 
   h2 {
-    color: $primary-color; // Kolor nagłówka
+    color: #000; // Kolor nagłówka
     font-size: 2rem;
+    border: none;
     margin-bottom: 20px;
+    text-align: center;
   }
 
   h3 {
-    color: #57ca9e; // Kolor podnagłówków
+    color: #000;
+    border-bottom: 2px solid #fff;
+    padding: 10px;
+    margin-bottom: 20px;
     font-size: 1.5rem;
-    margin: 15px 0;
+    text-align: center;
   }
 
   p {
@@ -42,43 +45,23 @@ $table-border-color: #ccc; // Kolor granicy tabeli
       border-radius: 4px;
       margin-bottom: 10px;
     }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-
-      thead {
-        background-color: $table-header-color; // Kolor nagłówka tabeli
-
-        th {
-          padding: 10px;
-          text-align: left;
-          border: 1px solid $table-border-color; // Kolor granicy nagłówka
-          font-weight: bold;
-          color: $text-color; // Kolor tekstu w nagłówku
-        }
-      }
-
-      tbody {
-        tr {
-          border: 1px solid $table-border-color; // Kolor granicy wierszy
-
-          td {
-            padding: 10px;
-            border: 1px solid $table-border-color; // Kolor granicy komórek
-            color: $text-color; // Kolor tekstu w komórkach
-          }
-
-          &:nth-child(even) {
-            background-color: #f9f9f9; // Kolor dla co drugiego wiersza
-          }
-        }
-      }
-    }
   }
 
   .teams-container {
-    display: flex; // Użycie flexbox do układu poziomego
-    justify-content: space-between; // Rozmieszczenie zespołów
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .score-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 20px;
+  }
+
+  .score {
+    font-size: 24px;
+    font-weight: bold;
   }
 }

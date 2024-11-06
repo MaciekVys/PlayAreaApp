@@ -11,6 +11,11 @@
 .teams {
   display: flex;
   justify-content: space-between;
+
+  h2 {
+    color: #000;
+    padding: 10px 0;
+  }
 }
 
 .team {
@@ -27,33 +32,36 @@
   background-color: #e0e0e0;
 }
 
-.players-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.players-table th,
-.players-table td {
-  padding: 10px;
-  border: 1px solid #ddd;
-  text-align: left;
-}
-
 .input-field {
-  width: 60px;
-  padding: 5px;
+  width: 100px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #57ca9e;
+  box-shadow: 0 2px 8px rgba(87, 202, 158, 0.4);
+}
+
+.input-field:hover {
+  border-color: #57ca9e;
 }
 
 .submit-button {
   display: block;
   margin: 20px auto;
   padding: 10px 20px;
-  background-color: #28a745;
-  color: white;
-  border: none;
+
   cursor: pointer;
 }
 
 .submit-button:hover {
-  background-color: #218838;
+  background-color: #000;
 }

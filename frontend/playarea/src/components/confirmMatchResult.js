@@ -3,6 +3,8 @@ import gql from "graphql-tag";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import "../styles/confirmMatch.scss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faRotateLeft } from "@fortawesome/free-solid-svg-icons";
 
 const GET_MATCH_PLAYERS = gql`
   query GetMatchPlayers($matchId: ID!) {
@@ -16,10 +18,7 @@ const GET_MATCH_PLAYERS = gql`
         }
         players {
           id
-          user {
-            id
-            username
-          }
+          username
         }
       }
       awayTeam {
@@ -29,10 +28,7 @@ const GET_MATCH_PLAYERS = gql`
         }
         players {
           id
-          user {
-            id
-            username
-          }
+          username
         }
       }
       matchresultSet {
@@ -165,7 +161,7 @@ const ConfirmMatchResult = () => {
             onChange={(e) => setHomeTeamScore(e.target.value)}
             disabled={!isHomeTeamCaptain || isFormDisabled}
           />
-          <table className="players-table">
+          <table className="table">
             <thead>
               <tr>
                 <th>Imię Użytkownika</th>
@@ -177,7 +173,7 @@ const ConfirmMatchResult = () => {
             <tbody>
               {match.homeTeam.players.map((player) => (
                 <tr key={player.id}>
-                  <td>{player.user.username}</td>
+                  <td>{player.username}</td>
                   <td>
                     <input
                       type="number"
@@ -237,7 +233,7 @@ const ConfirmMatchResult = () => {
             onChange={(e) => setAwayTeamScore(e.target.value)}
             disabled={!isAwayTeamCaptain || isFormDisabled}
           />
-          <table className="players-table">
+          <table className="table">
             <thead>
               <tr>
                 <th>Imię Użytkownika</th>
@@ -249,7 +245,7 @@ const ConfirmMatchResult = () => {
             <tbody>
               {match.awayTeam.players.map((player) => (
                 <tr key={player.id}>
-                  <td>{player.user.username}</td>
+                  <td>{player.username}</td>
                   <td>
                     <input
                       type="number"
@@ -303,7 +299,7 @@ const ConfirmMatchResult = () => {
         onClick={handleSubmit}
         disabled={isFormDisabled}
       >
-        Zatwierdź wynik
+        Zatwierdź wynik <FontAwesomeIcon icon={faCheck} />
       </button>
       {errorMessage && <p className="error-message">{errorMessage}</p>}
     </div>

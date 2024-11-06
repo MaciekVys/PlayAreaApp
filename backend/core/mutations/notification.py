@@ -15,6 +15,7 @@ class RespondToMatchInvite(graphene.Mutation):
         try:
             match = Match.objects.get(id=match_id)
 
+
             if match.away_team.captain != user:
                 return RespondToMatchInvite(success=False, message="You are not the captain of the invited team.")
 
@@ -31,7 +32,15 @@ class RespondToMatchInvite(graphene.Mutation):
 
             # Oznaczamy, że zaproszenie zostało rozpatrzone
             match.is_responded = True
+            
             match.save()
+
+            notification = Notification.objects.filter(match=match, notification_type='match_invite').first()
+
+            if notification:
+                # Ustawiamy 'is_responded' na True w powiadomieniu o meczu
+                notification.is_responded = True
+                notification.save()
 
             return RespondToMatchInvite(success=True, message=message)
 
@@ -59,7 +68,7 @@ class DeleteNotification(graphene.Mutation):
             # Usuwanie powiadomienia
             notification.delete()
 
-            return DeleteNotification(success=True, message="Notification deleted successfully.")
+            return DeleteNotification(success=True, message="Pomyślnie usunięte")
 
         except Notification.DoesNotExist:
             return DeleteNotification(success=False, message="Notification not found.")
@@ -81,10 +90,10 @@ class SendJoinRequest(graphene.Mutation):
 
             # Sprawdzenie, czy użytkownik już należy do drużyny
             if team.players.filter(id=user.id).exists():
-                return SendJoinRequest(success=False, message="You are already a member of this team.")
+                return SendJoinRequest(success=False, message="Należysz już do drużyny!")
 
             # Utworzenie powiadomienia dla kapitana drużyny
-            notification_message = f"{user.username} has requested to join your team: {team.name}."
+            notification_message = f"{user.username} wysłał prośbę o dołączenie do drużyny {team.name}."
             Notification.objects.create(
                 sender=user, 
                 recipient=team.captain, 
@@ -92,10 +101,11 @@ class SendJoinRequest(graphene.Mutation):
                 message=notification_message
             )
 
-            return SendJoinRequest(success=True, message="Join request sent successfully.")
+            return SendJoinRequest(success=True, message="Prośba o dołączenie została pomyślnie wysłana")
 
         except Team.DoesNotExist:
-            return SendJoinRequest(success=False, message="Team not found.")
+            return SendJoinRequest(success=False, message="Nie znaleziono drużyny")
+        
 
 class RespondToJoinRequest(graphene.Mutation):
     class Arguments:
@@ -113,7 +123,7 @@ class RespondToJoinRequest(graphene.Mutation):
 
             # Sprawdzenie, czy użytkownik jest kapitanem drużyny
             if notification.recipient != user:
-                return RespondToJoinRequest(success=False, message="You are not the captain of this team.")
+                return RespondToJoinRequest(success=False, message="Nie jesteś kapitanem drużyny!")
 
             if notification.notification_type != 'join_request':
                 return RespondToJoinRequest(success=False, message="This notification is not a join request.")
@@ -125,31 +135,31 @@ class RespondToJoinRequest(graphene.Mutation):
             team = Team.objects.get(captain=notification.recipient)
 
             if accept:
-                # Przypisujemy użytkownika do drużyny przez ustawienie jego pola `team`
                 notification.sender.team = team
                 notification.sender.save()
 
-                message = "Join request accepted. User added to the team."
+                message = "Prośba o dołączenie zaakceptowana, użytkownik dodany do drużyny!"
+                notification.status = 'accepted'  # Zmienione na wartość tekstową
 
                 # Tworzymy nowe powiadomienie dla użytkownika
-                Notification.objects.create(
-                    sender=user,
-                    recipient=notification.sender,
-                    notification_type='join_request',
-                    message=f"You have been accepted into the team: {team.name}."
-                )
+                # Notification.objects.create(
+                #     sender=user,
+                #     recipient=notification.sender,
+                #     notification_type='join_request',
+                #     message=f"Zaakceptowano prośbę o dołączenie do drużyny {team.name}."
+                # )
             else:
                 message = "Join request declined."
+                notification.status = 'declined'  # Zmienione na wartość tekstową
 
                 # Tworzymy powiadomienie o odrzuceniu dla użytkownika
-                Notification.objects.create(
-                    sender=user,
-                    recipient=notification.sender,
-                    notification_type='join_request',
-                    message=f"Your request to join the team {team.name} has been declined."
-                )
+                # Notification.objects.create(
+                #     sender=user,
+                #     recipient=notification.sender,
+                #     notification_type='join_request',
+                #     message=f"Twoja prośba o dołączenie do drużyny {team.name} została odrzucona"
+                # )
 
-            # Aktualizacja pola is_responded na True w powiadomieniu
             notification.is_responded = True
             notification.save()
 
@@ -159,4 +169,5 @@ class RespondToJoinRequest(graphene.Mutation):
             return RespondToJoinRequest(success=False, message="Notification not found.")
         except Team.DoesNotExist:
             return RespondToJoinRequest(success=False, message="Team not found.")
+
 

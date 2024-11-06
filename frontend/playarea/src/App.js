@@ -20,6 +20,7 @@ import ConfirmMatchResult from "./components/confirmMatchResult";
 import CheckMatch from "./components/checkMatch";
 import SearchView from "./components/searchView";
 import JoinToTeam from "./components/joinToTeam";
+import EditTeam from "./components/editTeam";
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
@@ -51,6 +52,7 @@ function App() {
           <Route path="/checkMatch/:id" element={<CheckMatch />} />
           <Route path="/search/:keywords" element={<SearchView />} />
           <Route path="/search" element={<JoinToTeam />} />
+          <Route path="/editTeam" element={<EditTeam />} />
         </Routes>
       </Router>
     </ApolloProvider>

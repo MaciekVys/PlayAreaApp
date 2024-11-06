@@ -1,40 +1,76 @@
-.profile-edit-container {
+.main-container {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+    url("../images/log.jpg");
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh; // Ustaw wysokość na całą stronę
   display: flex;
-  flex-direction: column;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.85);
+  justify-content: center;
+  padding: 20px; // Opcjonalnie, aby uzyskać trochę marginesu wewnętrznego
+}
+.profile-edit-container {
+  // background-color: rgba(29, 29, 29, 0.7);
+  backdrop-filter: blur(150px);
+  border: 2px solid #000;
+  display: grid;
+  grid-template-columns: 1fr; // Jedna kolumna dla mniejszych ekranów
+  gap: 20px;
+  align-items: start;
   color: #ffffff;
   padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.header-section {
   text-align: center;
-  margin-bottom: 20px;
+  width: 80%;
+  max-width: 800px; // Ustal maksymalną szerokość dla lepszego wyglądu na dużych ekranach
+  margin: auto;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4); // Lekki cień dla oddzielenia od głównego kontenera
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 2fr; // Dwie kolumny na większych ekranach
+    grid-template-areas: "header header" "photo form";
+    justify-items: center;
+  }
 }
 
 .header-title {
+  grid-area: header;
+  width: 100%;
+  padding: 10px;
   font-size: 24px;
-  color: #f5a623;
+  color: #fff;
+  margin: 0;
+  text-align: center;
+  border-bottom: 2px solid white;
 }
 
-.profile-pic {
+.header-section {
+  grid-area: photo;
+  text-align: center;
+}
+
+.placeholder-photo {
   width: 200px;
   height: 200px;
   border-radius: 50%;
+  background-color: #ccc;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
   margin-top: 15px;
-  border: 3px solid #f5a623;
-  object-fit: cover;
+  border: 3px solid #57ca9e;
 }
 
 .profile-form {
+  grid-area: form;
   width: 100%;
   max-width: 500px;
 }
 
 .form-group1 {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .form-group1 label {
@@ -49,34 +85,21 @@
   padding: 10px;
   font-size: 16px;
   border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.5);
   border: none;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  outline: none;
 }
 
-.submit-btn {
-  background-color: #f5a623;
-  color: #ffffff;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  margin-top: 15px;
-}
-
-.back-btn {
-  background-color: transparent;
-  color: #57ca9e;
-  border: none;
-  margin-top: 20px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
+// Dostosowanie układu do mniejszych ekranów
 @media (max-width: 768px) {
   .profile-edit-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 20px;
+  }
+
+  .profile-form {
+    width: 100%;
+    max-width: 100%;
   }
 }

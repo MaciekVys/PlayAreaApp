@@ -71,46 +71,48 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="login-container">
-      <form onSubmit={handleSubmit} className="login-form">
-        <h2>Zaloguj Się</h2>
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="username">Nazwa Użytkownika:</label>
-          <input
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">Hasło:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit" className="login-button">
-          Zaloguj się
-        </button>
-        {loading && <p>Logowanie...</p>}
-        {errorMessage && <p className="error-message">{errorMessage}</p>}
-      </form>
+    <div className="login-background">
+      <div className="login-container">
+        <form onSubmit={handleSubmit} className="login-form">
+          <h2>Zaloguj Się</h2>
+          <div className="form-group">
+            <label htmlFor="email">Email:</label>
+            <input
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="username">Nazwa Użytkownika:</label>
+            <input
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Hasło:</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit" className="login-button">
+            Zaloguj się
+          </button>
+          {loading && <p>Logowanie...</p>}
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
+        </form>
+      </div>
     </div>
   );
 };

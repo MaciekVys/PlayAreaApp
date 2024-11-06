@@ -13,67 +13,87 @@ from ..models import City
 from graphql import GraphQLError
 from graphql_jwt.decorators import login_required
 
-
-
-
 class AuthMutation(graphene.ObjectType):
     refresh_token = mutations.RefreshToken.Field()
 
-
 class RefreshTokenMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        try:
-            if request.COOKIES.get("JWT-Refresh-token") is None:
-                return None
-            if request.path == "/logout/":
-                return
-            schema = graphene.Schema(mutation=AuthMutation)
-            result = schema.execute(
-                '''
-                    mutation {
-                        refreshToken(refreshToken: "'''
-                + request.COOKIES.get("JWT-Refresh-token")
-                + """")
-                                {
-                                    token
-                                    refreshToken
-                                    success
-                                    errors
-                                    }
-                                }
-                            """
-            )
-            
-            if result.errors:
-                print("GraphQL errors:", result.errors)
-                return
-            
-            refresh_data = result.data.get("refreshToken")
-            if refresh_data and refresh_data.get("success"):
-                # Pobierz nowy token i refresh token
-                request.jwt_token = refresh_data.get("token")
-                request.refresh_token = refresh_data.get("refreshToken")
-                print("Nowy JWT token:", request.jwt_token)
-                print("Nowy Refresh token:", request.refresh_token)
-            else:
-                print("Błąd odświeżania tokena:", refresh_data.get("errors"))
-        except Exception as e:
-            print(e)
+        # Sprawdzenie, czy token został już odświeżony w ramach tego żądania
+        if hasattr(request, '_jwt_was_refreshed'):
+            return None
 
+        # Pobranie JWT i refresh tokena z ciasteczek
+        jwt_token = request.COOKIES.get("JWT")
+        refresh_token = request.COOKIES.get("JWT-Refresh-token")
+        
+        # Logowanie stanu początkowego
+        print(f"JWT Token: {jwt_token}")
+        print(f"Refresh Token: {refresh_token}")
+
+        # Jeśli JWT istnieje, sprawdź jego czas wygaśnięcia
+        if jwt_token:
+            # Jeśli JWT istnieje, ale brak refresh tokena, usuń ciasteczka
+            if not refresh_token:
+                print("Brak Refresh Tokena, usuwanie ciasteczek.")
+                response = JsonResponse({"error": "Authentication credentials were not provided or expired."}, status=403)
+                response.delete_cookie("JWT")
+                response.delete_cookie("JWT-Refresh-token")
+                return response
+
+        # Jeśli JWT nie istnieje, ale jest refresh token, spróbuj odświeżyć token
+        if jwt_token is None and refresh_token:
+            try:
+                # Tworzenie schematu z użyciem AuthMutation do odświeżenia tokena
+                schema = graphene.Schema(mutation=AuthMutation)
+                # Wykonanie mutacji odświeżenia tokena
+                print("Próba odświeżenia tokenu za pomocą refresh tokena...")
+                result = schema.execute(
+                    '''
+                    mutation {
+                        refreshToken(refreshToken: "''' + refresh_token + '''") {
+                            token
+                            refreshToken
+                            success
+                            errors
+                        }
+                    }
+                    '''
+                )
+
+                # Sprawdzenie, czy mutacja zakończyła się powodzeniem
+                if result and result.data and result.data.get("refreshToken") and result.data["refreshToken"]["success"]:
+                    print("Tokeny zostały odświeżone.")
+                    # Jeśli sukces, ustaw nowe tokeny w obiekcie `request` i oznacz, że został odświeżony
+                    request.jwt_token = result.data["refreshToken"]["token"]
+                    request.refresh_token = result.data["refreshToken"]["refreshToken"]
+                    request._jwt_was_refreshed = True
+                    request._jwt_token_to_update = True
+                else:
+                    print("Nie udało się odświeżyć tokenu. Usuwanie ciasteczek.")
+                    # W przypadku niepowodzenia odświeżania usuń ciasteczka i zwróć błąd
+                    response = JsonResponse({"error": "Failed to refresh token."}, status=403)
+                    response.delete_cookie("JWT")
+                    response.delete_cookie("JWT-Refresh-token")
+                    return response
+
+            except Exception as e:
+                print(f"Błąd odświeżania tokenu: {e}")
+        return None
 
     def process_response(self, request, response):
-        # Ustawienie nowych tokenów w ciasteczkach (jeśli są)
-        if hasattr(request, 'jwt_token'):
-            response.set_cookie('JWT', request.jwt_token, httponly=True, path='/')
-        if hasattr(request, 'refresh_token'):
-            response.set_cookie('JWT-Refresh-token', request.refresh_token, httponly=True, path='/')
-
+        # Logowanie, żeby sprawdzić, czy mamy nowe tokeny do ustawienia w ciasteczkach
+        if getattr(request, '_jwt_token_to_update', False):
+            print("Ustawianie nowych tokenów w ciasteczkach.")
+            response.set_cookie('JWT', request.jwt_token, httponly=True, secure=True, samesite='Lax')
+            response.set_cookie('JWT-Refresh-token', request.refresh_token, httponly=True, secure=True, samesite='Lax')
+        
         # Usuwanie ciasteczek po wylogowaniu
         if hasattr(request, 'delete_jwt_cookies') and request.delete_jwt_cookies:
+            print("Usuwanie ciasteczek po wylogowaniu.")
             response.delete_cookie('JWT')
             response.delete_cookie('JWT-Refresh-token')
+        
         return response
-    
 
 
 

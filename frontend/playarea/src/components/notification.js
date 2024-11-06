@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import gql from "graphql-tag";
 import "../styles/notification.scss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faHandshakeSimple,
+  faHandshakeSimpleSlash,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
 
 // Zapytanie GraphQL do pobierania powiadomień
 const MY_NOTIFICATIONS = gql`
@@ -9,6 +15,9 @@ const MY_NOTIFICATIONS = gql`
     myNotifications {
       id
       recipient {
+        username
+      }
+      sender {
         username
       }
       message
@@ -134,103 +143,117 @@ const Notification = () => {
 
   return (
     <div className="notification-container">
-      <h1 className="notification-header">Powiadomienia</h1>
-      {data.myNotifications.length === 0 ? (
-        <p>Brak nowych powiadomień</p>
-      ) : (
-        <ul className="notification-list">
-          {data.myNotifications.map((notification) => (
-            <li
-              key={notification.id}
-              className={notification.isRead ? "read" : ""}
-            >
-              <p className="notification-username">
-                {"Nadawca: "}
-                {notification.recipient.username}
-                <br />
-                {"Wiadomość: "}
-                {notification.message}
-              </p>
-              <p className="notification-status">
-                Status: {notification.isRead ? "Przeczytane" : "Nieprzeczytane"}
-              </p>
-
-              {notification.match ? (
-                <p className="notification-match">
-                  Mecz: {notification.match.homeTeam.name} vs{" "}
-                  {notification.match.awayTeam.name}
-                </p>
-              ) : (
-                <p></p>
-              )}
-
-              {notification.notificationType === "MATCH_INVITE" && (
-                <div className="notification-actions">
-                  {!notification.isResponded ? (
-                    <>
-                      <button
-                        className="accept"
-                        onClick={() =>
-                          handleResponseMatchInvite(true, notification.match.id)
-                        }
-                      >
-                        Akceptuj
-                      </button>
-                      <button
-                        className="reject"
-                        onClick={() =>
-                          handleResponseMatchInvite(
-                            false,
-                            notification.match.id
-                          )
-                        }
-                      >
-                        Odrzuć
-                      </button>
-                    </>
-                  ) : (
-                    <p>{notification.statusMessage}</p>
-                  )}
-                </div>
-              )}
-
-              {notification.notificationType === "JOIN_REQUEST" && (
-                <div className="notification-actions">
-                  {notification.isResponded ? (
-                    <p>{notification.statusMessage}</p>
-                  ) : (
-                    <>
-                      <button
-                        className="accept"
-                        onClick={() =>
-                          handleResponseJoinTeam(true, notification.id)
-                        }
-                      >
-                        Akceptuj
-                      </button>
-                      <button
-                        className="reject"
-                        onClick={() =>
-                          handleResponseJoinTeam(false, notification.id)
-                        }
-                      >
-                        Odrzuć
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
-
-              <button
-                className="delete"
-                onClick={() => handleDelete(notification.id)}
+      <div className="body-container">
+        <h1 className="notification-header">Powiadomienia</h1>
+        {data.myNotifications.length === 0 ? (
+          <p>Brak nowych powiadomień</p>
+        ) : (
+          <ul className="notification-list">
+            {data.myNotifications.map((notification) => (
+              <li
+                key={notification.id}
+                className={notification.isRead ? "read" : ""}
               >
-                Usuń
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+                <p className="notification-username">
+                  {"Od: "}
+                  {notification?.sender?.username || "Nieznany"}
+                  <br />
+                  {"Do: "}
+                  {notification.recipient.username}
+                  <br />
+                  {"Wiadomość: "}
+                  {notification.message}
+                </p>
+                {/* <p className="notification-status">
+                  Status:{" "}
+                  {notification.isRead ? "Przeczytane" : "Nieprzeczytane"}
+                </p> */}
+
+                {notification.match ? (
+                  <p>
+                    Mecz: {notification.match.homeTeam.name} vs{" "}
+                    {notification.match.awayTeam.name}
+                  </p>
+                ) : (
+                  <p></p>
+                )}
+
+                {notification.notificationType === "MATCH_INVITE" && (
+                  <div className="notification-actions">
+                    {!notification.isResponded ? (
+                      <>
+                        <button
+                          className="accept"
+                          onClick={() =>
+                            handleResponseMatchInvite(
+                              true,
+                              notification.match.id
+                            )
+                          }
+                        >
+                          Akceptuj <FontAwesomeIcon icon={faHandshakeSimple} />
+                        </button>
+                        <button
+                          className="reject"
+                          onClick={() =>
+                            handleResponseMatchInvite(
+                              false,
+                              notification.match.id
+                            )
+                          }
+                        >
+                          Odrzuć{" "}
+                          <FontAwesomeIcon icon={faHandshakeSimpleSlash} />
+                        </button>
+                      </>
+                    ) : (
+                      <p className="notification-match">
+                        {notification.statusMessage}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {notification.notificationType === "JOIN_REQUEST" && (
+                  <div className="notification-actions">
+                    {notification.isResponded ? (
+                      <p className="notification-match">
+                        {notification.statusMessage}
+                      </p>
+                    ) : (
+                      <>
+                        <button
+                          className="accept"
+                          onClick={() =>
+                            handleResponseJoinTeam(true, notification.id)
+                          }
+                        >
+                          Akceptuj
+                        </button>
+                        <button
+                          className="reject"
+                          onClick={() =>
+                            handleResponseJoinTeam(false, notification.id)
+                          }
+                        >
+                          Odrzuć
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                <button
+                  className="delete"
+                  onClick={() => handleDelete(notification.id)}
+                >
+                  <FontAwesomeIcon icon={faTrashCan} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

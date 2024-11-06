@@ -1,6 +1,6 @@
 import graphene
 from graphene_django.types import DjangoObjectType
-from ..models import Match, PlayerStatistics,MatchResult, Team
+from ..models import ExtendUser, Match, PlayerStatistics,MatchResult, Team
 
 class PlayerStatisticsInput(graphene.InputObjectType):
     player_id = graphene.Int(required=True)
@@ -47,10 +47,10 @@ class ConfirmMatchResult(graphene.Mutation):
 
         # Przetwarzanie statystyk dla zawodników
         for stat in statistics:
-            player = Player.objects.get(id=stat.player_id)
+            player = ExtendUser.objects.get(id=stat.player_id)  # Użycie ExtendUser zamiast Player
 
             # Sprawdzanie, czy zawodnik należy do drużyny potwierdzającej
-            if player.team != team:
+            if not team.players_in_team.filter(pk=user.pk).exists():  # Sprawdzenie ManyToMany dla drużyny
                 raise Exception(f"Zawodnik nie należy do drużyny {'gospodarzy' if is_home_team else 'gości'}.")
 
             # Aktualizacja statystyk zawodnika

@@ -3,6 +3,13 @@ import gql from "graphql-tag";
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../styles/myTeam.scss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faRightFromBracket,
+  faUsers,
+  faFutbol,
+  faCircleRight,
+} from "@fortawesome/free-solid-svg-icons";
 
 // Define the user query to check if the user has a team
 const USER_TEAM_QUERY = gql`
@@ -188,30 +195,30 @@ const UserTeam = () => {
   }
 
   return (
-    <div className="container">
-      <div className="team-info">
-        {team.logo ? (
-          <img src={`${MEDIA_URL}${team.logo}`} alt={`${team.name} logo`} />
-        ) : (
-          <div className="placeholder-logo">Brak logo</div>
-        )}
-        <div className="left-side">
-          <h1>{team.name}</h1>
-          <p>Liczba graczy: {team.playersCount}</p>
-          <p>Liczba meczów: {team.matchesCount}</p>
-          <p>Miasto: {team.league?.city?.name || "Brak miasta"}</p>
-          <p>Liga: {team.league?.name || "Brak ligi"}</p>
-          <p>Kapitan: {team.captain?.username || "Brak kapitana"}</p>
-          {/* Show the join team button only if the user is not on a team */}
-          {!userHasTeam && (
-            <button
-              className="join-team-button"
-              onClick={handleJoinRequest}
-              disabled={joining}
-            >
-              {joining ? "Wysyłanie..." : "Dołącz do drużyny"}
-            </button>
+    <>
+      <div className="container">
+        <div className="team-info">
+          {team.logo ? (
+            <img src={`${MEDIA_URL}${team.logo}`} alt={`${team.name} logo`} />
+          ) : (
+            <div className="placeholder-logo">Brak logo</div>
           )}
+          <div className="left-side">
+            <h1>{team.name}</h1>
+            <p>Liczba graczy: {team.playersCount}</p>
+            <p>Liczba meczów: {team.matchesCount}</p>
+            <p>Miasto: {team.league?.city?.name || "Brak miasta"}</p>
+            <p>Liga: {team.league?.name || "Brak ligi"}</p>
+            <p>Kapitan: {team.captain?.username || "Brak kapitana"}</p>
+          </div>
+          <button
+            className="leave-button"
+            onClick={handleJoinRequest}
+            disabled={joining}
+          >
+            {joining ? "Wysyłanie..." : "Dołącz do drużyny"}
+            <FontAwesomeIcon icon={faRightFromBracket} />
+          </button>
         </div>
       </div>
       <div className="tabs">
@@ -219,115 +226,124 @@ const UserTeam = () => {
           className={tabs === "squad" ? "active" : ""}
           onClick={() => setTabs("squad")}
         >
-          Skład
+          Skład <FontAwesomeIcon icon={faUsers} />
         </button>
         <button
           className={tabs === "matches" ? "active" : ""}
           onClick={() => setTabs("matches")}
         >
-          Mecze
+          Mecze <FontAwesomeIcon icon={faFutbol} />
         </button>
       </div>
-      {tabs === "squad" && (
-        <>
-          <h1>Gracze:</h1>
-          <table className="players-table">
-            <thead>
-              <tr>
-                <th>Imię Użytkownika</th>
-                <th>Pozycja</th>
-                <th>Gole</th>
-                <th>Asysty</th>
-                <th>MVP</th>
-              </tr>
-            </thead>
-            <tbody>
-              {team.players.map((player) => {
-                const playerStats = playerStatsMap[player.username] || {};
-                return (
-                  <tr key={player.id}>
+      <div className="second-container">
+        {tabs === "squad" && (
+          <>
+            <h1>Gracze</h1>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Zdjęcie</th>
+                  <th>Imię Użytkownika</th>
+                  <th>Pozycja</th>
+                  <th>Gole</th>
+                  <th>Asysty</th>
+                  <th>MVP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {team.players.map((player) => {
+                  const playerStats = playerStatsMap[player.username] || {};
+                  return (
+                    <tr key={player.id}>
+                      <td></td>
+                      <td
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate(`/profile/${player.id}`)}
+                      >
+                        {player.username}
+                      </td>
+                      <td>{player.position || "Nieznana"}</td>
+                      <td>{playerStats.totalGoals || 0}</td>
+                      <td>{playerStats.totalAssists || 0}</td>
+                      <td>{playerStats.totalMvps || 0}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </>
+        )}
+
+        {tabs === "matches" && (
+          <>
+            <h1>Mecze</h1>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Gospodarze</th>
+                  <th>Wynik</th>
+                  <th>Goście</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {team.matches.map((match, index) => (
+                  <tr key={index}>
+                    <td>{match.matchDate}</td>
                     <td
                       style={{ cursor: "pointer" }}
-                      onClick={() => navigate(`/profile/${player.id}`)}
+                      onClick={() => navigate(`/team/${match.homeTeam.id}`)}
                     >
-                      {player.username}
+                      <div style={{ padding: "5px", alignItems: "center" }}>
+                        {match.homeTeam.name}
+                        <img
+                          style={{
+                            width: "20px",
+                            height: "auto",
+                            marginLeft: "0",
+                            float: "right",
+                          }}
+                          src={`${MEDIA_URL}${match.homeTeam.logo}`}
+                          alt={`${match.homeTeam.logo} logo`}
+                        />
+                      </div>
                     </td>
-                    <td>{player.position || "Nieznana"}</td>
-                    <td>{playerStats.totalGoals}</td>
-                    <td>{playerStats.totalAssists}</td>
-                    <td>{playerStats.totalMvps}</td>
+                    <td>
+                      {match.scoreHome} : {match.scoreAway}
+                    </td>
+                    <td
+                      style={{ cursor: "pointer" }}
+                      onClick={() => navigate(`/team/${match.awayTeam.id}`)}
+                    >
+                      <div style={{ padding: "5px", alignItems: "center" }}>
+                        {match.awayTeam.name}
+                        <img
+                          style={{
+                            width: "20px",
+                            height: "auto",
+                            marginLeft: "0",
+                            float: "left",
+                          }}
+                          src={`${MEDIA_URL}${match.awayTeam.logo}`}
+                          alt={`${match.awayTeam.logo} logo`}
+                        />
+                      </div>
+                    </td>
+                    <td
+                      style={{ cursor: "pointer" }}
+                      onClick={() => navigate(`/checkMatch/${match.id}`)}
+                    >
+                      <FontAwesomeIcon icon={faCircleRight} />
+                    </td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </>
-      )}
-
-      {tabs === "matches" && (
-        <>
-          <h1>Mecze:</h1>
-          <table className="matches-table">
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Gospodarze</th>
-                <th>Wynik</th>
-                <th>Goście</th>
-                <th>Wygrana</th>
-              </tr>
-            </thead>
-            <tbody>
-              {team.matches.map((match, index) => (
-                <tr key={index}>
-                  <td>{match.matchDate}</td>
-                  <td
-                    style={{ cursor: "pointer" }}
-                    onClick={() => navigate(`/team/${match.homeTeam.id}`)}
-                  >
-                    <div style={{ padding: "5px", alignItems: "center" }}>
-                      {match.homeTeam.name}
-                      <img
-                        style={{
-                          width: "20px",
-                          height: "auto",
-                          marginLeft: "0",
-                          float: "right",
-                        }}
-                        src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                        alt={`${match.homeTeam.logo} logo`}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    {match.scoreHome} : {match.scoreAway}
-                  </td>
-                  <td
-                    style={{ cursor: "pointer" }}
-                    onClick={() => navigate(`/team/${match.awayTeam.id}`)}
-                  >
-                    <div style={{ padding: "5px", alignItems: "center" }}>
-                      {match.awayTeam.name}
-                      <img
-                        style={{
-                          width: "20px",
-                          height: "auto",
-                          marginLeft: "0",
-                          float: "right",
-                        }}
-                        src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                        alt={`${match.awayTeam.logo} logo`}
-                      />
-                    </div>
-                  </td>
-                  <td>{match.winner ? match.winner : "Brak"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
-    </div>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+      </div>
+    </>
   );
 };
 

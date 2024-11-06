@@ -120,15 +120,6 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
         
         notifications = Notification.objects.filter(recipient=user)
 
-        for notification in notifications:
-            if notification.match:
-                if notification.match.status == "scheduled":
-                    notification.status_message = "Mecz zaplanowany."
-                elif notification.match.status == "canceled":
-                    notification.status_message = "Mecz został odwołany."
-            else:
-                notification.status_message = None
-
         return notifications
     
     def resolve_teams_in_user_league(self, info):
@@ -239,6 +230,7 @@ class Mutation(AuthMutation, graphene.ObjectType):
     send_join_request = SendJoinRequest.Field()
     respond_to_join_request = RespondToJoinRequest.Field()
     leave_team = LeaveTeam.Field()
+
 
 
 

@@ -80,16 +80,14 @@ const CreateTeam = () => {
 
           <h3>Wprowadź nazwę drużyny:</h3>
           <input
-            className="input-field"
+            className="input-field-create-team"
             placeholder="Wprowadź nazwę drużyny"
             value={teamName}
             onChange={(e) => setTeamName(e.target.value)}
             required
           />
 
-          <button className="submit-button" type="submit">
-            Zarejestruj Drużynę
-          </button>
+          <button type="submit">Zarejestruj Drużynę</button>
           {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
         </form>
       </div>

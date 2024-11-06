@@ -75,7 +75,7 @@ const PlayerProfile = () => {
   const statistics = summaryData?.playerStatisticsSummary;
 
   return (
-    <>
+    <div>
       <div className="container-player">
         {user ? (
           <>
@@ -84,10 +84,13 @@ const PlayerProfile = () => {
                 {user.firstName} {user.lastName}
                 <br />"{user.username}"
               </h1>
-              {user.photo && (
+              {user.photo ? (
                 <img src={`${MEDIA_URL}${user.photo}`} alt="Player" />
+              ) : (
+                <div className="placeholder-photo">Brak zdjęcia</div>
               )}
             </div>
+
             <div className="stats">
               <p>Drużyna: {user.team?.name || "Brak drużyny"}</p>
               <p>Miasto: {user.city?.name || "Brak miasta"}</p>
@@ -113,8 +116,8 @@ const PlayerProfile = () => {
           <div className="alert">Brak danych o profilu użytkownika</div>
         )}
       </div>
-      <div>
-        <table className="matches-table">
+      <div className="second-container">
+        <table className="table">
           <thead>
             <tr>
               <th>Drużyna</th>
@@ -135,7 +138,7 @@ const PlayerProfile = () => {
           </tbody>
         </table>
       </div>
-    </>
+    </div>
   );
 };
 

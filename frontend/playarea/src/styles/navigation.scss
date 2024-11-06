@@ -1,18 +1,7 @@
 // Zmienne kolorów
-$primary-color: #000000; // Ciemne tło
-$white-color: #ffffff;
-$highlight-color: #57ca9e; // Kolor podkreślenia (zielony)
-
-// Zmienne typograficzne
-$font-size-large: 28px;
-$font-size-medium: 18px;
-
-// Zmienne odstępów
-$padding-vertical: 15px;
-$padding-horizontal: 30px;
-$gap-size: 20px;
-
-// Zmienne animacji
+$shadow-color: rgba(10, 170, 191, 0.375); // Kolor cienia
+$primary-color: #0dd7bc; // Green (similar to a football field)
+$font-family: "Roboto", sans-serif; // Nowoczesny font
 $transition-duration: 0.3s;
 
 /* Resetowanie marginesów i paddingów */
@@ -20,8 +9,7 @@ $transition-duration: 0.3s;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  font-family: $font-family;
 }
 
 /* Styl dla nawigacji */
@@ -31,65 +19,47 @@ $transition-duration: 0.3s;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: $primary-color;
-  padding: $padding-vertical $padding-horizontal;
-
-  /* Styl dla logo */
-  .logo {
-    a {
-      text-decoration: none;
-    }
-
-    h1 {
-      color: $highlight-color;
-      font-size: $font-size-large;
-      font-weight: bold;
-      text-decoration: none;
-    }
-  }
+  background-image: linear-gradient(250deg, #000, #1a1a1a, $primary-color);
+  padding: 20px 40px;
+  box-shadow: 0 4px 10px $shadow-color;
+  z-index: 1000;
 
   /* Styl dla menu */
   .menu {
     display: flex;
-    gap: $gap-size;
+    gap: 25px;
 
     .menu-item {
       text-transform: uppercase;
-      color: $white-color;
+      color: $primary-color;
       text-decoration: none;
-      font-size: $font-size-medium;
+      font-size: 20px;
       position: relative;
-      transition: color $transition-duration;
-      margin-top: 10px;
-
-      a {
-        text-decoration: none;
-        color: #ffffff;
-      }
 
       /* Efekt hover dla menu */
       &::after {
         content: "";
         display: block;
         width: 0%;
-        height: 2px;
-        background: $highlight-color;
+        height: 3px; // Grubsza linia podkreślenia
+        background: #ffffff;
         transition: width $transition-duration;
         position: absolute;
-        bottom: -5px;
+        bottom: -8px;
         left: 0;
       }
 
       &:hover {
-        color: $highlight-color;
+        color: #ffffff;
 
         &::after {
           width: 100%;
+          color: #ffffff;
         }
       }
 
       &.active {
-        color: $highlight-color;
+        color: #ffffff;
 
         &::after {
           width: 100%;
@@ -103,64 +73,56 @@ $transition-duration: 0.3s;
       cursor: pointer;
 
       .dropdown-menu {
-        display: none; // Domyślnie ukryte
+        border-top: solid 1px $primary-color;
+        display: none;
         position: absolute;
-        top: 40px;
-        right: 0;
-        background-color: $primary-color;
-        border: 1px solid $highlight-color;
-        border-radius: 8px;
+        width: 250px;
+        top: 62px;
+        right: -40px;
+        background-color: black;
+        border-radius: 0 0 0 0;
         padding: 10px;
         list-style: none;
-        min-width: 150px;
-        z-index: 100;
+        box-shadow: 0 4px 10px $shadow-color;
 
         /* Dodajemy strzałkę przed menu */
         &::before {
           content: "";
           position: absolute;
           top: -10px; // Pozycjonowanie strzałki nad menu
-          right: 10px; // Dopasuj, aby strzałka znajdowała się blisko elementu menu
-          border-width: 0 10px 10px 10px; // Kształt trójkąta
+          right: 30px; // Dopasuj, aby strzałka znajdowała się blisko elementu menu
+          border-width: 0 10px 10px 10px;
           border-style: solid;
-          border-color: transparent transparent $highlight-color transparent; // Kolor strzałki taki jak tło menu
-          z-index: 1;
+          border-color: transparent transparent $primary-color transparent; // Kolor strzałki
         }
 
         li {
-          padding: 10px 20px;
+          padding: 10px 15px; // Mniejsze paddingi
           cursor: pointer;
-          border-bottom: 1px solid $highlight-color;
-          transition: color $transition-duration;
-
-          &:last-child {
-            border-bottom: none;
-          }
 
           a {
-            color: $white-color;
+            color: $primary-color;
             text-decoration: none;
-            transition: color $transition-duration;
 
             &:hover,
             &:focus,
             &:active {
-              color: $highlight-color;
+              color: #ffffff;
             }
           }
 
           button {
             background: none;
-            color: $white-color;
+            color: $primary-color;
             border: none;
-            font-size: $font-size-medium;
+            font-size: 20px;
+            text-transform: uppercase;
             cursor: pointer;
             text-align: left;
             padding: 0;
-            transition: color $transition-duration;
 
             &:hover {
-              color: $highlight-color;
+              color: #ffffff;
             }
           }
         }

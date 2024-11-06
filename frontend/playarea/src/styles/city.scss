@@ -1,103 +1,99 @@
 /* Kontener całej strony */
-.city-container {
-  padding: 20px;
-  font-family: "Arial", sans-serif;
-  background-color: #f4f4f9;
-  margin: 70px;
-  border-radius: 20px;
-  color: #333;
-}
 
-/* Informacje o mieście */
 .city-info {
-  color: #ddd;
-  margin-bottom: 40px;
-  background-color: rgb(0, 0, 0, 0.7);
-  padding: 30px;
-}
-.city-info-body {
-  border: 2px white solid;
-  padding: 30px;
-  width: 60%;
-  margin: auto;
-  display: flex;
+  color: #000;
+  padding: 20px;
+  position: relative;
+  border-bottom: solid 2px #000;
+  overflow: hidden;
 
-  img {
-    width: 200px;
-    height: 250px;
-    border: 3px solid #57ca9e;
-    object-fit: cover;
-    margin-right: 20px;
+  /* Pseudoelement na tło */
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("../images/city.jpg");
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(80%);
+    z-index: 1;
   }
-}
 
-.city-info h1 {
-  font-size: 36px;
-  margin-bottom: 10px;
-}
+  .city-info-body {
+    display: flex;
+    width: 60%;
+    margin: auto;
+    padding: 20px;
+    border: solid 2px #000;
+    backdrop-filter: blur(10px);
+    // background-color: #000;
+    position: relative;
+    z-index: 2;
 
-.city-info p {
-  font-size: 18px;
-  color: #777;
+    img {
+      width: 140px;
+      height: auto;
+      object-fit: cover;
+      margin-right: 20px;
+      border-radius: 5px;
+    }
+
+    p {
+      color: #ffffff;
+      font-size: 20px;
+    }
+
+    h1 {
+      color: #ffffff;
+    }
+  }
 }
 
 /* Sekcja */
 .section {
-  max-width: 1000px;
+  max-width: 1200px; /* Szerokość sekcji */
   margin: 0 auto;
+  padding: 20px;
 }
 
 /* Nagłówki tabel */
 .section h2 {
-  font-size: 24px;
-  margin: 20px 0;
-  text-align: left;
-  padding-bottom: 5px;
-  color: #333;
-}
-
-/* Tabela (wspólne dla meczów i rankingów) */
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 40px;
-}
-
-.table th,
-.table td {
-  padding: 12px 15px;
+  font-size: 28px; /* Większa czcionka nagłówków */
+  margin: 30px 0; /* Większe marginesy */
   text-align: center;
-  border-bottom: 1px solid #ddd;
+  color: #2c3e50; /* Ciemny kolor nagłówków */
+  border-bottom: 2px solid #000000;
 }
 
-.table th {
-  color: black;
-}
-
-.table tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.table tr:hover {
-  background-color: #f1f1f1;
-}
-
-.table td {
-  color: #333;
-}
-.winner {
-  font-weight: bold;
-}
 /* Responsywność */
 @media (max-width: 768px) {
+  .city-container {
+    padding: 20px; /* Mniejsze paddingi dla mniejszych ekranów */
+  }
+
   .city-info h1 {
-    font-size: 28px;
+    font-size: 30px; /* Mniejsza czcionka dla nagłówków */
   }
 
   .section {
-    padding: 0 10px;
+    padding: 0 10px; /* Mniejsze paddingi w sekcjach */
   }
+
   .section h2 {
-    font-size: 20px;
+    font-size: 22px;
+  }
+
+  .city-info-body {
+    flex-direction: column; /* Zmiana kierunku dla mniejszych ekranów */
+    align-items: center; /* Centrowanie obrazka i tekstu */
+  }
+
+  img {
+    width: 100%; /* Pełna szerokość na mniejszych ekranach */
+    height: auto; /* Automatyczna wysokość */
+    margin-bottom: 20px; /* Dodanie marginesu na dole */
   }
 }

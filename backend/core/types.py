@@ -150,36 +150,30 @@ class NotificationType(DjangoObjectType):
     class Meta:
         model = Notification
 
-    id = graphene.Int()
-    isRead = graphene.Boolean()
-    recipient = graphene.Field(ExtendUserType) 
-    message = graphene.String()
-    createdAt = graphene.DateTime()
+    is_responded = graphene.Boolean()
     statusMessage = graphene.String()
-    isResponded = graphene.Boolean() 
 
     def resolve_statusMessage(self, info):
         if self.notification_type == 'join_request':
-            if self.is_responded:
-                return "Zaakceptowano prośbę!"
+            if self.status == 'accepted':
+                return "Zaakceptowano prośbę przyjęcia do drużyny!"
+            elif self.status == 'declined':   
+                return "Odrzucono prośbę przyjęcia do drużyny!"
             else:
-                return "Odrzucono prośbę!"
+                None
         
         if self.match:
             if self.match.status == 'scheduled':
+                # self.is_responded= True
                 return "Mecz zaplanowany."
             elif self.match.status == 'canceled':
+                # self.is_responded= True
                 return "Mecz został odwołany."
             else:
                 return None  
         return None  
 
-    def resolve_isResponded(self, info):
-        if self.match:  
-            return self.match.is_responded  
-        elif self.notification_type == 'join_request':
-            return self.is_responded  
-        return False 
+
     
     
 class MatchResultType(DjangoObjectType):

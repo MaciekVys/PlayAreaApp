@@ -3,6 +3,12 @@ import gql from "graphql-tag";
 import React, { useEffect, useState } from "react";
 import "../styles/city.scss";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCircleRight,
+  faFutbol,
+  faTable,
+} from "@fortawesome/free-solid-svg-icons";
 
 const CITY_QUERY = gql`
   query GetCityData($name: String!) {
@@ -159,13 +165,13 @@ const City = () => {
               className={table === "matches" ? "active" : ""}
               onClick={() => setTable("matches")}
             >
-              Mecze
+              Mecze <FontAwesomeIcon icon={faFutbol} />
             </button>
             <button
               className={table === "rankings" ? "active" : ""}
               onClick={() => setTable("rankings")}
             >
-              Tabela
+              Tabela <FontAwesomeIcon icon={faTable} />
             </button>
           </div>
 
@@ -240,6 +246,7 @@ const City = () => {
                               {match.awayTeam?.name}
                             </div>
                           </td>
+                          <td></td>
                         </tr>
                       ))}
                   </tbody>
@@ -322,7 +329,7 @@ const City = () => {
                                 navigate(`/confirmMatch/${match.id}`)
                               }
                             >
-                              GO{" "}
+                              <FontAwesomeIcon icon={faCircleRight} />
                             </td>
                           ) : (
                             <td></td>
@@ -411,7 +418,7 @@ const City = () => {
                             style={{ cursor: "pointer" }}
                             onClick={() => navigate(`/checkMatch/${match.id}`)}
                           >
-                            GO{" "}
+                            <FontAwesomeIcon icon={faCircleRight} />
                           </td>
                         </tr>
                       ))}

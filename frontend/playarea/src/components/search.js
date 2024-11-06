@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/search.scss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
 const Search = () => {
   const [search, setSearch] = useState("");
@@ -22,7 +24,7 @@ const Search = () => {
         onChange={(e) => setSearch(e.target.value)}
       />
       <button className="button" disabled={search === ""}>
-        Szukaj
+        Szukaj <FontAwesomeIcon icon={faMagnifyingGlass} />
       </button>
     </form>
   );

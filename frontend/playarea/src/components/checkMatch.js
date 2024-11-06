@@ -11,9 +11,7 @@ const GET_MATCH_STATISTICS = gql`
         name
         logo
         players {
-          user {
-            username
-          }
+          username
           playerstatisticsSet {
             goals
             assists
@@ -25,9 +23,7 @@ const GET_MATCH_STATISTICS = gql`
         name
         logo
         players {
-          user {
-            username
-          }
+          username
           playerstatisticsSet {
             goals
             assists
@@ -59,22 +55,29 @@ const CheckMatch = () => {
     <div className="check-match-container">
       <h2>Statystyki meczu</h2>
       <h3>Data meczu: {match.matchDate}</h3>
-      <h3>
-        Wynik: {match.scoreHome} - {match.scoreAway}
-      </h3>
 
       <div className="teams-container">
         <div className="team-section">
-          <h3>Gospodarze: {match.homeTeam.name}</h3>
-          <img
+          <div
             style={{
-              width: "40px",
-              height: "auto",
+              display: "flex",
+              alignItems: "center",
             }}
-            src={`${MEDIA_URL}${match.homeTeam.logo}`}
-            alt={`${match.homeTeam.logo} logo`}
-          />
-          <table>
+          >
+            <h3 style={{ marginRight: "10px" }}>
+              Gospodarze: {match.homeTeam.name}
+            </h3>
+            <img
+              style={{
+                width: "auto",
+                height: "25px",
+                marginBottom: "20px",
+              }}
+              src={`${MEDIA_URL}${match.homeTeam.logo}`}
+              alt={`${match.homeTeam.logo} logo`}
+            />
+          </div>
+          <table className="table">
             <thead>
               <tr>
                 <th>Gracz</th>
@@ -86,10 +89,10 @@ const CheckMatch = () => {
             <tbody>
               {match.homeTeam.players.map((player) =>
                 player.playerstatisticsSet.map((stat, index) => (
-                  <tr key={`${player.user.username}-${index}`}>
+                  <tr key={`${player.username}-${index}`}>
                     {index === 0 ? (
                       <td rowSpan={player.playerstatisticsSet.length}>
-                        {player.user.username}
+                        {player.username}
                       </td>
                     ) : null}
                     <td>{stat.goals}</td>
@@ -101,18 +104,33 @@ const CheckMatch = () => {
             </tbody>
           </table>
         </div>
-
+        <div className="score-container">
+          <p className="score">
+            {match.scoreHome} - {match.scoreAway}
+          </p>
+        </div>
         <div className="team-section">
-          <h3>Goście: {match.awayTeam.name}</h3>
-          <img
+          <div
             style={{
-              width: "40px",
-              height: "auto",
+              display: "flex",
+              alignItems: "center",
             }}
-            src={`${MEDIA_URL}${match.awayTeam.logo}`}
-            alt={`${match.awayTeam.logo} logo`}
-          />
-          <table>
+          >
+            <h3 style={{ marginRight: "10px" }}>
+              Goście: {match.awayTeam.name}
+            </h3>
+            <img
+              style={{
+                width: "auto",
+                height: "25px",
+                marginBottom: "20px",
+              }}
+              src={`${MEDIA_URL}${match.awayTeam.logo}`}
+              alt={`${match.awayTeam.logo} logo`}
+            />
+          </div>
+
+          <table className="table">
             <thead>
               <tr>
                 <th>Gracz</th>
@@ -124,10 +142,10 @@ const CheckMatch = () => {
             <tbody>
               {match.awayTeam.players.map((player) =>
                 player.playerstatisticsSet.map((stat, index) => (
-                  <tr key={`${player.user.username}-${index}`}>
+                  <tr key={`${player.username}-${index}`}>
                     {index === 0 ? (
                       <td rowSpan={player.playerstatisticsSet.length}>
-                        {player.user.username}
+                        {player.username}
                       </td>
                     ) : null}
                     <td>{stat.goals}</td>

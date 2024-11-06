@@ -1,4 +1,4 @@
-$primary-color: #192122;
+$primary-color: #0dd7bc;
 $white-color: #678b7d;
 $highlight-color: #ffffff;
 
@@ -14,64 +14,36 @@ $gap-size: 20px;
 // Zmienne animacji
 $transition-duration: 0.3s;
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
-}
-
 /* Przyciski */
 button {
-  background: #57ca9e; /* Usuwamy tło */
-  color: $highlight-color; /* Kolor tekstu zgodny z resztą menu */
-  border: none;
+  background: $primary-color; /* Usuwamy tło */
+  color: #000000; /* Kolor tekstu zgodny z resztą menu */
+  border: 2px solid #ffffff;
   border-radius: 25px;
   padding: 10px 20px; /* Zwiększyłem padding dla lepszego wyglądu */
   cursor: pointer;
   transition: all $transition-duration ease-in-out;
+  font-weight: bold;
 
   &:hover {
-    background-color: #45b384;
-    color: $primary-color; /* Zmiana koloru tekstu */
-    border-color: $highlight-color; /* Obramowanie zmienia kolor na highlight */
-  }
-
-  &::after {
-    display: block;
-    width: 0%;
-    height: 2px;
-    background: $highlight-color;
-    transition: width $transition-duration ease;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-  }
-
-  &:hover::after {
-    width: 100%;
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px lighten($primary-color, 30%);
+    background-color: #000000;
+    color: $primary-color;
+    border-color: #ffffff;
+    font-weight: bold;
   }
 }
 
 /* Etykiety */
 .label {
-  border: solid 2px $white-color; /* Obramowanie w kolorze przycisku */
+  border: solid 2px $primary-color; /* Obramowanie w kolorze przycisku */
   border-radius: 25px;
   padding: 10px;
   margin: 5px;
   display: inline-block;
-  background-color: transparent;
-  transition: all $transition-duration ease-in-out;
+  background-color: #ffffff;
 
   &:hover {
-    background-color: lighten($white-color, 20%);
-    color: $primary-color;
-    border-color: $highlight-color;
+    background-color: black;
+    color: #ffffff;
   }
 }

@@ -1,6 +1,6 @@
 body {
-  background-image: url("./images/background.png");
-  /* background-color: azure; */
+  /* background-image: url("./images/background.png"); */
+  background-color: azure;
   background-size: cover;
 }
 

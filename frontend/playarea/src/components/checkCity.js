@@ -3,6 +3,12 @@ import gql from "graphql-tag";
 import React, { useState } from "react";
 import "../styles/city.scss";
 import { useNavigate, useParams } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCircleRight,
+  faFutbol,
+  faTable,
+} from "@fortawesome/free-solid-svg-icons";
 
 const CITY_QUERY = gql`
   query GetCityData($name: String!) {
@@ -121,13 +127,13 @@ const CheckCity = () => {
               className={table === "matches" ? "active" : ""}
               onClick={() => setTable("matches")}
             >
-              Mecze
+              Mecze <FontAwesomeIcon icon={faFutbol} />
             </button>
             <button
               className={table === "rankings" ? "active" : ""}
               onClick={() => setTable("rankings")}
             >
-              Tabela
+              Tabela <FontAwesomeIcon icon={faTable} />
             </button>
           </div>
 
@@ -142,6 +148,7 @@ const CheckCity = () => {
                       <th>Gospodarze</th>
                       <th></th>
                       <th>Goście</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -207,7 +214,7 @@ const CheckCity = () => {
                               style={{ cursor: "pointer" }}
                               onClick={() => navigate("/notification")}
                             >
-                              GO{" "}
+                              <FontAwesomeIcon icon={faCircleRight} />
                             </td>
                           ) : (
                             <td></td>
@@ -226,7 +233,7 @@ const CheckCity = () => {
                       <th>Gospodarze</th>
                       <th></th>
                       <th>Goście</th>
-                      <th>Wynik</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -290,9 +297,11 @@ const CheckCity = () => {
                           match?.awayTeam?.captain?.id === userId ? (
                             <td
                               style={{ cursor: "pointer" }}
-                              onClick={() => navigate("/notification")}
+                              onClick={() =>
+                                navigate(`/confirmMatch/${match.id}`)
+                              }
                             >
-                              GO{" "}
+                              <FontAwesomeIcon icon={faCircleRight} />
                             </td>
                           ) : (
                             <td></td>
@@ -379,7 +388,7 @@ const CheckCity = () => {
                             style={{ cursor: "pointer" }}
                             onClick={() => navigate(`/checkMatch/${match.id}`)}
                           >
-                            GO{" "}
+                            <FontAwesomeIcon icon={faCircleRight} />
                           </td>
                         </tr>
                       ))}

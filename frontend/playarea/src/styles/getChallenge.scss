@@ -1,11 +1,56 @@
-/* Kontener dla formularza wyzwania drużyny */
+/* Styl dla kontenera z informacjami o mieście */
+
+/* Styl dla kontenera formularza */
 .challenge-team-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  margin-top: 20px;
+  margin: 20px;
+  background-image: url("../images/city.jpg");
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: center; // Ustawienie wyrównania do lewej
+  padding: 20px;
+  margin-right: 90px; // Odstęp między miastem a formularzem
+  background-color: rgba(255, 255, 255, 0.8); // Tło z przezroczystością
+  border-radius: 8px; // Zaokrąglone rogi
+  width: 30%; // Szerokość kontenera
+
+  img {
+    width: 100px;
+    height: auto;
+  }
+}
+
+/* Dodatkowe style dla nagłówków i paragrafów w kontenerze z informacjami */
+.city-info h1,
+.city-info p {
+  color: #333; // Kolor tekstu
+  margin: 0; // Usunięcie domyślnych marginesów
+}
+
+.city-info h1 {
+  font-size: 28px; // Rozmiar nagłówka
+  margin-bottom: 10px; // Odstęp poniżej nagłówka
+}
+
+.city-info p {
+  font-size: 16px; // Rozmiar tekstu
+  margin-bottom: 5px; // Odstęp poniżej akapitu
+}
+
+.challenge-form {
+  margin: 30px;
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(10, 170, 191, 0.375);
+  width: 35%;
 
   h2 {
     font-size: 24px;
@@ -16,28 +61,11 @@
   }
 }
 
-.challenge-form {
-  background-color: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-}
-
 .form-group {
   margin-bottom: 20px;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 14px;
-  color: #333;
-}
-
-.form-group select,
-.form-group input {
+.form-group select {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
@@ -60,7 +88,7 @@
   padding: 10px 15px;
   background-color: #57ca9e;
   color: white;
-  border: none;
+  border: 2px solid #000;
   border-radius: 4px;
   font-size: 16px;
   cursor: pointer;
@@ -68,7 +96,8 @@
 }
 
 .challenge-button:hover {
-  background-color: #45b384;
+  background-color: #000;
+  border: 2px solid #fff;
 }
 
 // getChallenge.scss

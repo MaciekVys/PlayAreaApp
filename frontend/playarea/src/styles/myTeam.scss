@@ -1,193 +1,185 @@
+/* Kontener główny */
 .container {
-  background-color: rgba(0, 0, 0, 0.85);
   color: white;
-  margin: 50px auto;
+  background-image: url("../images/team.jpg");
+  background-size: cover;
+  background-position: center;
+  margin: auto;
   padding: 40px;
-  max-width: 1200px;
-  border-radius: 12px;
-  min-height: 600px;
   overflow-y: auto;
-  border: 1px solid black;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+  position: relative;
+  width: 90%;
+  margin-top: 50px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+  }
+
+  * {
+    position: relative;
+    z-index: 1;
+  }
+}
+.second-container {
+  width: 80%;
+  margin: auto;
+  margin-bottom: 50px;
+  margin-top: 40px;
+
+  h1 {
+    text-align: center;
+    padding: 10px;
+  }
 }
 
+/* Informacje o drużynie */
 .team-info {
+  padding: 20px;
   display: flex;
-  justify-content: flex-start;
   margin-bottom: 20px;
 
   img {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    border: 3px solid #57ca9e;
-    object-fit: cover;
-    margin-right: 20px;
+    width: 200px; /* Szerokość obrazka */
+    height: auto; /* Wysokość obrazka */
+    margin-right: 20px; /* Margines */
+  }
+
+  button {
+    margin-left: auto;
+    height: 40px;
   }
 
   .left-side {
     h1 {
-      font-size: 36px;
-      color: #57ca9e;
-      margin-bottom: 10px;
+      font-size: 36px; /* Rozmiar nagłówka */
+      color: #1abc9c; /* Zmiana koloru nagłówka */
+      margin-bottom: 10px; /* Margines dolny */
     }
 
     p {
-      font-size: 18px;
-      padding: 5px 0;
+      font-size: 15px; /* Rozmiar tekstu */
+      padding: 5px 0; /* Padding */
     }
   }
 }
 
+/* Zakładki */
 .tabs {
-  display: flex;
+  display: flex; /* Flexbox */
   justify-content: center;
-  margin: 20px 0;
+  margin: 20px 0; /* Margines */
 }
 
 .tabs button {
-  background-color: black;
-  color: #57ca9e;
-  padding: 10px 20px;
-  margin: 5px;
-  border-radius: 5px;
-  border: 2px solid white;
-  cursor: pointer;
+  background-color: transparent; /* Przezroczyste tło */
+  color: #000;
+  padding: 10px 20px; /* Padding */
+  margin: 5px; /* Margines */
+  border-radius: 5px; /* Zaokrąglenia */
+  border: 2px solid #1abc9c; /* Ramka */
+  cursor: pointer; /* Kursor */
   transition: background-color 0.3s, color 0.3s;
 }
 
 .tabs button.active {
-  background-color: #57ca9e;
-  color: white;
-  border-color: #57ca9e;
+  background-color: #000; /* Aktywny przycisk */
+  color: #fff; /* Kolor tekstu */
+  border-color: #1abc9c; /* Kolor ramki */
 }
 
 .tabs button:hover {
-  background-color: #444;
-  color: white;
+  background-color: #444; /* Kolor hover */
+  color: white; /* Kolor tekstu */
 }
 
-.players-table,
-.matches-table {
-  width: 100%;
-  margin-top: 20px;
-  border-collapse: collapse;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.players-table th,
-.matches-table th,
-.players-table td,
-.matches-table td {
-  padding: 15px;
-  text-align: center;
-  border-bottom: 1px solid #ddd;
-  transition: background-color 0.3s ease;
-}
-
-.players-table th,
-.matches-table th {
-  background-color: #57ca9e;
-  color: black;
-  font-weight: bold;
-}
-
-.players-table tr:hover,
-.matches-table tr:hover {
-  background-color: #f5f5f5;
-}
-
-.players-table td,
-.matches-table td {
-  background-color: #f0f0f0;
-  color: #333;
-}
-
+/* Responsywność */
 @media (max-width: 768px) {
   .container {
-    margin: 20px;
-    padding: 20px;
+    margin: 20px; /* Margines */
+    padding: 20px; /* Padding */
   }
 
   .team-info {
-    flex-direction: column;
-    align-items: center;
+    flex-direction: column; /* Kolumna */
+    align-items: center; /* Wyśrodkowanie */
 
     img {
-      margin-bottom: 15px;
+      margin-bottom: 15px; /* Margines dolny */
     }
 
     .left-side {
-      text-align: center;
+      text-align: center; /* Wyjustowanie */
 
       h1 {
-        font-size: 28px;
+        font-size: 28px; /* Mniejszy rozmiar nagłówka */
       }
 
       p {
-        font-size: 16px;
+        font-size: 16px; /* Mniejszy rozmiar tekstu */
       }
     }
   }
 
   .tabs {
-    flex-direction: column;
-    align-items: center;
+    flex-direction: column; /* Kolumna */
+    align-items: center; /* Wyśrodkowanie */
   }
 
   .tabs button {
-    width: 100%;
-    max-width: 300px;
+    width: 100%; /* Szerokość przycisku */
+    max-width: 300px; /* Maksymalna szerokość */
   }
 }
-.no-team-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 40%;
-  margin: 50px auto;
-  padding: 20px;
-  background-color: rgb(0, 0, 0, 0.7);
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
 
-  // h1 {
-  //   font-size: 2rem;
-  //   color: #ffffff;
-  //   margin-bottom: 20px;
-  // }
+/* Kontener, gdy brak drużyny */
+.no-team-container {
+  display: flex; /* Flexbox */
+  flex-direction: column; /* Kolumna */
+  align-items: center; /* Wyśrodkowanie */
+  justify-content: center; /* Wyśrodkowanie */
+  width: 40%; /* Szerokość */
+  margin: 50px auto; /* Wyśrodkowanie */
+  padding: 20px; /* Padding */
+  background-color: rgba(0, 0, 0, 0.7); /* Przezroczyste tło */
+  border-radius: 10px; /* Zaokrąglenia */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Cień */
+  text-align: center; /* Wyjustowanie */
 
   .primary-button,
   .secondary-button {
-    padding: 15px 30px;
-    margin: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    padding: 15px 30px; /* Padding */
+    margin: 10px; /* Margines */
+    font-size: 16px; /* Rozmiar tekstu */
+    border: none; /* Brak ramki */
+    border-radius: 5px; /* Zaokrąglenia */
+    cursor: pointer; /* Kursor */
+    transition: background-color 0.3s ease; /* Efekt przejścia */
   }
 
   .primary-button {
-    background-color: #57ca9e;
-    color: white;
+    background-color: #1abc9c; /* Kolor przycisku */
+    color: white; /* Kolor tekstu */
   }
 
   .secondary-button {
-    background-color: #ffffff;
-    color: #57ca9e;
-    border: 2px solid #57ca9e;
+    background-color: #ffffff; /* Kolor przycisku */
+    color: #1abc9c; /* Kolor tekstu */
+    border: 2px solid #1abc9c; /* Ramka */
   }
 
   .primary-button:hover {
-    background-color: #45b384;
+    background-color: #45b384; /* Efekt hover */
   }
 
   .secondary-button:hover {
-    background-color: #f0f0f0;
+    background-color: #f0f0f0; /* Efekt hover */
   }
 }

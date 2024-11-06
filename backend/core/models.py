@@ -70,7 +70,7 @@ class Match(models.Model):
     match_result = models.OneToOneField('MatchResult', on_delete=models.CASCADE, null=True, blank=True, related_name='match_result')
     score_home = models.IntegerField(default=0)
     score_away = models.IntegerField(default=0)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     is_responded = models.BooleanField(default=False)  
     is_completed = models.BooleanField(default=False)
 
@@ -119,6 +119,11 @@ class Notification(models.Model):
         ('match_result', 'Match Result'),
         ('join_request', 'Join Request'),  # Typ powiadomienia o prośbie o dołączenie
     )
+    NOTIFICATION_STATUS = (
+        ('pending','Pending'),
+        ('accepted', 'Accepted'),
+        ('declined', 'Declined')
+    )
 
     sender = models.ForeignKey(ExtendUser, on_delete=models.CASCADE, related_name="sent_notifications", null=True, blank=True)  # Nowe pole dla nadawcy
     recipient = models.ForeignKey(ExtendUser, on_delete=models.CASCADE, related_name="received_notifications")  # Pole dla adresata
@@ -128,6 +133,8 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     is_responded = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(choices=NOTIFICATION_STATUS, default='pending', max_length=20)
+
 
     def __str__(self):
         return f"{self.get_notification_type_display()} from {self.sender} to {self.recipient}"

@@ -2,6 +2,7 @@ import { useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import React from "react";
 import { useParams } from "react-router-dom";
+import "../styles/playerProfile.scss";
 
 const PLAYER_BY_ID = gql`
   query PlayerProfile($userId: ID!) {
@@ -80,17 +81,23 @@ const UserProfile = () => {
                 {player.firstName} {player.lastName}
                 <br />"{player.username}"
               </h1>
-              {player.photo && (
+              {player.photo ? (
                 <img
                   src={`${MEDIA_URL}${player.photo}`}
                   alt={`${player.username} photo`}
                   className="player-photo"
                 />
+              ) : (
+                <div className="placeholder-photo">Brak zdjęcia</div>
               )}
             </div>
             <div className="stats">
               <p>Drużyna: {player.team?.name || "Brak drużyny"}</p>
               <p>Miasto: {player.city?.name || "Nie podano"}</p>
+              <p>
+                Pozycja:{" "}
+                {player.playerstatisticsSet[0]?.position || "Brak pozycji"}
+              </p>
               <p>Numer: {player.number || "Brak numeru"}</p>
               <p>
                 Waga: {player.weight ? `${player.weight} kg` : "Brak danych"}
@@ -100,7 +107,7 @@ const UserProfile = () => {
               </p>
             </div>
             <div className="user">
-              <h1>{player.team?.name}</h1>
+              <h1>{player.team?.name || "Brak Drużyny"}</h1>
               {player.team?.logo && (
                 <img
                   src={`${MEDIA_URL}${player.team.logo}`}
@@ -114,8 +121,8 @@ const UserProfile = () => {
           <div className="alert">Brak danych o profilu gracza</div>
         )}
       </div>
-      <div>
-        <table className="matches-table">
+      <div className="second-container">
+        <table className="table">
           <thead>
             <tr>
               <th>Drużyna</th>

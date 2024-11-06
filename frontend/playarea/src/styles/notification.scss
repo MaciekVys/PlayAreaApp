@@ -1,19 +1,28 @@
 .notification-container {
-  max-width: 800px;
-  margin: 30px auto;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+    url("../images/log.jpg");
+  background-size: cover;
+  background-position: center;
+  width: 100%;
+  min-height: 100vh;
   padding: 20px;
-  background-color: #f9f9f9;
+}
+.body-container {
+  // background-color: rgba(29, 29, 29, 0.7);
+  margin: 50px;
+  padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
 }
 
 .notification-header {
-  border-bottom: 2px #57ca9e solid;
+  border-bottom: 3px #fafafa solid;
+  padding: 20px;
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #333;
+  color: #ffffff;
   text-align: center;
 }
 
@@ -22,7 +31,11 @@
   padding: 0;
 
   li {
-    background-color: #f1f1f1;
+    max-width: 800px;
+    margin: auto;
+    // background-color: rgb(196, 196, 196, 0.8);
+    backdrop-filter: blur(150px);
+    border: 2px solid #fff;
     position: relative;
     padding: 20px;
     margin-bottom: 15px;
@@ -32,18 +45,20 @@
 
     p {
       margin: 5px 0;
+      font-size: 20px;
     }
 
     .notification-status {
       font-size: 14px;
-      color: #999;
+      color: #ff0000;
     }
 
-    .notification-match {
-      font-size: 16px;
-      font-weight: bold;
-      color: #333;
-      margin-top: 10px;
+    .notification-match.accepted {
+      color: green; /* Kolor dla zaakceptowanej wiadomości */
+    }
+
+    .notification-match.rejected {
+      color: red; /* Kolor dla odrzuconej wiadomości */
     }
 
     .notification-actions {
