@@ -2,47 +2,7 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
 import "../styles/searchView.scss";
-
-const SEARCH_USERS = gql`
-  query SearchUsers($username: String!) {
-    searchUsers(username: $username) {
-      edges {
-        node {
-          id
-          username
-        }
-      }
-    }
-  }
-`;
-
-const SEARCH_CITIES = gql`
-  query SearchCities($name: String!) {
-    searchCities(name: $name) {
-      edges {
-        node {
-          id
-          name
-          image
-        }
-      }
-    }
-  }
-`;
-
-const SEARCH_TEAMS = gql`
-  query SearchTeams($name: String!) {
-    searchTeams(name: $name) {
-      edges {
-        node {
-          id
-          name
-          logo
-        }
-      }
-    }
-  }
-`;
+import { SEARCH_CITIES, SEARCH_TEAMS, SEARCH_USERS } from "../queries/queries";
 
 const SearchView = () => {
   const { keywords } = useParams();

@@ -1,5 +1,6 @@
-from django.db import IntegrityError
-import graphene # type: ignore
+from django.db import IntegrityError, transaction
+import graphene
+from graphql import GraphQLError # type: ignore
 from ..types import TeamType
 from ..models import City, League, Ranking, Team
 from graphql_jwt.decorators import login_required # type: ignore
@@ -38,6 +39,9 @@ class CreateTeam(graphene.Mutation):
         except IntegrityError:
             return CreateTeam(success=False, errors="A team with this name already exists in the league.", team=None)
 
+
+        user.team = team  # przypisanie drużyny do użytkownika
+        user.save() 
         # Tworzymy ranking drużyny
         ranking = Ranking(
             league=league,
@@ -59,28 +63,64 @@ class CreateTeam(graphene.Mutation):
 class UpdateTeam(graphene.Mutation):
     class Arguments:
         team_id = graphene.ID(required=True)
-        name = graphene.String(required=True)
-        add_player_id = graphene.ID(required=True)
-        remove_player_id = graphene.ID(required=True)
+        name = graphene.String()
+        remove_player_id = graphene.ID()
+        new_captain_id = graphene.ID()
 
     success = graphene.Boolean()
     errors = graphene.String()
     team = graphene.Field(TeamType)
 
     @login_required
-    def mutate(self, info, team_id, name=None, add_player_id=None, remove_player_id=None):
+    def mutate(self, info, team_id, name=None, remove_player_id=None, new_captain_id=None):
         user = info.context.user
 
+        # Pobranie drużyny
         try:
             team = Team.objects.get(id=team_id)
         except Team.DoesNotExist:
-            return UpdateTeam(success=False, errors='Team Not Found')
+            return UpdateTeam(success=False, errors="Team Not Found")
         
-        if not user.id_superuser and team.captain != user:
-            return UpdateTeam(success=False, errors="You do not have permission to update team!")
-        
+        # Sprawdzenie, czy użytkownik ma uprawnienia do aktualizacji drużyny
+        if not user.is_superuser and team.captain != user:
+            return UpdateTeam(success=False, errors="You do not have permission to update this team.")
+
+        # Zmiana nazwy drużyny z weryfikacją unikalności w lidze
         if name:
+            if Team.objects.filter(name=name, league=team.league).exclude(id=team.id).exists():
+                return UpdateTeam(success=False, errors="A team with this name already exists in the league.")
             team.name = name
+
+        # Usunięcie zawodnika z drużyny
+        if remove_player_id:
+            try:
+                player_to_remove = team.players_in_team.get(id=remove_player_id)
+                team.players_in_team.remove(player_to_remove)
+            except team.players_in_team.model.DoesNotExist:
+                return UpdateTeam(success=False, errors="Player not found in this team.")
+
+        # Przekazanie dowodzenia innemu graczowi
+        if new_captain_id:
+            try:
+                new_captain = team.players_in_team.get(id=new_captain_id)
+
+                if new_captain.team != team:
+                    return UpdateTeam(success=False, errors="The selected player is not a member of this team.")
+                
+                if team.captain == new_captain:
+                    return UpdateTeam(success=False, errors="This player is already the captain.")
+            
+                team.captain = new_captain
+                team.save()
+
+            except team.players_in_team.model.DoesNotExist:
+                return UpdateTeam(success=False, errors="The specified player is not a member of this team.")
+        
+        team.save()
+        return UpdateTeam(success=True, team=team, errors=None)
+
+
+
 
 
 class ChallengeTeamToMatch(graphene.Mutation):
@@ -170,3 +210,21 @@ class LeaveTeam(graphene.Mutation):
         team.players_in_team.remove(user)
 
         return LeaveTeam(success=True, message="Użytkownik został usunięty z drużyny.")
+
+class DeleteTeam(graphene.Mutation):
+    success = graphene.Boolean()
+    message = graphene.String()
+
+    class Arguments:
+        team_id = graphene.ID(required=True)
+
+    def mutate(self, info, team_id):
+        # Wyszukaj drużynę na podstawie team_id
+        try:
+            team = Team.objects.get(id=team_id)
+        except Team.DoesNotExist:
+            raise GraphQLError("Drużyna o podanym ID nie istnieje.")
+
+        # Usuń drużynę
+        team.delete()
+        return DeleteTeam(success=True, message="Drużyna została usunięta.")

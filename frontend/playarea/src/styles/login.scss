@@ -70,13 +70,20 @@
 .form-group input {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #ffffff;
   border-radius: 4px;
-  font-size: 14px;
-  background-color: #e8f7ff;
+  font-size: 15px;
+  background: transparent;
+  // background-color: #e8f7ff;
+  // backdrop-filter: blur(8px);
   transition: border 0.3s ease;
+  font-weight: bold;
 }
-
+input::placeholder {
+  color: #fff;
+  font-size: 13px;
+  font-weight: lighter;
+}
 .form-group input:focus {
   border-color: #57ca9e;
   outline: none;

@@ -1,14 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
-
-const LOGOUT_MUTATION = gql`
-  mutation Logout {
-    logout {
-      success
-      errors
-    }
-  }
-`;
+import { LOGOUT_MUTATION } from "../queries/mutations";
 
 export const Logout = () => {
   const navigate = useNavigate();

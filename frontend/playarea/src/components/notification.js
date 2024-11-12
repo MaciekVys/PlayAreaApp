@@ -8,58 +8,16 @@ import {
   faHandshakeSimpleSlash,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
+import { MY_NOTIFICATIONS } from "../queries/queries";
+import {
+  RESPOND_TO_JOIN_TEAM,
+  RESPOND_TO_MATCH_INVITE,
+  DELETE_NOTIFICATION,
+} from "../queries/mutations";
 
-// Zapytanie GraphQL do pobierania powiadomień
-const MY_NOTIFICATIONS = gql`
-  query {
-    myNotifications {
-      id
-      recipient {
-        username
-      }
-      sender {
-        username
-      }
-      message
-      statusMessage
-      isResponded
-      isRead
-      notificationType
-      createdAt
-      match {
-        id
-        homeTeam {
-          name
-        }
-        awayTeam {
-          name
-        }
-      }
-    }
-  }
-`;
-
-const RESPOND_TO_MATCH_INVITE = gql`
-  mutation RespondToMatchInvite($matchId: ID!, $accept: Boolean!) {
-    respondToMatchInvite(matchId: $matchId, accept: $accept) {
-      success
-      message
-    }
-  }
-`;
-
-const RESPOND_TO_JOIN_TEAM = gql`
-  mutation RespondToJoinRequest($notificationId: ID!, $accept: Boolean!) {
-    respondToJoinRequest(notificationId: $notificationId, accept: $accept) {
-      success
-      message
-    }
-  }
-`;
-
-const DELETE_NOTIFICATION = gql`
-  mutation DeleteNotification($notificationId: Int!) {
-    deleteNotification(notificationId: $notificationId) {
+export const RESPOND_TO_INVITE_TEAM = gql`
+  mutation RespondToInviteTeam($accept: Boolean!, $notificationId: ID!) {
+    respondToInviteTeam(accept: $accept, notificationId: $notificationId) {
       success
       message
     }
@@ -71,6 +29,7 @@ const Notification = () => {
     variables: { unread: true },
   });
 
+  const [respondToInviteTeam] = useMutation(RESPOND_TO_INVITE_TEAM);
   const [respondToMatchInvite] = useMutation(RESPOND_TO_MATCH_INVITE);
   const [respondToJoinTeam] = useMutation(RESPOND_TO_JOIN_TEAM);
   const [deleteNotification] = useMutation(DELETE_NOTIFICATION);
@@ -110,6 +69,24 @@ const Notification = () => {
         refetch();
       } else {
         alert(data.respondToJoinRequest.message);
+      }
+    } catch (error) {
+      alert("Wystąpił błąd: " + error.message);
+    }
+  };
+
+  // Obsługa odpowiedzi na zaproszenie do drużyny
+  const handleResponseInviteTeam = async (accept, notificationId) => {
+    try {
+      const { data } = await respondToInviteTeam({
+        variables: { notificationId, accept },
+      });
+
+      if (data.respondToInviteTeam.success) {
+        alert(data.respondToInviteTeam.message);
+        refetch();
+      } else {
+        alert(data.respondToInviteTeam.message);
       }
     } catch (error) {
       alert("Wystąpił błąd: " + error.message);
@@ -234,6 +211,35 @@ const Notification = () => {
                           className="reject"
                           onClick={() =>
                             handleResponseJoinTeam(false, notification.id)
+                          }
+                        >
+                          Odrzuć
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {notification.notificationType === "TEAM_INVITE" && (
+                  <div className="notification-actions">
+                    {notification.isResponded ? (
+                      <p className="notification-match">
+                        {notification.statusMessage}
+                      </p>
+                    ) : (
+                      <>
+                        <button
+                          className="accept"
+                          onClick={() =>
+                            handleResponseInviteTeam(true, notification.id)
+                          }
+                        >
+                          Akceptuj
+                        </button>
+                        <button
+                          className="reject"
+                          onClick={() =>
+                            handleResponseInviteTeam(false, notification.id)
                           }
                         >
                           Odrzuć

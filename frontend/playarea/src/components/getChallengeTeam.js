@@ -4,50 +4,12 @@ import React, { useState, useEffect } from "react";
 import "../styles/getChallenge.scss";
 import { faHandPointRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-const CHALLENGE_TEAM_MUTATION = gql`
-  mutation ChallengeTeamToMatch($awayTeam: ID!, $matchDate: Date!) {
-    challengeTeamToMatch(awayTeamId: $awayTeam, matchDate: $matchDate) {
-      success
-      message
-    }
-  }
-`;
-
-const GET_TEAMS_IN_USER_LEAGUE = gql`
-  query GetTeamsInUserLeague {
-    teamsInUserLeague {
-      id
-      name
-      logo
-    }
-  }
-`;
-
-const CITY_QUERY = gql`
-  query GetCityData($name: String!) {
-    cityName(name: $name) {
-      image
-      id
-      name
-      voivodeship
-      league {
-        name
-        level
-      }
-    }
-  }
-`;
-
-const ME_QUERY = gql`
-  query MeQuery {
-    me {
-      city {
-        name
-      }
-    }
-  }
-`;
+import {
+  GET_TEAMS_IN_USER_LEAGUE,
+  CITY_QUERY,
+  ME_QUERY,
+} from "../queries/queries";
+import { CHALLENGE_TEAM_MUTATION } from "../queries/mutations";
 
 const ChallengeTeam = () => {
   const [cityName, setCityName] = useState(null);

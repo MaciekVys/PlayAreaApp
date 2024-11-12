@@ -5,55 +5,8 @@ import { useParams } from "react-router-dom";
 import "../styles/confirmMatch.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faRotateLeft } from "@fortawesome/free-solid-svg-icons";
-
-const GET_MATCH_PLAYERS = gql`
-  query GetMatchPlayers($matchId: ID!) {
-    match(id: $matchId) {
-      id
-      status
-      homeTeam {
-        name
-        captain {
-          id
-        }
-        players {
-          id
-          username
-        }
-      }
-      awayTeam {
-        name
-        captain {
-          id
-        }
-        players {
-          id
-          username
-        }
-      }
-      matchresultSet {
-        homeTeamConfirmed
-        awayTeamConfirmed
-      }
-    }
-  }
-`;
-
-const CONFIRM_MATCH_RESULT = gql`
-  mutation ConfirmMatchResult(
-    $matchId: Int!
-    $isHomeTeam: Boolean!
-    $statistics: [PlayerStatisticsInput!]!
-  ) {
-    confirmMatchResult(
-      matchId: $matchId
-      isHomeTeam: $isHomeTeam
-      statistics: $statistics
-    ) {
-      success
-    }
-  }
-`;
+import { GET_MATCH_PLAYERS } from "../queries/queries";
+import { CONFIRM_MATCH_RESULT } from "../queries/mutations";
 
 const ConfirmMatchResult = () => {
   const { id: matchId } = useParams();

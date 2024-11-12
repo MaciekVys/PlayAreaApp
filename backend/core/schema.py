@@ -5,17 +5,13 @@ from graphql_auth import mutations
 from graphql_jwt.decorators import login_required
 from .types import CityType, ExtendUserType, PlayerStatisticsSummaryType, PlayerStatisticsType, RankingType, TeamType,  MatchType, NotificationType
 from .models import City, ExtendUser, MatchResult, PlayerStatistics, Ranking, Team,  Match, Notification
-from .mutations.team import ChallengeTeamToMatch, CreateTeam, LeaveTeam
-from .mutations.users import Logout, LoginMutation, UpdateUserProfile
-from .mutations.notification import DeleteNotification, RespondToJoinRequest, RespondToMatchInvite, SendJoinRequest
+from .mutations.team import ChallengeTeamToMatch, CreateTeam, DeleteTeam, LeaveTeam, UpdateTeam
+from .mutations.users import DeleteAccount, Logout, LoginMutation, UpdateUserProfile
+from .mutations.notification import DeleteNotification, InvitePlayerToTeam, RespondToJoinRequest, RespondToMatchInvite, RespondToTeamInvite, SendJoinRequest
 from .mutations.matches import ConfirmMatchResult
 from graphene_django.filter import DjangoFilterConnectionField
 from .filters import ExtendUserFilter, CityFilter, TeamFilter
 from graphene import relay
-
-
-
-
 
 
 class AuthMutation(graphene.ObjectType):
@@ -24,7 +20,6 @@ class AuthMutation(graphene.ObjectType):
     refresh_token = mutations.RefreshToken.Field()
     revoke_token = mutations.RevokeToken.Field()
 
-    
 
 
 class Query(UserQuery, MeQuery, graphene.ObjectType):
@@ -230,6 +225,11 @@ class Mutation(AuthMutation, graphene.ObjectType):
     send_join_request = SendJoinRequest.Field()
     respond_to_join_request = RespondToJoinRequest.Field()
     leave_team = LeaveTeam.Field()
+    delete_account = DeleteAccount.Field()
+    delete_team = DeleteTeam.Field()
+    update_team = UpdateTeam.Field()
+    invite_player = InvitePlayerToTeam.Field()
+    respond_to_invite_team = RespondToTeamInvite.Field()
 
 
 

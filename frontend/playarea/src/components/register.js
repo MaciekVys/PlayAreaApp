@@ -1,26 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import React, { useState } from "react";
 import "../styles/register.scss"; // Import pliku CSS
-
-const REGISTER_MUTATION = gql`
-  mutation register(
-    $email: String!
-    $username: String!
-    $password1: String!
-    $password2: String!
-  ) {
-    register(
-      email: $email
-      username: $username
-      password1: $password1
-      password2: $password2
-    ) {
-      token
-      success
-      errors
-    }
-  }
-`;
+import { REGISTER_MUTATION } from "../queries/mutations";
 
 const RegistrationForm = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -80,11 +61,12 @@ const RegistrationForm = () => {
         <form onSubmit={handleSubmit} className="registration-form">
           <h2>Zarejestruj Się</h2>
           <div className="form-group">
-            <label htmlFor="username">Imię:</label>
+            <label htmlFor="username">Nazwa użytkownika:</label>
             <input
               type="text"
               id="username"
               name="username"
+              placeholder="Nazwa użytkownika"
               value={formData.username}
               onChange={handleChange}
               required
@@ -96,6 +78,7 @@ const RegistrationForm = () => {
               type="email"
               id="email"
               name="email"
+              placeholder="E-mail"
               value={formData.email}
               onChange={handleChange}
               required
@@ -107,6 +90,7 @@ const RegistrationForm = () => {
               type="password"
               id="password1"
               name="password1"
+              placeholder="Hasło"
               value={formData.password1}
               onChange={handleChange}
               required
@@ -118,6 +102,7 @@ const RegistrationForm = () => {
               type="password"
               id="password2"
               name="password2"
+              placeholder="Powtórz hasło"
               value={formData.password2}
               onChange={handleChange}
               required

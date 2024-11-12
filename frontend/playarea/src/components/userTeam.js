@@ -10,92 +10,12 @@ import {
   faFutbol,
   faCircleRight,
 } from "@fortawesome/free-solid-svg-icons";
-
-// Define the user query to check if the user has a team
-const USER_TEAM_QUERY = gql`
-  query User {
-    me {
-      team {
-        name
-        id
-      }
-    }
-  }
-`;
-
-// Define the team query
-const TEAM_BY_ID = gql`
-  query TeamById($id: ID!) {
-    teamById(id: $id) {
-      name
-      logo
-      captain {
-        username
-        id
-      }
-      league {
-        name
-        level
-        city {
-          name
-        }
-      }
-      playersCount
-      players {
-        position
-        height
-        weight
-        id
-        number
-        photo
-        username
-      }
-      matchesCount
-      matches {
-        homeTeam {
-          name
-          id
-          logo
-        }
-        awayTeam {
-          name
-          id
-          logo
-        }
-        id
-        matchDate
-        scoreHome
-        scoreAway
-        status
-        winner
-      }
-    }
-  }
-`;
-
-// Define the team statistics query
-const TEAM_STATISTICS_SUMMARY_QUERY = gql`
-  query teamStatisticsSummary($teamId: ID!) {
-    teamStatisticsSummary(teamId: $teamId) {
-      totalMvps
-      totalGoals
-      totalAssists
-      user {
-        username
-      }
-    }
-  }
-`;
-
-// Define the join team mutation
-const SEND_JOIN_REQUEST = gql`
-  mutation sendJoinRequest($teamId: ID!) {
-    sendJoinRequest(teamId: $teamId) {
-      success
-      message
-    }
-  }
-`;
+import {
+  ME_QUERY,
+  TEAM_BY_ID,
+  TEAM_STATISTICS_SUMMARY_QUERY,
+} from "../queries/queries";
+import { SEND_JOIN_REQUEST } from "../queries/mutations";
 
 const UserTeam = () => {
   const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
@@ -108,7 +28,7 @@ const UserTeam = () => {
     data: userData,
     loading: loadingUser,
     error: userError,
-  } = useQuery(USER_TEAM_QUERY);
+  } = useQuery(ME_QUERY);
 
   // Existing query for team details
   const { data, loading, error } = useQuery(TEAM_BY_ID, {
@@ -159,6 +79,8 @@ const UserTeam = () => {
     return <p>Błąd w ładowaniu statystyk: {errorStats.message}</p>;
 
   const userHasTeam = userData?.me?.team !== null;
+  const isCaptain = userData?.me?.captainOfTeam !== null;
+
   console.log("Czy użytkownik ma drużynę?", userHasTeam);
 
   if (!team) {
@@ -211,14 +133,16 @@ const UserTeam = () => {
             <p>Liga: {team.league?.name || "Brak ligi"}</p>
             <p>Kapitan: {team.captain?.username || "Brak kapitana"}</p>
           </div>
-          <button
-            className="leave-button"
-            onClick={handleJoinRequest}
-            disabled={joining}
-          >
-            {joining ? "Wysyłanie..." : "Dołącz do drużyny"}
-            <FontAwesomeIcon icon={faRightFromBracket} />
-          </button>
+          {!isCaptain && (
+            <button
+              className="leave-button"
+              onClick={handleJoinRequest}
+              disabled={joining}
+            >
+              {joining ? "Wysyłanie..." : "Dołącz do drużyny"}
+              <FontAwesomeIcon icon={faRightFromBracket} />
+            </button>
+          )}
         </div>
       </div>
       <div className="tabs">

@@ -161,6 +161,14 @@ class NotificationType(DjangoObjectType):
                 return "Odrzucono prośbę przyjęcia do drużyny!"
             else:
                 None
+
+        if self.notification_type == 'team_invite':
+            if self.status == 'accepted':
+                return "Zaakceptowano zaproszenie!"
+            elif self.status == 'declined':   
+                return "Odrzucono zaproszenie!"
+            else:
+                None        
         
         if self.match:
             if self.match.status == 'scheduled':

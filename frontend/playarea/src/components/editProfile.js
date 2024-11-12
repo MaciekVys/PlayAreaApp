@@ -4,44 +4,16 @@ import { useNavigate } from "react-router-dom";
 import "../styles/editProfile.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import { ALL_CITIES } from "../queries/queries";
+import { UPDATE_USER_PROFILE } from "../queries/mutations";
+import { LOGOUT_MUTATION } from "../queries/mutations";
 
-const UPDATE_USER_PROFILE = gql`
-  mutation UpdateUserProfile(
-    $firstName: String!
-    $lastName: String!
-    $number: Int
-    $position: String
-    $weight: Int
-    $height: Int
-    $cityName: String
-  ) {
-    updateUserProfile(
-      cityName: $cityName
-      firstName: $firstName
-      lastName: $lastName
-      height: $height
-      weight: $weight
-      number: $number
-      position: $position
-    ) {
-      user {
-        username
-        firstName
-        lastName
-      }
-      player {
-        height
-        weight
-      }
-    }
-  }
-`;
-
-const GET_ALL_CITIES = gql`
-  query GetAllCities {
-    allCities {
-      id
-      name
+// Mutacja do usuwania konta
+const DELETE_ACCOUNT = gql`
+  mutation deleteAccount {
+    deleteAccount {
+      success
+      message
     }
   }
 `;
@@ -63,9 +35,35 @@ const EditProfile = () => {
     updateUserProfile,
     { data: updateData, loading: loadingUpdate, error: errorUpdate },
   ] = useMutation(UPDATE_USER_PROFILE);
-  const { data: citiesData } = useQuery(GET_ALL_CITIES);
 
-  console.log(citiesData);
+  const { data: citiesData } = useQuery(ALL_CITIES);
+
+  const [deleteAccount] = useMutation(DELETE_ACCOUNT, {
+    onCompleted: async (data) => {
+      if (data.deleteAccount.success) {
+        await logoutUser();
+        localStorage.clear();
+        sessionStorage.clear();
+        navigate("/home");
+      } else {
+        console.error("Błąd przy usuwaniu konta:", data.deleteAccount.message);
+      }
+    },
+    onError: (error) => {
+      console.error("Błąd przy usuwaniu konta:", error.message);
+    },
+  });
+
+  // Dodaj mutację do wylogowania
+  const [logoutUser] = useMutation(LOGOUT_MUTATION);
+
+  const handleDeleteAccount = async () => {
+    try {
+      await deleteAccount();
+    } catch (error) {
+      console.error("Błąd przy usuwaniu konta:", error);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,12 +78,13 @@ const EditProfile = () => {
     try {
       await updateUserProfile({ variables: formData });
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error("Błąd przy aktualizacji profilu:", error);
     }
   };
 
   if (loadingUpdate) return <p>Aktualizacja profilu...</p>;
   if (errorUpdate) return <p>Błąd: {errorUpdate.message}</p>;
+
   const cityOptions = citiesData?.allCities || [];
 
   return (
@@ -94,7 +93,7 @@ const EditProfile = () => {
         <h1 className="header-title">Edytuj Profil</h1>
         <div className="header-section">
           <div className="placeholder-photo">Brak zdjęcia</div>
-          <button>Usuń trwale konto!</button>
+          <button onClick={handleDeleteAccount}>Usuń trwale konto!</button>
         </div>
 
         <form onSubmit={handleSubmit} className="profile-form">

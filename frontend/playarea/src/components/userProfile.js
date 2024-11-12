@@ -1,60 +1,36 @@
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import gql from "graphql-tag";
 import React from "react";
 import { useParams } from "react-router-dom";
 import "../styles/playerProfile.scss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import {
+  PLAYER_BY_ID,
+  PLAYER_STATISTICS_SUMMARY_QUERY,
+  ME_QUERY,
+} from "../queries/queries";
 
-const PLAYER_BY_ID = gql`
-  query PlayerProfile($userId: ID!) {
-    playerById(userId: $userId) {
-      username
-      firstName
-      lastName
-      id
-      email
-      weight
-      height
-      number
-      photo
-      city {
-        name
-      }
-      team {
-        name
-        captain {
-          username
-        }
-        league {
-          name
-        }
-        logo
-      }
-      playerstatisticsSet {
-        goals
-        assists
-        isMvp
-      }
-    }
-  }
-`;
-
-const PLAYER_STATISTICS_SUMMARY_QUERY = gql`
-  query playerStatisticsSummary($userId: ID!) {
-    playerStatisticsSummary(userId: $userId) {
-      totalMvps
-      totalGoals
-      totalAssists
+// Definiowanie mutacji invitePlayer
+const INVITE_PLAYER = gql`
+  mutation invitePlayer($teamId: ID!, $playerId: ID!) {
+    invitePlayer(teamId: $teamId, playerId: $playerId) {
+      success
+      message
     }
   }
 `;
 
 const UserProfile = () => {
+  const userId = localStorage.getItem("userId");
   const { id } = useParams();
   const { data, loading, error } = useQuery(PLAYER_BY_ID, {
     variables: { userId: id },
   });
+  const { data: Me } = useQuery(ME_QUERY);
 
   const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
+  const isCaptain = Me?.me?.captainOfTeam !== null;
 
   const {
     data: summaryData,
@@ -64,12 +40,40 @@ const UserProfile = () => {
     variables: { userId: id },
   });
 
+  // Inicjalizacja mutacji invitePlayer
+  const [invitePlayer] = useMutation(INVITE_PLAYER, {
+    onCompleted: (data) => {
+      if (data.invitePlayer.success) {
+        alert("Zaproszenie wysłane!");
+      } else {
+        alert(`Błąd: ${data.invitePlayer.message}`);
+      }
+    },
+    onError: (error) => {
+      console.error("Błąd przy wysyłaniu zaproszenia:", error.message);
+      alert("Wystąpił błąd podczas wysyłania zaproszenia.");
+    },
+  });
+
   if (loading || loadingSummary) return <p>Ładowanie danych...</p>;
   if (error || errorSummary)
     return <p>Błąd: {error?.message || errorSummary?.message}</p>;
 
   const statistics = summaryData?.playerStatisticsSummary;
   const player = data?.playerById;
+
+  // Funkcja obsługująca kliknięcie przycisku zapraszania do drużyny
+  const handleInvitePlayer = () => {
+    if (player && player.team && player.id) {
+      invitePlayer({
+        variables: {
+          teamId: me.team.id,
+          playerId: player.id,
+        },
+      });
+    }
+  };
+  const me = Me?.me;
 
   return (
     <>
@@ -115,6 +119,15 @@ const UserProfile = () => {
                   className="team-logo"
                 />
               )}
+              <br />
+              {userId !== player.id &&
+                player.team.id !== me?.team?.id &&
+                isCaptain && (
+                  <button onClick={handleInvitePlayer}>
+                    Zaproś do drużyny{" "}
+                    <FontAwesomeIcon icon={faRightFromBracket} />
+                  </button>
+                )}
             </div>
           </>
         ) : (

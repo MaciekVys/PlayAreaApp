@@ -5,20 +5,7 @@ import "../styles/home.scss"; // Import pliku CSS do stylizacji
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserPlus, faFileSignature } from "@fortawesome/free-solid-svg-icons";
-
-const ALL_CITIES = gql`
-  query MeQuery {
-    allCities {
-      image
-      name
-      id
-      league {
-        name
-        level
-      }
-    }
-  }
-`;
+import { ALL_CITIES } from "../queries/queries";
 
 const Home = () => {
   const navigate = useNavigate();

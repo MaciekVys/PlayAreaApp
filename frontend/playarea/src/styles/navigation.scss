@@ -23,6 +23,7 @@ $transition-duration: 0.3s;
   padding: 20px 40px;
   box-shadow: 0 4px 10px $shadow-color;
   z-index: 1000;
+  border-bottom: 2px solid rgb(0, 0, 0);
 
   /* Styl dla menu */
   .menu {

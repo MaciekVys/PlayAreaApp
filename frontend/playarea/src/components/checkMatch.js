@@ -3,40 +3,7 @@ import { useParams } from "react-router-dom";
 import gql from "graphql-tag";
 import React from "react";
 import "../styles/checkMatch.scss";
-
-const GET_MATCH_STATISTICS = gql`
-  query GetMatchStatistics($matchId: ID!) {
-    match(id: $matchId) {
-      homeTeam {
-        name
-        logo
-        players {
-          username
-          playerstatisticsSet {
-            goals
-            assists
-            isMvp
-          }
-        }
-      }
-      awayTeam {
-        name
-        logo
-        players {
-          username
-          playerstatisticsSet {
-            goals
-            assists
-            isMvp
-          }
-        }
-      }
-      scoreHome
-      scoreAway
-      matchDate
-    }
-  }
-`;
+import { GET_MATCH_STATISTICS } from "../queries/queries";
 
 const CheckMatch = () => {
   const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;

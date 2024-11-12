@@ -2,50 +2,10 @@ import { useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import React from "react";
 import "../styles/playerProfile.scss";
-
-const USER_PROFILE = gql`
-  query userProfile {
-    userProfile {
-      username
-      firstName
-      lastName
-      id
-      email
-      weight
-      height
-      number
-      photo
-      city {
-        name
-      }
-      team {
-        name
-        captain {
-          username
-        }
-        league {
-          name
-        }
-        logo
-      }
-      playerstatisticsSet {
-        goals
-        assists
-        isMvp
-      }
-    }
-  }
-`;
-
-const PLAYER_STATISTICS_SUMMARY_QUERY = gql`
-  query playerStatisticsSummary($userId: ID!) {
-    playerStatisticsSummary(userId: $userId) {
-      totalMvps
-      totalGoals
-      totalAssists
-    }
-  }
-`;
+import {
+  USER_PROFILE,
+  PLAYER_STATISTICS_SUMMARY_QUERY,
+} from "../queries/queries";
 
 const PlayerProfile = () => {
   const {

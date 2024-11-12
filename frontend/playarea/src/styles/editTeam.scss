@@ -1,0 +1,115 @@
+/* Główny kontener */
+.edit-team-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+/* Nagłówek */
+.edit-team-header {
+  font-size: 24px;
+  color: #333;
+  text-align: center;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+/* Formularz */
+.edit-team-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+
+    .form-label {
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 5px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      background-color: #f9f9f9;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: #1abc9c;
+      outline: none;
+    }
+
+    /* Wyłączone pola */
+    .form-input[disabled] {
+      background-color: #f0f0f0;
+      color: #888;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* Sekcja zawodników */
+.players-header {
+  font-size: 18px;
+  color: #1abc9c;
+  margin-top: 20px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.player-info {
+  margin: 10px 0;
+}
+
+.player-username {
+  font-size: 16px;
+  color: #444;
+}
+
+/* Przyciski */
+.save-button,
+.delete-button {
+  padding: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+// .save-button {
+//   background-color: #1abc9c;
+//   color: white;
+//   border-color: #1abc9c;
+//   margin-top: 15px;
+// }
+
+// .save-button:hover {
+//   background-color: #16a085;
+//   border-color: #16a085;
+// }
+
+.delete-button {
+  background-color: white;
+  color: #ff1900;
+  border: 1px solid #ff1900;
+  margin-top: 10px;
+}
+
+.delete-button:hover {
+  background-color: #ff1900;
+  color: #000;
+  border: 2px solid black;
+}

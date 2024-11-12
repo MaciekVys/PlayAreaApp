@@ -9,60 +9,7 @@ import {
   faFutbol,
   faTable,
 } from "@fortawesome/free-solid-svg-icons";
-
-const CITY_QUERY = gql`
-  query GetCityData($name: String!) {
-    cityName(name: $name) {
-      image
-      id
-      name
-      voivodeship
-      league {
-        name
-        level
-        rankings {
-          points
-          wins
-          draws
-          losses
-          goalsFor
-          goalsAgainst
-          team {
-            logo
-            name
-            id
-          }
-        }
-      }
-      matches {
-        homeTeam {
-          logo
-          id
-          name
-          captain {
-            id
-            username
-          }
-        }
-        awayTeam {
-          logo
-          name
-          id
-          captain {
-            id
-            username
-          }
-        }
-        id
-        matchDate
-        scoreHome
-        scoreAway
-        status
-        winner
-      }
-    }
-  }
-`;
+import { CITY_QUERY } from "../queries/queries";
 
 const CheckCity = () => {
   const { name: cityName } = useParams();

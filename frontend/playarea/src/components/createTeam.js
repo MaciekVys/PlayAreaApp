@@ -3,26 +3,8 @@ import gql from "graphql-tag";
 import React, { useState } from "react";
 import "../styles/createTeam.scss";
 import { useNavigate } from "react-router-dom";
-
-const ALL_CITIES = gql`
-  query MyQuery {
-    allCities {
-      name
-    }
-  }
-`;
-
-const CREATE_TEAM = gql`
-  mutation createTeam($cityName: String!, $name: String!) {
-    createTeam(cityName: $cityName, name: $name) {
-      success
-      errors
-      team {
-        name
-      }
-    }
-  }
-`;
+import { ALL_CITIES } from "../queries/queries";
+import { CREATE_TEAM } from "../queries/mutations";
 
 const CreateTeam = () => {
   const [errorMessage, setErrorMessage] = useState();

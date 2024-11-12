@@ -10,77 +10,11 @@ import {
   faFutbol,
   faCircleRight,
 } from "@fortawesome/free-solid-svg-icons";
-
-const MY_TEAM_QUERY = gql`
-  query team {
-    teamByUser {
-      id
-      name
-      logo
-      league {
-        name
-        id
-        level
-        city {
-          name
-        }
-      }
-      matchesCount
-      captain {
-        username
-        id
-      }
-      players {
-        id
-        username
-        position
-        height
-        weight
-      }
-      matches {
-        id
-        matchDate
-        scoreHome
-        scoreAway
-        status
-        winner
-        homeTeam {
-          logo
-          name
-          id
-        }
-        awayTeam {
-          logo
-          name
-          id
-        }
-      }
-    }
-  }
-`;
-
-const TEAM_STATISTICS_SUMMARY_QUERY = gql`
-  query teamStatisticsSummary($teamId: ID!) {
-    teamStatisticsSummary(teamId: $teamId) {
-      totalMvps
-      totalGoals
-      totalAssists
-      user {
-        username
-      }
-    }
-  }
-`;
-
-// Define the leaveTeam mutation
-const LEAVE_TEAM_MUTATION = gql`
-  mutation leaveTeam($teamId: ID!) {
-    leaveTeam(teamId: $teamId) {
-      success
-      message
-    }
-  }
-`;
+import {
+  MY_TEAM_QUERY,
+  TEAM_STATISTICS_SUMMARY_QUERY,
+} from "../queries/queries";
+import { LEAVE_TEAM_MUTATION } from "../queries/mutations";
 
 const Team = () => {
   const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
@@ -159,7 +93,7 @@ const Team = () => {
   }
 
   // Check if the current user is the captain of the team
-  const isCaptain = team.captain.id === userId;
+  const isCaptain = team?.captain?.id === userId;
 
   return (
     <>
@@ -168,7 +102,7 @@ const Team = () => {
           {team.logo ? (
             <img src={`${MEDIA_URL}${team.logo}`} alt={`${team.name} logo`} />
           ) : (
-            <div className="placeholder-logo">Brak logo</div>
+            <div className="placeholder-photo">Brak logo</div>
           )}
           <div className="left-side">
             <h1>{team.name}</h1>
@@ -178,24 +112,27 @@ const Team = () => {
             <p>Liga: {team.league.name}</p>
             <p>Kapitan: {team?.captain?.username}</p>
           </div>
-          <button
-            className="leave-button"
-            onClick={() => {
-              if (window.confirm("Czy na pewno chcesz opuścić drużynę?")) {
-                leaveTeam();
-              }
-            }}
-            disabled={loadingLeave}
-          >
-            {loadingLeave ? "Opuszczanie drużyny..." : "Opuść drużynę"}{" "}
-            <FontAwesomeIcon icon={faRightFromBracket} />
-          </button>
 
-          {isCaptain && (
-            <button onClick={() => navigate("/editTeam")}>
-              Edytuj drużynę
+          {/* Button group for alignment */}
+          <div className="button-group">
+            <button
+              onClick={() => {
+                if (window.confirm("Czy na pewno chcesz opuścić drużynę?")) {
+                  leaveTeam();
+                }
+              }}
+              disabled={loadingLeave}
+            >
+              {loadingLeave ? "Opuszczanie drużyny..." : "Opuść drużynę"}{" "}
+              <FontAwesomeIcon icon={faRightFromBracket} />
             </button>
-          )}
+
+            {isCaptain && (
+              <button onClick={() => navigate("/editTeam")}>
+                Edytuj drużynę
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

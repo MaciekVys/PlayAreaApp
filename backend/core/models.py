@@ -118,6 +118,7 @@ class Notification(models.Model):
         ('message', 'Message'),
         ('match_result', 'Match Result'),
         ('join_request', 'Join Request'),  # Typ powiadomienia o prośbie o dołączenie
+        ('team_invite', 'Team Invite'),  # Typ powiadomienia o prośbie o dołączenie
     )
     NOTIFICATION_STATUS = (
         ('pending','Pending'),

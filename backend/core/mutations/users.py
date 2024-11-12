@@ -214,3 +214,13 @@ class UpdateUserProfile(graphene.Mutation):
         # Jeśli model gracza byłby w przyszłości, można by je uwzględnić tutaj.
 
         return UpdateUserProfile(user=user)  # Zwracamy zaktualizowanego użytkownika
+
+class DeleteAccount(graphene.Mutation):
+    success = graphene.Boolean()
+    message = graphene.String()
+
+    @login_required
+    def mutate(self, info):
+        user = info.context.user
+        user.delete() 
+        return DeleteAccount(success=True, message="Konto zostało usunięte.")

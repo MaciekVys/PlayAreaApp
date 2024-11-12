@@ -1,20 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-import "../styles/login.scss"; // Import pliku CSS
-
-const LOGIN_MUTATION = gql`
-  mutation login($email: String!, $username: String!, $password: String!) {
-    login(email: $email, username: $username, password: $password) {
-      success
-      errors
-      user {
-        username
-        id
-      }
-    }
-  }
-`;
+import "../styles/login.scss";
+import { LOGIN_MUTATION } from "../queries/mutations";
 
 const LoginForm = () => {
   const [isLogged, setIsLogged] = useState(false);
@@ -80,6 +68,7 @@ const LoginForm = () => {
             <input
               id="email"
               name="email"
+              placeholder="E-mail"
               value={formData.email}
               onChange={handleChange}
               required
@@ -90,6 +79,7 @@ const LoginForm = () => {
             <input
               id="username"
               name="username"
+              placeholder="Nazwa użytkownika"
               value={formData.username}
               onChange={handleChange}
               required
@@ -101,6 +91,7 @@ const LoginForm = () => {
               type="password"
               id="password"
               name="password"
+              placeholder="Hasło"
               value={formData.password}
               onChange={handleChange}
               required
