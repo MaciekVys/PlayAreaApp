@@ -2,7 +2,7 @@ body {
   background: linear-gradient(to bottom, #0dd7bc 0%, #a3f7e5 25%, #ffffff 50%);
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  min-height: 100vh;
+  max-height: 100vh;
 }
 
 .App {

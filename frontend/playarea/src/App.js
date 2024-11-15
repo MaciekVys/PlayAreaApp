@@ -1,6 +1,13 @@
 import "./App.css";
+import { REFRESH_TOKEN_MUTATION } from "./queries/mutations";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import {
+  useApolloClient,
+  ApolloClient,
+  ApolloProvider,
+  InMemoryCache,
+} from "@apollo/client";
+import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import RegistrationForm from "./components/register";
 import LoginForm from "./components/login";
 import Navigation from "./components/navigation";
@@ -22,9 +29,14 @@ import SearchView from "./components/searchView";
 import JoinToTeam from "./components/joinToTeam";
 import EditTeam from "./components/editTeam";
 
+const httpLink = createUploadLink({
+  uri: "http://localhost:8000/graphql/",
+  credentials: "include",
+});
+
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  uri: "http://localhost:8000/graphql/",
+  link: httpLink,
   credentials: "include",
 });
 

@@ -5,8 +5,10 @@ import "../styles/joinToTeam.scss"; // Upewnij się, że ścieżka do pliku CSS 
 const JoinToTeam = () => {
   return (
     <div className="join-to-team-container">
-      <h1 className="join-title">Szukaj drużyny!</h1>
-      <Search />
+      <div className="join-container">
+        <h1 className="join-title">Szukaj drużyny!</h1>
+        <Search />
+      </div>
     </div>
   );
 };

@@ -131,6 +131,17 @@ const Notification = () => {
                 key={notification.id}
                 className={notification.isRead ? "read" : ""}
               >
+                {/* Nagłówek na podstawie typu powiadomienia */}
+                {notification.notificationType === "MATCH_INVITE" && (
+                  <h2>Zaproszenie do meczu</h2>
+                )}
+                {notification.notificationType === "JOIN_REQUEST" && (
+                  <h2>Prośba o przyjęcie do drużyny</h2>
+                )}
+                {notification.notificationType === "TEAM_INVITE" && (
+                  <h2>Zaproszenie do drużyny</h2>
+                )}
+
                 <p className="notification-username">
                   {"Od: "}
                   {notification?.sender?.username || "Nieznany"}
@@ -141,19 +152,13 @@ const Notification = () => {
                   {"Wiadomość: "}
                   {notification.message}
                 </p>
-                {/* <p className="notification-status">
-                  Status:{" "}
-                  {notification.isRead ? "Przeczytane" : "Nieprzeczytane"}
-                </p> */}
 
                 {notification.match ? (
                   <p>
                     Mecz: {notification.match.homeTeam.name} vs{" "}
                     {notification.match.awayTeam.name}
                   </p>
-                ) : (
-                  <p></p>
-                )}
+                ) : null}
 
                 {notification.notificationType === "MATCH_INVITE" && (
                   <div className="notification-actions">
@@ -205,7 +210,7 @@ const Notification = () => {
                             handleResponseJoinTeam(true, notification.id)
                           }
                         >
-                          Akceptuj
+                          Akceptuj <FontAwesomeIcon icon={faHandshakeSimple} />
                         </button>
                         <button
                           className="reject"
@@ -213,7 +218,8 @@ const Notification = () => {
                             handleResponseJoinTeam(false, notification.id)
                           }
                         >
-                          Odrzuć
+                          Odrzuć{" "}
+                          <FontAwesomeIcon icon={faHandshakeSimpleSlash} />
                         </button>
                       </>
                     )}
@@ -234,7 +240,7 @@ const Notification = () => {
                             handleResponseInviteTeam(true, notification.id)
                           }
                         >
-                          Akceptuj
+                          Akceptuj <FontAwesomeIcon icon={faHandshakeSimple} />
                         </button>
                         <button
                           className="reject"
@@ -242,7 +248,8 @@ const Notification = () => {
                             handleResponseInviteTeam(false, notification.id)
                           }
                         >
-                          Odrzuć
+                          Odrzuć{" "}
+                          <FontAwesomeIcon icon={faHandshakeSimpleSlash} />
                         </button>
                       </>
                     )}

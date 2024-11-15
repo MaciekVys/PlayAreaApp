@@ -10,6 +10,7 @@ import {
   PLAYER_STATISTICS_SUMMARY_QUERY,
   ME_QUERY,
 } from "../queries/queries";
+import noImage from "../images/noImage.png";
 
 // Definiowanie mutacji invitePlayer
 const INVITE_PLAYER = gql`
@@ -89,10 +90,10 @@ const UserProfile = () => {
                 <img
                   src={`${MEDIA_URL}${player.photo}`}
                   alt={`${player.username} photo`}
-                  className="player-photo"
+                  style={{ maxWidth: "200px", maxHeight: "200px" }}
                 />
               ) : (
-                <div className="placeholder-photo">Brak zdjęcia</div>
+                <img src={noImage} />
               )}
             </div>
             <div className="stats">
@@ -112,12 +113,14 @@ const UserProfile = () => {
             </div>
             <div className="user">
               <h1>{player.team?.name || "Brak Drużyny"}</h1>
-              {player.team?.logo && (
+              {player.team?.logo ? (
                 <img
                   src={`${MEDIA_URL}${player.team.logo}`}
                   alt={`${player.team.name} logo`}
                   className="team-logo"
                 />
+              ) : (
+                <img src={noImage} />
               )}
               <br />
               {userId !== player.id &&
@@ -155,6 +158,7 @@ const UserProfile = () => {
             </tr>
           </tbody>
         </table>
+        <div style={{ height: "50px" }}></div>
       </div>
     </>
   );

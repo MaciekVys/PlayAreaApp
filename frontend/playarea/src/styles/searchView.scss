@@ -31,7 +31,7 @@
   width: 80%;
   margin: 70px auto;
   padding: 20px;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(100px);
   border-radius: 8px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
@@ -41,13 +41,13 @@
 // Nagłówki sekcji wyników
 .search-container h2 {
   font-size: 2rem;
-  color: #333;
+  color: #000;
   margin-bottom: 20px;
 }
 
 .search-container h3 {
   font-size: 1.5rem;
-  color: #57ca9e;
+  color: #000;
   margin: 20px 0 10px 0;
   border-bottom: 2px solid #ddd;
   padding-bottom: 5px;
@@ -56,10 +56,11 @@
 // Element wyników
 .result-item {
   font-size: 1.2rem;
-  color: #333;
+  color: #000;
   padding: 10px 15px;
   margin: 10px 0;
-  background-color: #fff;
+  background-color: #00ff22;
+  border: 2px solid #000;
   border-radius: 5px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease;
@@ -67,7 +68,9 @@
 
 // Efekt hover dla elementów wyników
 .result-item:hover {
-  background-color: #e0f7ef;
+  background-color: #b7ffc0;
+  border: 2px solid black;
+  color: #000;
   cursor: pointer;
 }
 
@@ -76,8 +79,8 @@
   margin: 10px 0;
   padding: 15px;
   background-color: #f0f4f8;
-  color: #888;
-  border: 1px dashed #ccc;
+  color: #ff0000;
+  border: 2px dashed #747474;
   border-radius: 5px;
   font-size: 1rem;
 }

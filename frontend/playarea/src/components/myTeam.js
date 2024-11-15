@@ -9,12 +9,14 @@ import {
   faUsers,
   faFutbol,
   faCircleRight,
+  faGear,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   MY_TEAM_QUERY,
   TEAM_STATISTICS_SUMMARY_QUERY,
 } from "../queries/queries";
 import { LEAVE_TEAM_MUTATION } from "../queries/mutations";
+import noImage from "../images/noImage.png";
 
 const Team = () => {
   const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
@@ -102,7 +104,10 @@ const Team = () => {
           {team.logo ? (
             <img src={`${MEDIA_URL}${team.logo}`} alt={`${team.name} logo`} />
           ) : (
-            <div className="placeholder-photo">Brak logo</div>
+            <div className="placeholder-photo">
+              {" "}
+              <img src={noImage} />
+            </div>
           )}
           <div className="left-side">
             <h1>{team.name}</h1>
@@ -129,7 +134,7 @@ const Team = () => {
 
             {isCaptain && (
               <button onClick={() => navigate("/editTeam")}>
-                Edytuj drużynę
+                Edytuj drużynę <FontAwesomeIcon icon={faGear} />
               </button>
             )}
           </div>
@@ -181,7 +186,19 @@ const Team = () => {
                     const playerStats = playerStatsMap[player.username] || {};
                     return (
                       <tr key={player.id}>
-                        <td>{player.im}</td>
+                        <td>
+                          {player.photo ? (
+                            <img
+                              style={{ height: "35px", weight: "auto" }}
+                              src={`${MEDIA_URL}${player.photo}`}
+                            />
+                          ) : (
+                            <img
+                              style={{ height: "35px", weight: "auto" }}
+                              src={noImage}
+                            />
+                          )}
+                        </td>
                         <td
                           style={{ cursor: "pointer" }}
                           onClick={() => navigate(`/profile/${player.id}`)}
@@ -198,6 +215,7 @@ const Team = () => {
                 )}
               </tbody>
             </table>
+            <div style={{ height: "50px" }}></div>
           </>
         )}
 
@@ -224,16 +242,28 @@ const Team = () => {
                     >
                       <div style={{ padding: "5px", alignItems: "center" }}>
                         {match.homeTeam.name}
-                        <img
-                          style={{
-                            width: "20px",
-                            height: "auto",
-                            marginLeft: "0",
-                            float: "right",
-                          }}
-                          src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                          alt={`${match.homeTeam.name} logo`}
-                        />
+                        {match.homeTeam.logo ? (
+                          <img
+                            style={{
+                              width: "20px",
+                              height: "auto",
+                              marginLeft: "0",
+                              float: "right",
+                            }}
+                            src={`${MEDIA_URL}${match.homeTeam.logo}`}
+                            alt={`${match.homeTeam.logo} logo`}
+                          />
+                        ) : (
+                          <img
+                            style={{
+                              width: "20px",
+                              height: "auto",
+                              marginLeft: "0",
+                              float: "right",
+                            }}
+                            src={noImage}
+                          />
+                        )}
                       </div>
                     </td>
                     <td>
@@ -245,16 +275,28 @@ const Team = () => {
                     >
                       <div style={{ padding: "5px", alignItems: "center" }}>
                         {match.awayTeam.name}
-                        <img
-                          style={{
-                            width: "20px",
-                            height: "auto",
-                            marginLeft: "0",
-                            float: "left",
-                          }}
-                          src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                          alt={`${match.awayTeam.name} logo`}
-                        />
+                        {match.awayTeam.logo ? (
+                          <img
+                            style={{
+                              width: "20px",
+                              height: "auto",
+                              marginLeft: "0",
+                              float: "left",
+                            }}
+                            src={`${MEDIA_URL}${match.awayTeam.logo}`}
+                            alt={`${match.awayTeam.logo} logo`}
+                          />
+                        ) : (
+                          <img
+                            style={{
+                              width: "20px",
+                              height: "auto",
+                              marginLeft: "0",
+                              float: "left",
+                            }}
+                            src={noImage}
+                          />
+                        )}
                       </div>
                     </td>
                     <td
@@ -269,6 +311,7 @@ const Team = () => {
             </table>
           </>
         )}
+        <div style={{ height: "50px" }}></div>
       </div>
     </>
   );

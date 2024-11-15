@@ -1,58 +1,71 @@
-/* Styl dla kontenera */
 .create-team-container {
+  background-image: url("../images/peach.jpg");
+  background-repeat: repeat;
+  background-size: cover;
+  background-color: rgba(0, 0, 0, 0.5);
+  background-blend-mode: darken;
+  height: 80vh;
+  width: 150vb;
+  margin: 20px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 70px;
   padding: 20px;
 }
 
-/* Styl dla formularza */
 .form-wrapper {
-  background-color: #ffffff;
+  backdrop-filter: blur(8px);
+  border: 2px solid #ffffff;
   padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
   max-width: 500px;
   width: 100%;
+  color: #fff;
 }
 
 .form-wrapper h1 {
   font-size: 28px;
   margin-bottom: 20px;
   text-align: center;
-  color: #333;
+  color: #fff; /* Biały tekst dla kontrastu */
+  font-weight: 700;
 }
 
 .form-wrapper h3 {
   font-size: 18px;
   margin-bottom: 10px;
-  color: #333;
+  color: #e0f7ea; /* Jasna zieleń dla subtelnego kontrastu */
 }
 
-/* Styl dla pól wyboru */
+/* Styl dla pól wyboru i pól tekstowych */
 .select-field,
 .input-field-create-team {
   width: 100%;
   padding: 12px;
   margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border: 1px solid #66bb6a;
+  border-radius: 8px;
   font-size: 16px;
   box-sizing: border-box;
+  color: #333;
+  background-color: #f7f9f7;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .select-field:focus,
 .input-field-create-team:focus {
-  border-color: #57ca9e;
+  border-color: #4caf50;
   outline: none;
-  box-shadow: 0 0 5px rgba(87, 202, 158, 0.5);
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.3); /* Dodany cień na focus */
 }
 
-/* Stylizacja dla tekstu */
+/* Stylizacja etykiet */
 label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   font-size: 16px;
-  color: #333;
+  color: #e0f7ea;
+  font-weight: 500;
 }

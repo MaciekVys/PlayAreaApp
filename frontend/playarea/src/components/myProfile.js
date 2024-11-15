@@ -6,6 +6,7 @@ import {
   USER_PROFILE,
   PLAYER_STATISTICS_SUMMARY_QUERY,
 } from "../queries/queries";
+import noImage from "../images/noImage.png";
 
 const PlayerProfile = () => {
   const {
@@ -45,30 +46,34 @@ const PlayerProfile = () => {
                 <br />"{user.username}"
               </h1>
               {user.photo ? (
-                <img src={`${MEDIA_URL}${user.photo}`} alt="Player" />
+                <img
+                  style={{ maxWidth: "200px", maxHeight: "200px" }}
+                  src={`${MEDIA_URL}${user.photo}`}
+                  alt="Player"
+                />
               ) : (
-                <div className="placeholder-photo">Brak zdjęcia</div>
+                <img src={noImage} />
               )}
             </div>
 
             <div className="stats">
               <p>Drużyna: {user.team?.name || "Brak drużyny"}</p>
               <p>Miasto: {user.city?.name || "Brak miasta"}</p>
-              <p>
-                Pozycja:{" "}
-                {user.playerstatisticsSet[0]?.position || "Brak pozycji"}
-              </p>
+              <p>Pozycja: {user.position || "Brak pozycji"}</p>
               <p>Numer: {user.number || "Brak numeru"}</p>
               <p>Waga: {user.weight ? `${user.weight} kg` : "Brak danych"}</p>
               <p>Wzrost: {user.height ? `${user.height} cm` : "Brak danych"}</p>
             </div>
             <div className="user">
               <h1>{user.team?.name || "Brak drużyny"}</h1>
-              {user.team?.logo && (
+              {user.team?.logo ? (
                 <img
+                  style={{ weight: "40px", height: "auto" }}
                   src={`${MEDIA_URL}${user.team.logo}`}
                   alt={`${user.team.name} logo`}
                 />
+              ) : (
+                <img style={{ weight: "40px", height: "auto" }} src={noImage} />
               )}
             </div>
           </>
@@ -98,6 +103,7 @@ const PlayerProfile = () => {
           </tbody>
         </table>
       </div>
+      <div style={{ height: "50px" }}></div>
     </div>
   );
 };

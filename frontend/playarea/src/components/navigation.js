@@ -15,19 +15,24 @@ import {
   faUserGear,
   faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
+import { ME_QUERY } from "../queries/queries";
+import noImage from "../images/noImage.png";
+import { useQuery } from "@apollo/client";
 
 const Navigation = () => {
+  const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
   const isLogged = localStorage.getItem("isLogged");
   const username = localStorage.getItem("username");
   const { logout } = Logout();
   const location = useLocation();
+  const { data: meData } = useQuery(ME_QUERY);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const toggleDropdown = () => {
     setDropdownOpen((prevState) => !prevState);
   };
-
+  console.log(meData?.me?.photo);
   return (
     <nav className="navigation">
       <div className="logo">
@@ -67,7 +72,33 @@ const Navigation = () => {
             className={`menu-item profile ${dropdownOpen ? "open" : ""}`}
             onClick={toggleDropdown}
           >
-            <FontAwesomeIcon icon={faUserTie} />
+            <div>
+              {username}
+              {meData?.me?.photo ? (
+                <img
+                  style={{
+                    marginLeft: "10px",
+                    width: "auto",
+                    height: "30px",
+                    border: "1px solid",
+                    float: "right",
+                  }}
+                  src={`${MEDIA_URL}${meData?.me?.photo}`}
+                />
+              ) : (
+                <img
+                  style={{
+                    marginLeft: "10px",
+                    width: "auto",
+                    height: "30px",
+                    border: "1px solid",
+                    float: "right",
+                  }}
+                  src={noImage}
+                />
+              )}
+            </div>
+
             <ul className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}>
               <li>
                 <a href="/profile">

@@ -2,13 +2,20 @@
 
 /* Styl dla kontenera formularza */
 .challenge-team-container {
+  background-image: url("../images/peach.jpg");
+  background-repeat: repeat;
+  background-size: cover;
+  background-color: rgba(0, 0, 0, 0.5);
+  background-blend-mode: darken;
+  height: 80vh;
+  width: 150vb;
+  margin: 20px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
   display: flex;
-  flex-direction: row;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   padding: 20px;
-  margin: 20px;
-  background-image: url("../images/city.jpg");
 }
 
 .info {
@@ -17,9 +24,10 @@
   align-items: center; // Ustawienie wyrównania do lewej
   padding: 20px;
   margin-right: 90px; // Odstęp między miastem a formularzem
-  background-color: rgba(255, 255, 255, 0.8); // Tło z przezroczystością
+  backdrop-filter: blur(10px);
+  border: 2px solid #ffffff;
   border-radius: 8px; // Zaokrąglone rogi
-  width: 30%; // Szerokość kontenera
+  color: #ffffff;
 
   img {
     width: 100px;
@@ -30,7 +38,7 @@
 /* Dodatkowe style dla nagłówków i paragrafów w kontenerze z informacjami */
 .city-info h1,
 .city-info p {
-  color: #333; // Kolor tekstu
+  color: #000; // Kolor tekstu
   margin: 0; // Usunięcie domyślnych marginesów
 }
 
@@ -46,18 +54,17 @@
 
 .challenge-form {
   margin: 30px;
-  background-color: white;
+  backdrop-filter: blur(10px);
   padding: 30px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(10, 170, 191, 0.375);
-  width: 35%;
+  border: 2px solid #ffffff;
 
   h2 {
     font-size: 24px;
-    color: #333;
+    color: #ffffff;
     margin-bottom: 20px;
     text-align: center;
-    border-bottom: 2px #000000 solid;
+    border-bottom: 2px #ffffff solid;
   }
 }
 
@@ -65,14 +72,15 @@
   margin-bottom: 20px;
 }
 
-.form-group select {
+.form-group input,
+select {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #000000;
   border-radius: 4px;
   font-size: 14px;
-  color: #333;
-  background-color: #f9f9f9;
+  color: #000;
+  background-color: #ffffff;
   transition: border 0.3s ease;
 }
 

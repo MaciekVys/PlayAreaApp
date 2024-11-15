@@ -3,6 +3,8 @@ from graphql import GraphQLError
 from graphql_auth.schema import UserQuery, MeQuery
 from graphql_auth import mutations
 from graphql_jwt.decorators import login_required
+
+from .mutations.uploads import UploadPhotoMutation, UploadTeamLogo
 from .types import CityType, ExtendUserType, PlayerStatisticsSummaryType, PlayerStatisticsType, RankingType, TeamType,  MatchType, NotificationType
 from .models import City, ExtendUser, MatchResult, PlayerStatistics, Ranking, Team,  Match, Notification
 from .mutations.team import ChallengeTeamToMatch, CreateTeam, DeleteTeam, LeaveTeam, UpdateTeam
@@ -14,11 +16,11 @@ from .filters import ExtendUserFilter, CityFilter, TeamFilter
 from graphene import relay
 
 
-class AuthMutation(graphene.ObjectType):
-    register = mutations.Register.Field()
-    verify_account = mutations.VerifyAccount.Field()
-    refresh_token = mutations.RefreshToken.Field()
-    revoke_token = mutations.RevokeToken.Field()
+# class AuthMutation(graphene.ObjectType):
+#     register = mutations.Register.Field()
+#     verify_account = mutations.VerifyAccount.Field()
+#     refresh_token = mutations.RefreshToken.Field()
+#     revoke_token = mutations.RevokeToken.Field()
 
 
 
@@ -213,7 +215,11 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
     
 
 
-class Mutation(AuthMutation, graphene.ObjectType):
+class Mutation(graphene.ObjectType):
+    register = mutations.Register.Field()
+    verify_account = mutations.VerifyAccount.Field()
+    refresh_token = mutations.RefreshToken.Field()
+    revoke_token = mutations.RevokeToken.Field()
     create_team = CreateTeam.Field()
     login = LoginMutation.Field()
     logout = Logout.Field()
@@ -230,6 +236,9 @@ class Mutation(AuthMutation, graphene.ObjectType):
     update_team = UpdateTeam.Field()
     invite_player = InvitePlayerToTeam.Field()
     respond_to_invite_team = RespondToTeamInvite.Field()
+    upload_photo = UploadPhotoMutation.Field()  # Definicja mutacji
+    upload_team_logo = UploadTeamLogo.Field()
+
 
 
 

@@ -16,6 +16,7 @@ import {
   TEAM_STATISTICS_SUMMARY_QUERY,
 } from "../queries/queries";
 import { SEND_JOIN_REQUEST } from "../queries/mutations";
+import noImage from "../images/noImage.png";
 
 const UserTeam = () => {
   const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
@@ -80,8 +81,8 @@ const UserTeam = () => {
 
   const userHasTeam = userData?.me?.team !== null;
   const isCaptain = userData?.me?.captainOfTeam !== null;
-
-  console.log("Czy użytkownik ma drużynę?", userHasTeam);
+  const userTeam = team.id;
+  const myteam = userData.me.team.id;
 
   if (!team) {
     return (
@@ -123,7 +124,9 @@ const UserTeam = () => {
           {team.logo ? (
             <img src={`${MEDIA_URL}${team.logo}`} alt={`${team.name} logo`} />
           ) : (
-            <div className="placeholder-logo">Brak logo</div>
+            <div className="placeholder-photo">
+              <img src={noImage} />
+            </div>
           )}
           <div className="left-side">
             <h1>{team.name}</h1>
@@ -133,7 +136,7 @@ const UserTeam = () => {
             <p>Liga: {team.league?.name || "Brak ligi"}</p>
             <p>Kapitan: {team.captain?.username || "Brak kapitana"}</p>
           </div>
-          {!isCaptain && (
+          {!isCaptain && userTeam !== myteam && (
             <button
               className="leave-button"
               onClick={handleJoinRequest}
@@ -179,7 +182,19 @@ const UserTeam = () => {
                   const playerStats = playerStatsMap[player.username] || {};
                   return (
                     <tr key={player.id}>
-                      <td></td>
+                      <td>
+                        {player.photo ? (
+                          <img
+                            style={{ height: "35px", weight: "auto" }}
+                            src={`${MEDIA_URL}${player.photo}`}
+                          />
+                        ) : (
+                          <img
+                            style={{ height: "35px", weight: "auto" }}
+                            src={noImage}
+                          />
+                        )}
+                      </td>
                       <td
                         style={{ cursor: "pointer" }}
                         onClick={() => navigate(`/profile/${player.id}`)}
@@ -221,16 +236,28 @@ const UserTeam = () => {
                     >
                       <div style={{ padding: "5px", alignItems: "center" }}>
                         {match.homeTeam.name}
-                        <img
-                          style={{
-                            width: "20px",
-                            height: "auto",
-                            marginLeft: "0",
-                            float: "right",
-                          }}
-                          src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                          alt={`${match.homeTeam.logo} logo`}
-                        />
+                        {match.homeTeam.logo ? (
+                          <img
+                            style={{
+                              width: "20px",
+                              height: "auto",
+                              marginLeft: "0",
+                              float: "right",
+                            }}
+                            src={`${MEDIA_URL}${match.homeTeam.logo}`}
+                            alt={`${match.homeTeam.logo} logo`}
+                          />
+                        ) : (
+                          <img
+                            style={{
+                              width: "20px",
+                              height: "auto",
+                              marginLeft: "0",
+                              float: "right",
+                            }}
+                            src={noImage}
+                          />
+                        )}
                       </div>
                     </td>
                     <td>
@@ -242,16 +269,28 @@ const UserTeam = () => {
                     >
                       <div style={{ padding: "5px", alignItems: "center" }}>
                         {match.awayTeam.name}
-                        <img
-                          style={{
-                            width: "20px",
-                            height: "auto",
-                            marginLeft: "0",
-                            float: "left",
-                          }}
-                          src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                          alt={`${match.awayTeam.logo} logo`}
-                        />
+                        {match.awayTeam.logo ? (
+                          <img
+                            style={{
+                              width: "20px",
+                              height: "auto",
+                              marginLeft: "0",
+                              float: "left",
+                            }}
+                            src={`${MEDIA_URL}${match.awayTeam.logo}`}
+                            alt={`${match.awayTeam.logo} logo`}
+                          />
+                        ) : (
+                          <img
+                            style={{
+                              width: "20px",
+                              height: "auto",
+                              marginLeft: "0",
+                              float: "left",
+                            }}
+                            src={noImage}
+                          />
+                        )}
                       </div>
                     </td>
                     <td

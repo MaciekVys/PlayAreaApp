@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "sass": "^1.79.4"
+  },
+  "dependencies": {
+    "apollo-upload-client": "^18.0.1"
   }
 }

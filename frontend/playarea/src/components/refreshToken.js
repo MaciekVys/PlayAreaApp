@@ -1,121 +1,107 @@
+// import { gql } from "@apollo/client";
+// import { useMutation } from "@apollo/client";
+// import Cookies from "js-cookie";
 // import {
 //   ApolloClient,
 //   InMemoryCache,
-//   HttpLink,
 //   ApolloLink,
+//   HttpLink,
+//   from,
 // } from "@apollo/client";
 // import { onError } from "@apollo/client/link/error";
-// import jwtDecode from "jwt-decode";
-// import { setContext } from "@apollo/client/link/context";
+// import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
-// // Funkcja do sprawdzania czy token wygasł
-// function isTokenExpired(token) {
-//   if (!token) return true;
-//   try {
-//     const { exp } = jwtDecode(token);
-//     if (Date.now() >= exp * 1000) {
-//       return true;
+// export const REFRESH_TOKEN_MUTATION = gql`
+//   mutation RefreshToken($refreshToken: String!) {
+//     refreshToken(refreshToken: $refreshToken) {
+//       token
+//       refreshToken
+//       success
 //     }
-//     return false;
-//   } catch (error) {
-//     return true;
 //   }
-// }
+// `;
 
-// // Funkcja do uzyskania odświeżonego tokenu
-// async function refreshAccessToken() {
-//   const refreshToken = getCookie("JWT-Refresh-token"); // Zakładam, że masz funkcję, która odczytuje ciasteczko
-//   if (!refreshToken) {
-//     console.error(
-//       "Brak refresh tokena, użytkownik musi się ponownie zalogować."
-//     );
-//     return null;
-//   }
+// const useRefreshToken = () => {
+//   const [refreshTokenMutation] = useMutation(REFRESH_TOKEN_MUTATION);
 
-//   // Mutacja GraphQL do odświeżenia tokenu
-//   const response = await fetch("/graphql/", {
-//     method: "POST",
+//   const refreshAuthToken = async () => {
+//     const refreshToken = Cookies.get("JWT-Refresh-token");
+
+//     if (!refreshToken) {
+//       throw new Error("Brak refresh tokenu w ciasteczkach");
+//     }
+
+//     const response = await refreshTokenMutation({
+//       variables: { refreshToken },
+//     });
+
+//     if (response.data?.refreshToken?.success) {
+//       const newToken = response.data.refreshToken.token;
+//       const newRefreshToken = response.data.refreshToken.refreshToken;
+
+//       // Zapisanie nowych tokenów w ciasteczkach
+//       Cookies.set("JWT", newToken, { sameSite: "Lax", secure: true });
+//       Cookies.set("JWT-Refresh-token", newRefreshToken, {
+//         sameSite: "Lax",
+//         secure: true,
+//       });
+
+//       return newToken;
+//     } else {
+//       throw new Error("Nie udało się odświeżyć tokenu");
+//     }
+//   };
+
+//   return refreshAuthToken;
+// };
+// export default useRefreshToken;
+
+// const httpLink = createUploadLink({
+//   uri: "http://localhost:8000/graphql/",
+//   credentials: "include",
+// });
+
+// const authLink = new ApolloLink((operation, forward) => {
+//   const token = Cookies.get("JWT");
+
+//   operation.setContext({
 //     headers: {
-//       "Content-Type": "application/json",
+//       authorization: token ? `Bearer ${token}` : "",
 //     },
-//     body: JSON.stringify({
-//       query: `
-//         mutation {
-//           refreshToken(refreshToken: "${refreshToken}") {
-//             token
-//             success
-//             errors
-//           }
-//         }
-//       `,
-//     }),
 //   });
 
-//   const data = await response.json();
-//   if (data.data.refreshToken.success) {
-//     document.cookie = `JWT=${data.data.refreshToken.token}; path=/; httponly; samesite=strict`;
-//     return data.data.refreshToken.token;
-//   } else {
-//     console.error(
-//       "Nie udało się odświeżyć tokenu:",
-//       data.data.refreshToken.errors
-//     );
-//     return null;
-//   }
-// }
-
-// // Ustawienie kontekstu autoryzacji
-// const authLink = setContext(async (_, { headers }) => {
-//   let token = getCookie("JWT"); // Zakładam, że masz funkcję do odczytu ciasteczka z access tokenem
-
-//   // Sprawdź, czy token wygasł, jeśli tak, odśwież go
-//   if (isTokenExpired(token)) {
-//     token = await refreshAccessToken();
-//   }
-
-//   return {
-//     headers: {
-//       ...headers,
-//       Authorization: token ? `JWT ${token}` : "",
-//     },
-//   };
+//   return forward(operation);
 // });
 
-// // Link do obsługi błędów, np. 401 Unauthorized
-// const errorLink = onError(
-//   ({ graphQLErrors, networkError, operation, forward }) => {
-//     if (graphQLErrors) {
-//       for (let err of graphQLErrors) {
-//         if (err.extensions?.code === "UNAUTHENTICATED") {
-//           return fromPromise(
-//             refreshAccessToken().then((newToken) => {
-//               if (newToken) {
-//                 // Update operation context with new token
-//                 operation.setContext(({ headers = {} }) => ({
-//                   headers: {
-//                     ...headers,
-//                     Authorization: `JWT ${newToken}`,
-//                   },
-//                 }));
-//                 return forward(operation);
-//               }
-//               return;
-//             })
-//           ).flatMap((result) => (result ? forward(operation) : []));
-//         }
+// const errorLink = onError(({ graphQLErrors, operation, forward }) => {
+//   const refreshAuthToken = useRefreshToken();
+
+//   if (graphQLErrors) {
+//     for (let err of graphQLErrors) {
+//       if (err.extensions.code === "UNAUTHENTICATED") {
+//         return refreshAuthToken()
+//           .then((newToken) => {
+//             operation.setContext({
+//               headers: {
+//                 authorization: `Bearer ${newToken}`,
+//               },
+//             });
+//             return forward(operation);
+//           })
+//           .catch((error) => {
+//             console.error("Błąd odświeżania tokenu:", error);
+//             Cookies.remove("JWT");
+//             Cookies.remove("JWT-Refresh-token");
+//           });
 //       }
 //     }
-//     if (networkError) console.log(`[Network error]: ${networkError}`);
 //   }
-// );
-
-// // HttpLink - link do serwera GraphQL
-// const httpLink = new HttpLink({
-//   uri: "http://localhost:8000/graphql/",
 // });
 
-// // Apollo Client
 // const client = new ApolloClient({
-//   link: ApolloLink.from([authLink, errorLink, httpLink]),
+//   link: from([authLink, errorLink, httpLink]),
 //   cache: new InMemoryCache(),
+//   credentials: "include",
 // });
+
+// export default client;

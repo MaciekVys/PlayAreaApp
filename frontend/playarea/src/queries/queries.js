@@ -120,6 +120,8 @@ const GET_MATCH_STATISTICS = gql`
 const ME_QUERY = gql`
   query MeQuery {
     me {
+      photo
+      id
       city {
         name
       }
@@ -202,6 +204,7 @@ const MY_TEAM_QUERY = gql`
         id
       }
       players {
+        photo
         id
         username
         position
@@ -246,6 +249,7 @@ const USER_PROFILE = gql`
       lastName
       id
       email
+      position
       weight
       height
       number
@@ -389,6 +393,7 @@ const PLAYER_BY_ID = gql`
 const TEAM_BY_ID = gql`
   query TeamById($id: ID!) {
     teamById(id: $id) {
+      id
       name
       logo
       captain {
@@ -404,6 +409,7 @@ const TEAM_BY_ID = gql`
       }
       playersCount
       players {
+        id
         position
         height
         weight

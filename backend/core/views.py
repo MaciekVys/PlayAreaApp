@@ -23,3 +23,5 @@ def activate_account(request, token):
     else:
         # Zwróć błąd, jeśli coś poszło nie tak
         return HttpResponse("Invalid or expired token", status=400)
+    
+    

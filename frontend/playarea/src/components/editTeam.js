@@ -4,7 +4,6 @@ import { MY_TEAM_QUERY } from "../queries/queries";
 import "../styles/editTeam.scss";
 import { useNavigate } from "react-router-dom";
 
-// Mutation to delete the team
 const DELETE_TEAM = gql`
   mutation deleteTeam($teamId: ID!) {
     deleteTeam(teamId: $teamId) {
@@ -14,7 +13,15 @@ const DELETE_TEAM = gql`
   }
 `;
 
-// Updated mutation for team editing
+const UPLOAD_TEAM_LOGO = gql`
+  mutation uploadTeamLogo($teamId: ID!, $file: Upload!) {
+    uploadTeamLogo(teamId: $teamId, file: $file) {
+      success
+      message
+    }
+  }
+`;
+
 const UPDATE_TEAM = gql`
   mutation updateTeam(
     $teamId: ID!
@@ -35,12 +42,14 @@ const UPDATE_TEAM = gql`
 `;
 
 const EditTeam = () => {
+  const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
+
   const { loading, error, data, refetch } = useQuery(MY_TEAM_QUERY);
   const [teamData, setTeamData] = useState(null);
+  const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
 
-  // Mutation to delete the team
   const [deleteTeam] = useMutation(DELETE_TEAM, {
     onCompleted: (data) => {
       if (data.deleteTeam.success) {
@@ -56,7 +65,6 @@ const EditTeam = () => {
     },
   });
 
-  // Mutation to update the team
   const [updateTeam] = useMutation(UPDATE_TEAM, {
     onCompleted: (data) => {
       if (data.updateTeam.success) {
@@ -72,14 +80,27 @@ const EditTeam = () => {
     },
   });
 
-  // Update state when query completes
+  const [uploadTeamLogo] = useMutation(UPLOAD_TEAM_LOGO, {
+    onCompleted: (data) => {
+      if (data.uploadTeamLogo.success) {
+        alert("Zdjęcie drużyny zostało załadowane!");
+        refetch();
+      } else {
+        alert(`Błąd: ${data.uploadTeamLogo.message}`);
+      }
+    },
+    onError: (error) => {
+      console.error("Błąd przy wgrywaniu zdjęcia:", error.message);
+      alert("Wystąpił błąd przy wgrywaniu zdjęcia.");
+    },
+  });
+
   useEffect(() => {
     if (data && data.teamByUser) {
       setTeamData(data.teamByUser);
     }
   }, [data]);
 
-  // Delete team handler
   const handleDeleteTeam = () => {
     if (teamData && teamData.id) {
       const confirmDelete = window.confirm(
@@ -91,16 +112,10 @@ const EditTeam = () => {
     }
   };
 
-  // Change handler for form inputs
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setTeamData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
   };
 
-  // Save team changes handler
   const handleSaveChanges = () => {
     if (teamData && teamData.id) {
       updateTeam({
@@ -112,19 +127,19 @@ const EditTeam = () => {
     }
   };
 
-  // Transfer captaincy handler
-  const handleTransferCaptaincy = (playerId) => {
-    if (window.confirm("Czy na pewno chcesz przekazać kapitana?")) {
-      updateTeam({
+  const handleUploadLogo = () => {
+    if (file) {
+      uploadTeamLogo({
         variables: {
           teamId: teamData.id,
-          newCaptainId: playerId,
+          file: file,
         },
       });
+    } else {
+      alert("Proszę wybrać plik przed wysłaniem.");
     }
   };
 
-  // Remove player handler
   const handleRemovePlayer = (playerId) => {
     if (window.confirm("Czy na pewno chcesz usunąć tego gracza z drużyny?")) {
       updateTeam({
@@ -136,7 +151,17 @@ const EditTeam = () => {
     }
   };
 
-  // Render form
+  const handleTransferCaptaincy = (playerId) => {
+    if (window.confirm("Czy na pewno chcesz przekazać kapitana?")) {
+      updateTeam({
+        variables: {
+          teamId: teamData.id,
+          newCaptainId: playerId,
+        },
+      });
+    }
+  };
+
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">Error! {error.message}</div>;
   if (!teamData) return null;
@@ -151,21 +176,43 @@ const EditTeam = () => {
             type="text"
             name="name"
             value={teamData.name}
-            onChange={handleChange}
+            onChange={(e) => setTeamData({ ...teamData, name: e.target.value })}
             className="form-input"
           />
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Logo URL:</label>
+        <div className="form-group logo-upload">
+          <label className="form-label">Logo:</label>
+          <div className="logo-preview-container">
+            <img
+              src={
+                `${MEDIA_URL}${teamData.logo}` || "placeholder-image-url.jpg"
+              }
+              alt="Team Logo"
+              className="logo-preview"
+            />
+            <div
+              className="overlay"
+              onClick={() => document.getElementById("fileInput").click()}
+            >
+              Zmień zdjęcie
+            </div>
+          </div>
           <input
-            type="text"
+            type="file"
             name="logo"
-            value={teamData.logo}
-            onChange={handleChange}
-            className="form-input"
-            disabled
+            id="fileInput"
+            onChange={handleFileChange}
+            className="file-input"
+            style={{ display: "none" }}
           />
+          <button
+            type="button"
+            onClick={handleUploadLogo}
+            className="upload-button"
+          >
+            Zapisz
+          </button>
         </div>
 
         <div className="form-group">

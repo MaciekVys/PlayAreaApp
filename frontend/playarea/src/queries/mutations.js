@@ -12,7 +12,19 @@ export {
   UPDATE_USER_PROFILE,
   CREATE_TEAM,
   CONFIRM_MATCH_RESULT,
+  REFRESH_TOKEN_MUTATION,
 };
+
+const REFRESH_TOKEN_MUTATION = gql`
+  mutation RefreshToken($refreshToken: String!) {
+    refreshToken(refreshToken: $refreshToken) {
+      token
+      refreshToken
+      success
+      errors
+    }
+  }
+`;
 
 const SEND_JOIN_REQUEST = gql`
   mutation sendJoinRequest($teamId: ID!) {
@@ -126,10 +138,6 @@ const UPDATE_USER_PROFILE = gql`
         username
         firstName
         lastName
-      }
-      player {
-        height
-        weight
       }
     }
   }

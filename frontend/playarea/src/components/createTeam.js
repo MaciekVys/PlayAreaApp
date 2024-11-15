@@ -43,7 +43,6 @@ const CreateTeam = () => {
       <div className="form-wrapper">
         <h1>Zarejestruj Drużynę</h1>
         <form onSubmit={handleSubmit}>
-          <h3>Wybierz miasto</h3>
           <label htmlFor="city">Miasto:</label>
           <select
             id="city"
@@ -69,7 +68,9 @@ const CreateTeam = () => {
             required
           />
 
-          <button type="submit">Zarejestruj Drużynę</button>
+          <button type="submit" className="">
+            Zarejestruj Drużynę
+          </button>
           {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
         </form>
       </div>

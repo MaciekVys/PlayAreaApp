@@ -10,6 +10,7 @@ import {
   faTable,
 } from "@fortawesome/free-solid-svg-icons";
 import { CITY_QUERY } from "../queries/queries";
+import noImage from "../images/noImage.png";
 
 const CheckCity = () => {
   const { name: cityName } = useParams();
@@ -47,14 +48,16 @@ const CheckCity = () => {
       <div className="city-info">
         <div className="city-info-body">
           <div className="city-logo">
-            {city.image && (
+            {city.image ? (
               <img
                 src={`${MEDIA_URL}${city.image}`}
                 alt={`${city.image} logo`}
               />
+            ) : (
+              <img src={noImage} />
             )}
           </div>
-          <div>
+          <div className="left-side">
             <h1>Miasto: {city.name}</h1>
             <p>Województwo: {city.voivodeship}</p>
             {league ? (
@@ -117,16 +120,28 @@ const CheckCity = () => {
                               }}
                             >
                               {match.homeTeam.name}
-                              <img
-                                style={{
-                                  width: "20px",
-                                  height: "auto",
-                                  marginLeft: "0",
-                                  float: "right",
-                                }}
-                                src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                                alt={`${match.homeTeam.logo} logo`}
-                              />
+                              {match.homeTeam.logo ? (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "right",
+                                  }}
+                                  src={`${MEDIA_URL}${match.homeTeam.logo}`}
+                                  alt={`${match.homeTeam.logo} logo`}
+                                />
+                              ) : (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "right",
+                                  }}
+                                  src={noImage}
+                                />
+                              )}
                             </div>
                           </td>
                           <td>-</td>
@@ -143,16 +158,28 @@ const CheckCity = () => {
                               }}
                             >
                               {match.awayTeam.name}
-                              <img
-                                style={{
-                                  width: "20px",
-                                  height: "auto",
-                                  marginLeft: "0",
-                                  float: "left",
-                                }}
-                                src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                                alt={`${match.awayTeam.logo} logo`}
-                              />
+                              {match.awayTeam.logo ? (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "left",
+                                  }}
+                                  src={`${MEDIA_URL}${match.awayTeam.logo}`}
+                                  alt={`${match.awayTeam.logo} logo`}
+                                />
+                              ) : (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "left",
+                                  }}
+                                  src={noImage}
+                                />
+                              )}
                             </div>
                           </td>
                           {match?.homeTeam?.captain?.id === userId ||
@@ -202,16 +229,28 @@ const CheckCity = () => {
                               }}
                             >
                               {match.homeTeam.name}
-                              <img
-                                style={{
-                                  width: "20px",
-                                  height: "auto",
-                                  marginLeft: "0",
-                                  float: "right",
-                                }}
-                                src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                                alt={`${match.homeTeam.logo} logo`}
-                              />
+                              {match.homeTeam.logo ? (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "right",
+                                  }}
+                                  src={`${MEDIA_URL}${match.homeTeam.logo}`}
+                                  alt={`${match.homeTeam.logo} logo`}
+                                />
+                              ) : (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "right",
+                                  }}
+                                  src={noImage}
+                                />
+                              )}
                             </div>
                           </td>
                           <td>-</td>
@@ -228,16 +267,28 @@ const CheckCity = () => {
                               }}
                             >
                               {match.awayTeam.name}
-                              <img
-                                style={{
-                                  width: "20px",
-                                  height: "auto",
-                                  marginLeft: "0",
-                                  float: "left",
-                                }}
-                                src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                                alt={`${match.awayTeam.logo} logo`}
-                              />
+                              {match.awayTeam.logo ? (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "left",
+                                  }}
+                                  src={`${MEDIA_URL}${match.awayTeam.logo}`}
+                                  alt={`${match.awayTeam.logo} logo`}
+                                />
+                              ) : (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "left",
+                                  }}
+                                  src={noImage}
+                                />
+                              )}
                             </div>
                           </td>
                           {match?.homeTeam?.captain?.id === userId ||
@@ -290,16 +341,28 @@ const CheckCity = () => {
                               }}
                             >
                               {match.homeTeam.name}
-                              <img
-                                style={{
-                                  width: "20px",
-                                  height: "auto",
-                                  marginLeft: "0",
-                                  float: "right",
-                                }}
-                                src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                                alt={`${match.homeTeam.logo} logo`}
-                              />
+                              {match.homeTeam.logo ? (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "right",
+                                  }}
+                                  src={`${MEDIA_URL}${match.homeTeam.logo}`}
+                                  alt={`${match.homeTeam.logo} logo`}
+                                />
+                              ) : (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "right",
+                                  }}
+                                  src={noImage}
+                                />
+                              )}
                             </div>
                           </td>
                           <td>
@@ -318,16 +381,28 @@ const CheckCity = () => {
                               }}
                             >
                               {match.awayTeam.name}
-                              <img
-                                style={{
-                                  width: "20px",
-                                  height: "auto",
-                                  marginLeft: "0",
-                                  float: "left",
-                                }}
-                                src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                                alt={`${match.awayTeam.logo} logo`}
-                              />
+                              {match.awayTeam.logo ? (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "left",
+                                  }}
+                                  src={`${MEDIA_URL}${match.awayTeam.logo}`}
+                                  alt={`${match.awayTeam.logo} logo`}
+                                />
+                              ) : (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "left",
+                                  }}
+                                  src={noImage}
+                                />
+                              )}
                             </div>
                           </td>
 
@@ -373,16 +448,28 @@ const CheckCity = () => {
                               }}
                             >
                               {match.homeTeam.name}
-                              <img
-                                style={{
-                                  width: "20px",
-                                  height: "auto",
-                                  marginLeft: "0",
-                                  float: "right",
-                                }}
-                                src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                                alt={`${match.homeTeam.logo} logo`}
-                              />
+                              {match.homeTeam.logo ? (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "right",
+                                  }}
+                                  src={`${MEDIA_URL}${match.homeTeam.logo}`}
+                                  alt={`${match.homeTeam.logo} logo`}
+                                />
+                              ) : (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "right",
+                                  }}
+                                  src={noImage}
+                                />
+                              )}
                             </div>
                           </td>
                           <td>-</td>
@@ -399,16 +486,28 @@ const CheckCity = () => {
                               }}
                             >
                               {match.awayTeam.name}
-                              <img
-                                style={{
-                                  width: "20px",
-                                  height: "auto",
-                                  marginLeft: "0",
-                                  float: "left",
-                                }}
-                                src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                                alt={`${match.awayTeam.logo} logo`}
-                              />
+                              {match.awayTeam.logo ? (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "left",
+                                  }}
+                                  src={`${MEDIA_URL}${match.awayTeam.logo}`}
+                                  alt={`${match.awayTeam.logo} logo`}
+                                />
+                              ) : (
+                                <img
+                                  style={{
+                                    width: "20px",
+                                    height: "auto",
+                                    marginLeft: "0",
+                                    float: "left",
+                                  }}
+                                  src={noImage}
+                                />
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -416,6 +515,7 @@ const CheckCity = () => {
                   </tbody>
                 </table>
               </section>
+              <div style={{ height: "100px" }}></div>
             </div>
           )}
 
@@ -449,16 +549,28 @@ const CheckCity = () => {
                         >
                           <div style={{ padding: "5px", alignItems: "center" }}>
                             {ranking.team.name}
-                            <img
-                              style={{
-                                width: "20px",
-                                height: "auto",
-                                marginLeft: "0",
-                                float: "right",
-                              }}
-                              src={`${MEDIA_URL}${ranking.team.logo}`}
-                              alt={`${ranking.team.logo} logo`}
-                            />
+                            {ranking.team?.logo ? (
+                              <img
+                                style={{
+                                  width: "20px",
+                                  height: "auto",
+                                  marginLeft: "0",
+                                  float: "right",
+                                }}
+                                src={`${MEDIA_URL}${ranking.team.logo}`}
+                                alt={`${ranking.team.logo} logo`}
+                              />
+                            ) : (
+                              <img
+                                style={{
+                                  width: "20px",
+                                  height: "auto",
+                                  marginLeft: "0",
+                                  float: "right",
+                                }}
+                                src={noImage}
+                              />
+                            )}
                           </div>
                         </td>
                         <td>{ranking.wins}</td>
@@ -471,20 +583,12 @@ const CheckCity = () => {
                     ))}
                 </tbody>
               </table>
+              <div style={{ height: "100px" }}></div>
             </div>
           )}
         </>
       ) : (
-        <div>
-          <h1>Brak ligi</h1>
-          <div>
-            <p>
-              Wygląda na to, że twoje miasto nie jest przypisane do ligi. Zgłoś
-              swoje miasto do rozgrywek.
-            </p>
-            <button>Zgłoś</button>
-          </div>
-        </div>
+        <div></div>
       )}
     </div>
   );

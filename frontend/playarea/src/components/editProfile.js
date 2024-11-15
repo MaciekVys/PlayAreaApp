@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "../styles/editProfile.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faRotateLeft } from "@fortawesome/free-solid-svg-icons";
-import { ALL_CITIES } from "../queries/queries";
+import { ALL_CITIES, ME_QUERY } from "../queries/queries";
 import { UPDATE_USER_PROFILE } from "../queries/mutations";
 import { LOGOUT_MUTATION } from "../queries/mutations";
 
@@ -17,9 +17,22 @@ const DELETE_ACCOUNT = gql`
     }
   }
 `;
+const UPLOAD_PHOTO_MUTATION = gql`
+  mutation uploadPhoto($file: Upload!) {
+    uploadPhoto(file: $file) {
+      success
+      message
+    }
+  }
+`;
 
 const EditProfile = () => {
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
   const navigate = useNavigate();
+  const [file, setFile] = useState(null);
+  const { data: meData, refetch } = useQuery(ME_QUERY);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -31,6 +44,36 @@ const EditProfile = () => {
     cityName: "",
   });
 
+  const [uploadPhoto] = useMutation(UPLOAD_PHOTO_MUTATION, {
+    onCompleted: (data) => {
+      if (data.uploadPhoto.success) {
+        alert("Zdjęcie zostało dodane");
+        refetch();
+      } else {
+        alert(`Błąd: ${data.uploadPhoto.message}`);
+      }
+    },
+    onError: (error) => {
+      console.error("Błąd przy wgrywaniu zdjęcia:", error.message);
+      alert("Wystąpił błąd przy wgrywaniu zdjęcia.");
+    },
+  });
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleUploadLogo = () => {
+    if (file) {
+      uploadPhoto({
+        variables: {
+          file: file,
+        },
+      });
+    } else {
+      alert("Proszę wybrać plik przed wysłaniem.");
+    }
+  };
   const [
     updateUserProfile,
     { data: updateData, loading: loadingUpdate, error: errorUpdate },
@@ -77,6 +120,8 @@ const EditProfile = () => {
     e.preventDefault();
     try {
       await updateUserProfile({ variables: formData });
+      setSuccessMessage("Profil został zaktualizowany!"); // Ustawienie komunikatu
+      setTimeout(() => setSuccessMessage(""), 3000); // Ukrycie komunikatu po 3 sekundach
     } catch (error) {
       console.error("Błąd przy aktualizacji profilu:", error);
     }
@@ -90,9 +135,47 @@ const EditProfile = () => {
   return (
     <div className="main-container">
       <div className="profile-edit-container">
+        {successMessage && (
+          <div className="success-message">{successMessage}</div>
+        )}
         <h1 className="header-title">Edytuj Profil</h1>
         <div className="header-section">
-          <div className="placeholder-photo">Brak zdjęcia</div>
+          <div className="placeholder-photo">
+            <div className="logo-preview-container">
+              <img
+                style={{ maxWidth: "200px", maxHeight: "200px" }}
+                src={
+                  `${MEDIA_URL}${meData?.me?.photo}` ||
+                  "placeholder-image-url.jpg"
+                }
+                alt="Team Logo"
+                className="logo-preview"
+              />
+              <div
+                className="overlay"
+                onClick={() => document.getElementById("fileInput").click()}
+              >
+                Zmień zdjęcie
+              </div>
+            </div>
+            <input
+              type="file"
+              name="logo"
+              id="fileInput"
+              onChange={handleFileChange}
+              className="file-input"
+              style={{ display: "none" }}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleUploadLogo}
+            className="upload-button"
+          >
+            Zapisz
+          </button>
+          <br />
+          <br />
           <button onClick={handleDeleteAccount}>Usuń trwale konto!</button>
         </div>
 
@@ -182,8 +265,6 @@ const EditProfile = () => {
             Powrót <FontAwesomeIcon icon={faRotateLeft} />
           </button>
         </form>
-
-        {updateData && <p>Profil został zaktualizowany!</p>}
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserPlus, faFileSignature } from "@fortawesome/free-solid-svg-icons";
 import { ALL_CITIES } from "../queries/queries";
+import noImage from "../images/noImage.png";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -94,7 +95,7 @@ const Home = () => {
               {citiesData?.allCities?.map((city, index) => (
                 <tr key={index}>
                   <td style={{ maxWidth: "30px" }}>
-                    {city.image && (
+                    {city.image ? (
                       <img
                         src={`${MEDIA_URL}${city.image}`}
                         alt={`${city.image} logo`}
@@ -102,6 +103,14 @@ const Home = () => {
                           width: "50px",
                           height: "auto",
                         }}
+                      />
+                    ) : (
+                      <img
+                        style={{
+                          width: "50px",
+                          height: "auto",
+                        }}
+                        src={noImage}
                       />
                     )}
                   </td>

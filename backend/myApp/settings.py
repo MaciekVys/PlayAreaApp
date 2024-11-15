@@ -2,9 +2,9 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "graphql_auth",
     "django_filters",
     'corsheaders',
+    'graphene_file_upload',
 ]
 
 
@@ -47,7 +48,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "core.mutations.users.RefreshTokenMiddleware",
+    "core.middleware.RefreshTokenMiddleware",
+    # 'graphene_file_upload.django.FileUploadMiddleware',
+
 ]
 
 
@@ -77,8 +80,9 @@ WSGI_APPLICATION = 'myApp.wsgi.application'
 
 
 CORS_ALLOW_CREDENTIALS = True
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
 ]
@@ -86,7 +90,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
-SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = 'Lax'
+HTTP_ONLY = True
 SESSION_COOKIE_NAME = "admin_sessionid"
 
 DATABASES = {
@@ -176,6 +181,8 @@ GRAPHQL_JWT = {
     "JWT_LONG_RUNNING_REFRESH_TOKEN": True,
     "JWT_AUTH_TOKEN_EXPIRATION_DELTA": timedelta(minutes=1),
     "JWT_REFRESH_TOKEN_EXPIRATION_DELTA": timedelta(days=7),
+    "JWT_COOKIE": True,  # Upewnij się, że JWT jest zapisany jako ciasteczko
+    "JWT_REFRESH_TOKEN_COOKIE": True,
     "JWT_COOKIE_NAME": "JWT",
     "JWT_REFRESH_TOKEN_COOKIE_NAME": "JWT-Refresh-token",
 }
@@ -189,4 +196,5 @@ DEFAULT_FROM_EMAIL = 'Play Area <playarea.football@gmail.com>'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
