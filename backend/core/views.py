@@ -25,3 +25,7 @@ def activate_account(request, token):
         return HttpResponse("Invalid or expired token", status=400)
     
     
+from django.http import JsonResponse
+
+def status_view(request):
+    return JsonResponse({"status": "Everything is running fine!"})

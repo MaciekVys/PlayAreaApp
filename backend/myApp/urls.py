@@ -3,7 +3,7 @@ from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
 from graphql_jwt.decorators import jwt_cookie
 from core.schema import schema
-from core.views import activate_account
+from core.views import activate_account, status_view
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -15,6 +15,8 @@ urlpatterns = [
     path('graphql/', jwt_cookie(csrf_exempt(
         FileUploadGraphQLView.as_view(graphiql=True, schema=schema)))),
     path('activate/<str:token>/', activate_account, name='activate_account'),
+    path('status/', status_view, name='status'),  # Dodajemy nowy endpoint
+
 ]
 
 if settings.DEBUG:

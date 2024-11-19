@@ -49,6 +49,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.RefreshTokenMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Dodaj to middleware
+
     # 'graphene_file_upload.django.FileUploadMiddleware',
 
 ]
@@ -158,8 +160,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Ustawienia w produkcji dla zbierania plików statycznych
-if not DEBUG:
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Dodajemy miejsce, gdzie pliki statyczne aplikacji będą trzymane
 STATICFILES_DIRS = [
