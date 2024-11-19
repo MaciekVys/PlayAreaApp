@@ -80,8 +80,8 @@ WSGI_APPLICATION = 'myApp.wsgi.application'
 
 
 CORS_ALLOW_CREDENTIALS = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
@@ -179,10 +179,10 @@ GRAPHQL_JWT = {
     "JWT_VERIFY_EXPIRATION": True,
     "JWT_ALLOW_REFRESH": True,
     "JWT_LONG_RUNNING_REFRESH_TOKEN": True,
-    "JWT_AUTH_TOKEN_EXPIRATION_DELTA": timedelta(minutes=1),
+    "JWT_AUTH_TOKEN_EXPIRATION_DELTA": timedelta(minutes=5),
     "JWT_REFRESH_TOKEN_EXPIRATION_DELTA": timedelta(days=7),
-    "JWT_COOKIE": True,  # Upewnij się, że JWT jest zapisany jako ciasteczko
-    "JWT_REFRESH_TOKEN_COOKIE": True,
+    "JWT_COOKIE":False,
+    "JWT_REFRESH_TOKEN_COOKIE": False,
     "JWT_COOKIE_NAME": "JWT",
     "JWT_REFRESH_TOKEN_COOKIE_NAME": "JWT-Refresh-token",
 }

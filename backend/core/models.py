@@ -33,7 +33,7 @@ class League(models.Model):
 class City(models.Model):
     name = models.CharField(max_length=100, unique=True, blank=False)
     voivodeship = models.CharField(max_length=25)
-    area = models.DecimalField(max_digits=10, decimal_places=2)
+    area = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     description = models.TextField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='cities/', null=True, blank=True)  # Dodanie pola do zdjęcia miasta
 
