@@ -88,6 +88,8 @@ CORS_ORIGIN_WHITELIST = [
 ]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://playarea-hky7.onrender.com",
+
 ]
 
 SESSION_COOKIE_SAMESITE = 'Lax'
@@ -101,6 +103,23 @@ DATABASES = {
     }
 }
 
+# W trybie produkcyjnym
+if not DEBUG:
+    # Zabezpieczenie przed CSRF
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_SAMESITE = 'Strict'
+
+    # Zabezpieczenie przed sesjami na niezabezpieczonym połączeniu
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Strict'
+
+    # Używanie HTTPS w produkcji
+    SECURE_SSL_REDIRECT = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -135,13 +154,18 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+# Ustawienia w produkcji dla zbierania plików statycznych
+if not DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Dodajemy miejsce, gdzie pliki statyczne aplikacji będą trzymane
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # Zbiera pliki statyczne z katalogu 'static' w głównym katalogu projektu
+]
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
