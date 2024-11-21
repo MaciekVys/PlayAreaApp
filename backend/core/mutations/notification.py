@@ -140,6 +140,10 @@ class RespondToJoinRequest(graphene.Mutation):
             team = Team.objects.get(captain=notification.recipient)
 
             if accept:
+                # Jeżeli gracz jest już w jakiejś drużynie, opuszcza ją przed dołączeniem do nowej
+                if notification.sender.team:
+                    notification.sender.leave_team()
+
                 notification.sender.team = team
                 notification.sender.save()
 
@@ -259,9 +263,15 @@ class RespondToTeamInvite(graphene.Mutation):
             team = Team.objects.get(id=notification.sender.team.id)
 
             if accept:
+                # Jeżeli gracz jest już w jakiejś drużynie, opuszcza ją przed dołączeniem do nowej
+                if user.team:
+                    user.leave_team()
+
+
                 # Dodanie gracza do drużyny
                 team.players_in_team.add(user)
-                team.save()
+                user.team = team
+                user.save()
                 message = f"You have joined the team {team.name}."
                 notification.status = 'accepted'
             else:

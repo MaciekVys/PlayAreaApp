@@ -1,6 +1,8 @@
 import graphene
 from graphene_django.types import DjangoObjectType
-from ..models import ExtendUser, Match, PlayerStatistics,MatchResult, Team
+
+from core.services import update_team_stats_after_match
+from ..models import ExtendUser, Match, MatchResult, PlayerStatistics, Team
 
 class PlayerStatisticsInput(graphene.InputObjectType):
     player_id = graphene.Int(required=True)
@@ -47,13 +49,12 @@ class ConfirmMatchResult(graphene.Mutation):
 
         # Przetwarzanie statystyk dla zawodników
         for stat in statistics:
-            player = ExtendUser.objects.get(id=stat.player_id)  # Użycie ExtendUser zamiast Player
+            player = ExtendUser.objects.get(id=stat.player_id)
 
             # Sprawdzanie, czy zawodnik należy do drużyny potwierdzającej
-            if not team.players_in_team.filter(pk=user.pk).exists():  # Sprawdzenie ManyToMany dla drużyny
-                raise Exception(f"Zawodnik nie należy do drużyny {'gospodarzy' if is_home_team else 'gości'}.")
+            if player.team != team:
+                raise Exception(f"Zawodnik {player.username} nie należy do drużyny {'gospodarzy' if is_home_team else 'gości'}.")
 
-            # Aktualizacja statystyk zawodnika
             PlayerStatistics.objects.update_or_create(
                 match=match,
                 player=player,
@@ -63,6 +64,12 @@ class ConfirmMatchResult(graphene.Mutation):
                     'is_mvp': stat.is_mvp or False,
                 }
             )
+
+            # Aktualizacja statystyk zawodnika
+            player.goals += stat.goals
+            player.assists += stat.assists
+            player.mvp += 1 if stat.is_mvp else 0
+            player.save()
 
         # Zapisanie wyniku dla drużyny
         if is_home_team:
@@ -84,5 +91,8 @@ class ConfirmMatchResult(graphene.Mutation):
         if match_result.home_team_confirmed and match_result.away_team_confirmed:
             match.status = 'completed'
             match.save()
+
+            update_team_stats_after_match(match)
+
 
         return ConfirmMatchResult(success=True)

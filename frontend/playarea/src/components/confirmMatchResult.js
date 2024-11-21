@@ -5,12 +5,12 @@ import { useParams } from "react-router-dom";
 import "../styles/confirmMatch.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faRotateLeft } from "@fortawesome/free-solid-svg-icons";
-import { GET_MATCH_PLAYERS } from "../queries/queries";
+import { GET_MATCH_DETAILS } from "../queries/queries";
 import { CONFIRM_MATCH_RESULT } from "../queries/mutations";
 
 const ConfirmMatchResult = () => {
   const { id: matchId } = useParams();
-  const { data, loading, error, refetch } = useQuery(GET_MATCH_PLAYERS, {
+  const { data, loading, error, refetch } = useQuery(GET_MATCH_DETAILS, {
     variables: { matchId },
   });
   const currentUserId = localStorage.getItem("userId");
@@ -30,11 +30,13 @@ const ConfirmMatchResult = () => {
   const isAwayTeamCaptain = match.awayTeam.captain.id === currentUserId;
   const isHomeTeamCaptain = match.homeTeam.captain.id === currentUserId;
 
-  const alreadyConfirmed = isHomeTeamCaptain
-    ? match.matchresultSet[0]?.homeTeamConfirmed
-    : match.matchresultSet[0]?.awayTeamConfirmed;
+  // Sprawdzamy, czy wynik drużyny przeciwnej został już potwierdzony
+  const isAwayTeamConfirmed = match.matchresultSet[0]?.awayTeamConfirmed;
+  const isHomeTeamConfirmed = match.matchresultSet[0]?.homeTeamConfirmed;
 
-  const isFormDisabled = alreadyConfirmed;
+  const isFormDisabled =
+    (isHomeTeamCaptain && isHomeTeamConfirmed) ||
+    (isAwayTeamCaptain && isAwayTeamConfirmed);
 
   const handleInputChange = (team, playerId, field, value) => {
     const updateStats = (stats) => {
@@ -105,146 +107,204 @@ const ConfirmMatchResult = () => {
       <div className="teams">
         <div className="team home-team">
           <h2>{match.homeTeam.name} (Gospodarze)</h2>
-          <input
-            type="number"
-            className="input-field"
-            min="0"
-            placeholder="Wynik gospodarzy"
-            value={homeTeamScore}
-            onChange={(e) => setHomeTeamScore(e.target.value)}
-            disabled={!isHomeTeamCaptain || isFormDisabled}
-          />
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Imię Użytkownika</th>
-                <th>Gole</th>
-                <th>Asysty</th>
-                <th>MVP</th>
-              </tr>
-            </thead>
-            <tbody>
-              {match.homeTeam.players.map((player) => (
-                <tr key={player.id}>
-                  <td>{player.username}</td>
-                  <td>
-                    <input
-                      type="number"
-                      className="input-field"
-                      min="0"
-                      disabled={!isHomeTeamCaptain || isFormDisabled}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "home",
-                          player.id,
-                          "goals",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      className="input-field"
-                      min="0"
-                      disabled={!isHomeTeamCaptain || isFormDisabled}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "home",
-                          player.id,
-                          "assists",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      disabled={!isHomeTeamCaptain || isFormDisabled}
-                      type="radio"
-                      name="homeMvp"
-                      onChange={() =>
-                        handleInputChange("home", player.id, "isMvp", true)
-                      }
-                    />
-                  </td>
+          {isHomeTeamConfirmed ? (
+            <h1 style={{ color: "black" }}>{match.scoreHome} ⚽</h1>
+          ) : (
+            <input
+              type="number"
+              className="input-field"
+              min="0"
+              placeholder="Wynik gospodarzy"
+              value={homeTeamScore}
+              onChange={(e) => setHomeTeamScore(e.target.value)}
+              disabled={!isHomeTeamCaptain || isFormDisabled}
+            />
+          )}
+
+          {isHomeTeamConfirmed ? (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Imię Użytkownika</th>
+                  <th>Gole</th>
+                  <th>Asysty</th>
+                  <th>MVP</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {match.homeTeamStatistics.map((stat) => (
+                  <tr key={stat.player.id}>
+                    <td>{stat.player.username}</td>
+                    <td>{stat.goals}</td>
+                    <td>{stat.assists}</td>
+                    <td>{stat.isMvp ? "⭐" : ""}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Imię Użytkownika</th>
+                  <th>Gole</th>
+                  <th>Asysty</th>
+                  <th>MVP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {match.homeTeam.players.map((player) => (
+                  <tr key={player.id}>
+                    <td>{player.username}</td>
+                    <td>
+                      <input
+                        type="number"
+                        className="input-field"
+                        min="0"
+                        disabled={!isHomeTeamCaptain || isFormDisabled}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "home",
+                            player.id,
+                            "goals",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        className="input-field"
+                        min="0"
+                        disabled={!isHomeTeamCaptain || isFormDisabled}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "home",
+                            player.id,
+                            "assists",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <input
+                        disabled={!isHomeTeamCaptain || isFormDisabled}
+                        type="radio"
+                        name="homeMvp"
+                        onChange={() =>
+                          handleInputChange("home", player.id, "isMvp", true)
+                        }
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
 
+        {/* Goście */}
         <div className="team away-team">
           <h2>{match.awayTeam.name} (Goście)</h2>
-          <input
-            type="number"
-            className="input-field"
-            min="0"
-            placeholder="Wynik gości"
-            value={awayTeamScore}
-            onChange={(e) => setAwayTeamScore(e.target.value)}
-            disabled={!isAwayTeamCaptain || isFormDisabled}
-          />
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Imię Użytkownika</th>
-                <th>Gole</th>
-                <th>Asysty</th>
-                <th>MVP</th>
-              </tr>
-            </thead>
-            <tbody>
-              {match.awayTeam.players.map((player) => (
-                <tr key={player.id}>
-                  <td>{player.username}</td>
-                  <td>
-                    <input
-                      type="number"
-                      className="input-field"
-                      min="0"
-                      disabled={!isAwayTeamCaptain || isFormDisabled}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "away",
-                          player.id,
-                          "goals",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      className="input-field"
-                      min="0"
-                      disabled={!isAwayTeamCaptain || isFormDisabled}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "away",
-                          player.id,
-                          "assists",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="radio"
-                      name="awayMvp"
-                      disabled={!isAwayTeamCaptain || isFormDisabled}
-                      onChange={() =>
-                        handleInputChange("away", player.id, "isMvp", true)
-                      }
-                    />
-                  </td>
+          {isAwayTeamConfirmed ? (
+            <h1 style={{ color: "black" }}>{match.scoreAway} ⚽</h1>
+          ) : (
+            // Jeśli wynik nie został zatwierdzony, wyświetlamy pole do wprowadzenia wyniku
+            <input
+              type="number"
+              className="input-field"
+              min="0"
+              placeholder="Wynik gości"
+              value={awayTeamScore}
+              onChange={(e) => setAwayTeamScore(e.target.value)}
+              disabled={!isAwayTeamCaptain || isFormDisabled}
+            />
+          )}
+          {isAwayTeamConfirmed ? (
+            // Wyświetlanie statystyk drużyny gości, jeśli wynik jest potwierdzony
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Imię Użytkownika</th>
+                  <th>Gole</th>
+                  <th>Asysty</th>
+                  <th>MVP</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {match.awayTeamStatistics.map((stat) => (
+                  <tr key={stat.player.id}>
+                    <td>{stat.player.username}</td>
+                    <td>{stat.goals}</td>
+                    <td>{stat.assists}</td>
+                    <td>{stat.isMvp ? "⭐" : ""}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Imię Użytkownika</th>
+                  <th>Gole</th>
+                  <th>Asysty</th>
+                  <th>MVP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {match.awayTeam.players.map((player) => (
+                  <tr key={player.id}>
+                    <td>{player.username}</td>
+                    <td>
+                      <input
+                        type="number"
+                        className="input-field"
+                        min="0"
+                        disabled={!isAwayTeamCaptain || isFormDisabled}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "away",
+                            player.id,
+                            "goals",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        className="input-field"
+                        min="0"
+                        disabled={!isAwayTeamCaptain || isFormDisabled}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "away",
+                            player.id,
+                            "assists",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="radio"
+                        name="awayMvp"
+                        disabled={!isAwayTeamCaptain || isFormDisabled}
+                        onChange={() =>
+                          handleInputChange("away", player.id, "isMvp", true)
+                        }
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
       <button

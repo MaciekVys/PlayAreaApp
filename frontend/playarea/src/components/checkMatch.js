@@ -1,22 +1,23 @@
 import { useQuery } from "@apollo/client";
-import { useParams } from "react-router-dom";
-import gql from "graphql-tag";
+import { useParams, useNavigate } from "react-router-dom";
 import React from "react";
 import "../styles/checkMatch.scss";
-import { GET_MATCH_STATISTICS } from "../queries/queries";
+import { GET_MATCH_DETAILS } from "../queries/queries";
+import noImage from "../images/noImage.png";
 
 const CheckMatch = () => {
   const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
+  const navigate = useNavigate();
 
   const { id: matchId } = useParams();
-  const { loading, error, data } = useQuery(GET_MATCH_STATISTICS, {
+  const { loading, error, data } = useQuery(GET_MATCH_DETAILS, {
     variables: { matchId },
   });
 
   if (loading) return <p>Ładowanie...</p>;
   if (error) return <p>Błąd: {error.message}</p>;
 
-  const match = data.match;
+  const { match } = data;
 
   return (
     <div className="check-match-container">
@@ -24,29 +25,29 @@ const CheckMatch = () => {
       <h3>Data meczu: {match.matchDate}</h3>
 
       <div className="teams-container">
+        {/* Sekcja gospodarzy */}
         <div className="team-section">
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <h3 style={{ marginRight: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <h3
+              onClick={() => navigate(`/team/${match.homeTeam.id}`)}
+              style={{ cursor: "pointer", marginRight: "10px" }}
+            >
               Gospodarze: {match.homeTeam.name}
             </h3>
             <img
-              style={{
-                width: "auto",
-                height: "25px",
-                marginBottom: "20px",
-              }}
-              src={`${MEDIA_URL}${match.homeTeam.logo}`}
-              alt={`${match.homeTeam.logo} logo`}
+              style={{ width: "auto", height: "25px", marginBottom: "20px" }}
+              src={
+                match.homeTeam.logo
+                  ? `${MEDIA_URL}${match.homeTeam.logo}`
+                  : noImage
+              }
+              alt={`${match.homeTeam.name} logo`}
             />
           </div>
           <table className="table">
             <thead>
               <tr>
+                <th>Zdjęcie</th>
                 <th>Gracz</th>
                 <th>Gole</th>
                 <th>Asysty</th>
@@ -54,52 +55,71 @@ const CheckMatch = () => {
               </tr>
             </thead>
             <tbody>
-              {match.homeTeam.players.map((player) =>
-                player.playerstatisticsSet.map((stat, index) => (
-                  <tr key={`${player.username}-${index}`}>
-                    {index === 0 ? (
-                      <td rowSpan={player.playerstatisticsSet.length}>
-                        {player.username}
-                      </td>
-                    ) : null}
-                    <td>{stat.goals}</td>
-                    <td>{stat.assists}</td>
-                    <td>{stat.isMvp ? "Tak" : "Nie"}</td>
-                  </tr>
-                ))
-              )}
+              {match.homeTeamStatistics.map((stat) => (
+                <tr key={stat.player.id}>
+                  <td
+                    onClick={() => navigate(`/profile/${stat.player.id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <img
+                      src={
+                        stat.player.photo
+                          ? `${MEDIA_URL}${stat.player.photo}`
+                          : noImage
+                      }
+                      alt={stat.player.username}
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  </td>
+                  <td
+                    onClick={() => navigate(`/profile/${stat.player.id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {stat.player.username}
+                  </td>
+                  <td>{stat.goals}</td>
+                  <td>{stat.assists}</td>
+                  <td>{stat.isMvp ? "⭐" : ""}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
+
+        {/* Wynik meczu */}
         <div className="score-container">
           <p className="score">
             {match.scoreHome} - {match.scoreAway}
           </p>
         </div>
+
+        {/* Sekcja gości */}
         <div className="team-section">
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <h3 style={{ marginRight: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <h3
+              onClick={() => navigate(`/team/${match.awayTeam.id}`)}
+              style={{ cursor: "pointer", marginRight: "10px" }}
+            >
               Goście: {match.awayTeam.name}
             </h3>
             <img
-              style={{
-                width: "auto",
-                height: "25px",
-                marginBottom: "20px",
-              }}
-              src={`${MEDIA_URL}${match.awayTeam.logo}`}
-              alt={`${match.awayTeam.logo} logo`}
+              style={{ width: "auto", height: "25px", marginBottom: "20px" }}
+              src={
+                match.awayTeam.logo
+                  ? `${MEDIA_URL}${match.awayTeam.logo}`
+                  : noImage
+              }
+              alt={`${match.awayTeam.name} logo`}
             />
           </div>
-
           <table className="table">
             <thead>
               <tr>
+                <th>Zdjęcie</th>
                 <th>Gracz</th>
                 <th>Gole</th>
                 <th>Asysty</th>
@@ -107,20 +127,37 @@ const CheckMatch = () => {
               </tr>
             </thead>
             <tbody>
-              {match.awayTeam.players.map((player) =>
-                player.playerstatisticsSet.map((stat, index) => (
-                  <tr key={`${player.username}-${index}`}>
-                    {index === 0 ? (
-                      <td rowSpan={player.playerstatisticsSet.length}>
-                        {player.username}
-                      </td>
-                    ) : null}
-                    <td>{stat.goals}</td>
-                    <td>{stat.assists}</td>
-                    <td>{stat.isMvp ? "Tak" : "Nie"}</td>
-                  </tr>
-                ))
-              )}
+              {match.awayTeamStatistics.map((stat) => (
+                <tr key={stat.player.id}>
+                  <td
+                    onClick={() => navigate(`/profile/${stat.player.id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <img
+                      src={
+                        stat.player.photo
+                          ? `${MEDIA_URL}${stat.player.photo}`
+                          : noImage
+                      }
+                      alt={stat.player.username}
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  </td>
+                  <td
+                    onClick={() => navigate(`/profile/${stat.player.id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {stat.player.username}
+                  </td>
+                  <td>{stat.goals}</td>
+                  <td>{stat.assists}</td>
+                  <td>{stat.isMvp ? "⭐" : ""}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

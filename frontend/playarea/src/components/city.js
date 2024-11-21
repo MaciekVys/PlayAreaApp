@@ -35,7 +35,7 @@ const City = () => {
     }
   }, [meData]);
 
-  const [table, setTable] = useState("matches");
+  const [table, setTable] = useState("rankings");
 
   if (loading) return <p>Ładowanie danych...</p>;
   if (error || (!data && !message))
@@ -70,8 +70,28 @@ const City = () => {
   const city = data?.cityName;
   const league = city?.league;
   const matches = city?.matches;
-  const rankings = league ? league.rankings : [];
   const userId = localStorage.getItem("userId");
+  let rankings = league ? [...league.rankings] : []; // Utworzenie kopii tablicy rankings za pomocą spread operatora
+
+  // Sortowanie rankings według punktów, a następnie po goalDifference
+  rankings = rankings.sort((a, b) => {
+    if (b.points === a.points) {
+      // Sortowanie po goalDifference jeśli punkty są równe
+      return b.goalDifference - a.goalDifference;
+    }
+    // Sortowanie po punktach
+    return b.points - a.points;
+  });
+
+  // Declare filtered match arrays
+  const pendingMatches =
+    matches?.filter((match) => match.status === "PENDING") || [];
+  const scheduledMatches =
+    matches?.filter((match) => match.status === "SCHEDULED") || [];
+  const completedMatches =
+    matches?.filter((match) => match.status === "COMPLETED") || [];
+  const canceledMatches =
+    matches?.filter((match) => match.status === "CANCELED") || [];
 
   return (
     <div>
@@ -104,438 +124,18 @@ const City = () => {
         <>
           <div className="tabs">
             <button
-              className={table === "matches" ? "active" : ""}
-              onClick={() => setTable("matches")}
-            >
-              Mecze <FontAwesomeIcon icon={faFutbol} />
-            </button>
-            <button
               className={table === "rankings" ? "active" : ""}
               onClick={() => setTable("rankings")}
             >
               Tabela <FontAwesomeIcon icon={faTable} />
             </button>
+            <button
+              className={table === "matches" ? "active" : ""}
+              onClick={() => setTable("matches")}
+            >
+              Mecze <FontAwesomeIcon icon={faFutbol} />
+            </button>
           </div>
-
-          {table === "matches" && (
-            <div className="city-container section">
-              <section>
-                <h2>Mecze oczekujące</h2>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Data</th>
-                      <th>Gospodarze</th>
-                      <th></th>
-                      <th>Goście</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {matches
-                      .filter((match) => match.status === "PENDING")
-                      .map((match, index) => (
-                        <tr key={index}>
-                          <td>{match.matchDate}</td>
-                          <td
-                            style={{ cursor: "pointer" }}
-                            onClick={() =>
-                              match.homeTeam &&
-                              navigate(`/team/${match.homeTeam.id}`)
-                            }
-                          >
-                            <div
-                              style={{ padding: "5px", alignItems: "center" }}
-                            >
-                              {match.homeTeam?.name}
-                              {match.homeTeam.logo ? (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "right",
-                                  }}
-                                  src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                                  alt={`${match.homeTeam.logo} logo`}
-                                />
-                              ) : (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "right",
-                                  }}
-                                  src={noImage}
-                                />
-                              )}
-                            </div>
-                          </td>
-                          <td>-</td>
-                          <td
-                            style={{ cursor: "pointer" }}
-                            onClick={() =>
-                              match.awayTeam &&
-                              navigate(`/team/${match.awayTeam.id}`)
-                            }
-                          >
-                            <div
-                              style={{ padding: "5px", alignItems: "center" }}
-                            >
-                              {match.awayTeam.logo ? (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "left",
-                                  }}
-                                  src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                                  alt={`${match.awayTeam.logo} logo`}
-                                />
-                              ) : (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "left",
-                                  }}
-                                  src={noImage}
-                                />
-                              )}
-                              {match.awayTeam?.name}
-                            </div>
-                          </td>
-                          <td></td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </section>
-              <section>
-                <h2>Najbliższe mecze</h2>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Data</th>
-                      <th>Gospodarze</th>
-                      <th></th>
-                      <th>Goście</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {matches
-                      .filter((match) => match.status === "SCHEDULED")
-                      .map((match, index) => (
-                        <tr key={index}>
-                          <td>{match.matchDate}</td>
-                          <td
-                            style={{ cursor: "pointer" }}
-                            onClick={() =>
-                              navigate(`/team/${match.homeTeam.id}`)
-                            }
-                          >
-                            <div
-                              style={{
-                                padding: "5px",
-                                alignItems: "center",
-                              }}
-                            >
-                              {match?.homeTeam?.name}
-                              {match.homeTeam.logo ? (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "right",
-                                  }}
-                                  src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                                  alt={`${match.homeTeam.logo} logo`}
-                                />
-                              ) : (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "right",
-                                  }}
-                                  src={noImage}
-                                />
-                              )}
-                            </div>
-                          </td>
-                          <td>-</td>
-                          <td
-                            style={{ cursor: "pointer" }}
-                            onClick={() =>
-                              navigate(`/team/${match.awayTeam.id}`)
-                            }
-                          >
-                            <div
-                              style={{
-                                padding: "5px",
-                                alignItems: "center",
-                              }}
-                            >
-                              {match.awayTeam.logo ? (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "left",
-                                  }}
-                                  src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                                  alt={`${match.awayTeam.logo} logo`}
-                                />
-                              ) : (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "left",
-                                  }}
-                                  src={noImage}
-                                />
-                              )}
-                              {match.awayTeam.name}
-                            </div>
-                          </td>
-                          {match?.homeTeam?.captain?.id === userId ||
-                          match?.awayTeam?.captain?.id === userId ? (
-                            <td
-                              style={{ cursor: "pointer" }}
-                              onClick={() =>
-                                navigate(`/confirmMatch/${match.id}`)
-                              }
-                            >
-                              <FontAwesomeIcon icon={faCircleRight} />
-                            </td>
-                          ) : (
-                            <td></td>
-                          )}
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </section>
-
-              <section>
-                <h2>Ostatnie mecze</h2>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Data</th>
-                      <th>Gospodarze</th>
-                      <th>Wynik</th>
-                      <th>Goście</th>
-                      <th></th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {matches
-                      .filter((match) => match.status === "COMPLETED")
-                      .map((match, index) => (
-                        <tr key={index}>
-                          <td>{match.matchDate}</td>
-                          <td
-                            style={{ cursor: "pointer" }}
-                            onClick={() =>
-                              navigate(`/team/${match.homeTeam.id}`)
-                            }
-                          >
-                            <div
-                              style={{
-                                padding: "5px",
-                                alignItems: "center",
-                              }}
-                            >
-                              {match.homeTeam.name}
-                              {match.homeTeam.logo ? (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "right",
-                                  }}
-                                  src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                                  alt={`${match.homeTeam.logo} logo`}
-                                />
-                              ) : (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "right",
-                                  }}
-                                  src={noImage}
-                                />
-                              )}
-                            </div>
-                          </td>
-                          <td>
-                            {match.scoreHome} : {match.scoreAway}
-                          </td>
-                          <td
-                            style={{ cursor: "pointer" }}
-                            onClick={() =>
-                              navigate(`/team/${match.awayTeam.id}`)
-                            }
-                          >
-                            <div
-                              style={{
-                                padding: "5px",
-                                alignItems: "center",
-                              }}
-                            >
-                              {match.awayTeam.name}
-                              {match.awayTeam.logo ? (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "left",
-                                  }}
-                                  src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                                  alt={`${match.awayTeam.logo} logo`}
-                                />
-                              ) : (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "left",
-                                  }}
-                                  src={noImage}
-                                />
-                              )}
-                            </div>
-                          </td>
-                          <td></td>
-
-                          <td
-                            style={{ cursor: "pointer" }}
-                            onClick={() => navigate(`/checkMatch/${match.id}`)}
-                          >
-                            <FontAwesomeIcon icon={faCircleRight} />
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </section>
-
-              <section>
-                <h2>Nieodbyte mecze</h2>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Data</th>
-                      <th>Gospodarze</th>
-                      <th></th>
-                      <th>Goście</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {matches
-                      .filter((match) => match.status === "CANCELED")
-                      .map((match, index) => (
-                        <tr key={index}>
-                          <td>{match.matchDate}</td>
-                          <td
-                            style={{ cursor: "pointer" }}
-                            onClick={() =>
-                              navigate(`/team/${match.homeTeam.id}`)
-                            }
-                          >
-                            <div
-                              style={{
-                                padding: "5px",
-                                alignItems: "center",
-                              }}
-                            >
-                              {match.homeTeam.name}
-                              {match.homeTeam.logo ? (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "right",
-                                  }}
-                                  src={`${MEDIA_URL}${match.homeTeam.logo}`}
-                                  alt={`${match.homeTeam.logo} logo`}
-                                />
-                              ) : (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "right",
-                                  }}
-                                  src={noImage}
-                                />
-                              )}
-                            </div>
-                          </td>
-                          <td>-</td>
-                          <td
-                            style={{ cursor: "pointer" }}
-                            onClick={() =>
-                              navigate(`/team/${match.awayTeam.id}`)
-                            }
-                          >
-                            <div
-                              style={{
-                                padding: "5px",
-                                alignItems: "center",
-                              }}
-                            >
-                              {match.awayTeam.name}
-                              {match.awayTeam.logo ? (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "left",
-                                  }}
-                                  src={`${MEDIA_URL}${match.awayTeam.logo}`}
-                                  alt={`${match.awayTeam.logo} logo`}
-                                />
-                              ) : (
-                                <img
-                                  style={{
-                                    width: "20px",
-                                    height: "auto",
-                                    marginLeft: "0",
-                                    float: "left",
-                                  }}
-                                  src={noImage}
-                                />
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </section>
-              <div style={{ height: "100px" }}></div>
-            </div>
-          )}
 
           {table === "rankings" && (
             <div className="city-container section">
@@ -543,63 +143,53 @@ const City = () => {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Miejsce</th> {/* Dodanie kolumny "Miejsce" */}
+                    <th>Miejsce</th> {/* Kolumna "Miejsce" */}
                     <th>Drużyna</th>
                     <th>Zwycięstwa</th>
                     <th>Remisy</th>
                     <th>Porażki</th>
                     <th>Bramki strzelone</th>
                     <th>Bramki stracone</th>
+                    <th>Bilans +/-</th>
                     <th>Punkty</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {rankings
-                    .slice()
-                    .sort((a, b) => b.points - a.points)
-                    .map((ranking, index) => (
-                      <tr key={index}>
-                        <td style={{ fontWeight: "bold" }}>{index + 1}</td>
-                        <td
-                          style={{ cursor: "pointer" }}
-                          onClick={() =>
-                            ranking.team && navigate(`/team/${ranking.team.id}`)
-                          }
-                        >
-                          <div style={{ padding: "5px", alignItems: "center" }}>
-                            {ranking.team?.name}
-                            {ranking.team?.logo ? (
-                              <img
-                                style={{
-                                  width: "20px",
-                                  height: "auto",
-                                  marginLeft: "0",
-                                  float: "right",
-                                }}
-                                src={`${MEDIA_URL}${ranking.team.logo}`}
-                                alt={`${ranking.team.logo} logo`}
-                              />
-                            ) : (
-                              <img
-                                style={{
-                                  width: "20px",
-                                  height: "auto",
-                                  marginLeft: "0",
-                                  float: "right",
-                                }}
-                                src={noImage}
-                              />
-                            )}
-                          </div>
-                        </td>
-                        <td>{ranking.wins}</td>
-                        <td>{ranking.draws}</td>
-                        <td>{ranking.losses}</td>
-                        <td>{ranking.goalsFor}</td>
-                        <td>{ranking.goalsAgainst}</td>
-                        <td>{ranking.points}</td>
-                      </tr>
-                    ))}
+                  {rankings.map((ranking, index) => (
+                    <tr key={index}>
+                      <td style={{ fontWeight: "bold" }}>{index + 1}</td>{" "}
+                      {/* Numer miejsca */}
+                      <td
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate(`/team/${ranking.team.id}`)}
+                      >
+                        <div style={{ padding: "5px", alignItems: "center" }}>
+                          {ranking.team.name}
+                          <img
+                            style={{
+                              width: "20px",
+                              height: "auto",
+                              marginLeft: "0",
+                              float: "right",
+                            }}
+                            src={
+                              ranking.team.logo
+                                ? `${MEDIA_URL}${ranking.team.logo}`
+                                : noImage
+                            }
+                            alt={`${ranking.team.name} logo`}
+                          />
+                        </div>
+                      </td>
+                      <td>{ranking.wins}</td>
+                      <td>{ranking.draws}</td>
+                      <td>{ranking.losses}</td>
+                      <td>{ranking.goalsFor}</td>
+                      <td>{ranking.goalsAgainst}</td>
+                      <td>{ranking.goalDifference}</td>{" "}
+                      <td>{ranking.points}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
               <div style={{ height: "100px" }}></div>
@@ -607,15 +197,431 @@ const City = () => {
           )}
         </>
       ) : (
-        <div>
-          <h1>Brak ligi</h1>
-          <div>
-            <p>
-              Wygląda na to, że twoje miasto nie jest przypisane do ligi. Zgłoś
-              swoje miasto do rozgrywek.
-            </p>
-            <button>Zgłoś</button>
-          </div>
+        <div></div>
+      )}
+      {table === "matches" && (
+        <div className="city-container section">
+          <section>
+            <h2>Mecze oczekujące</h2>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Gospodarze</th>
+                  <th></th>
+                  <th>Goście</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingMatches.length > 0 ? (
+                  pendingMatches.map((match, index) => (
+                    <tr key={index}>
+                      <td>{match.matchDate}</td>
+                      <td
+                        style={{ cursor: "pointer" }}
+                        onClick={() =>
+                          match.homeTeam &&
+                          navigate(`/team/${match.homeTeam.id}`)
+                        }
+                      >
+                        <div style={{ padding: "5px", alignItems: "center" }}>
+                          {match.homeTeam?.name}
+                          {match.homeTeam.logo ? (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "right",
+                              }}
+                              src={`${MEDIA_URL}${match.homeTeam.logo}`}
+                              alt={`${match.homeTeam.logo} logo`}
+                            />
+                          ) : (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "right",
+                              }}
+                              src={noImage}
+                            />
+                          )}
+                        </div>
+                      </td>
+                      <td>-</td>
+                      <td
+                        style={{ cursor: "pointer" }}
+                        onClick={() =>
+                          match.awayTeam &&
+                          navigate(`/team/${match.awayTeam.id}`)
+                        }
+                      >
+                        <div style={{ padding: "5px", alignItems: "center" }}>
+                          {match.awayTeam.logo ? (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "left",
+                              }}
+                              src={`${MEDIA_URL}${match.awayTeam.logo}`}
+                              alt={`${match.awayTeam.logo} logo`}
+                            />
+                          ) : (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "left",
+                              }}
+                              src={noImage}
+                            />
+                          )}
+                          {match.awayTeam?.name}
+                        </div>
+                      </td>
+                      <td></td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} style={{ textAlign: "center" }}>
+                      Brak meczy
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </section>
+          <section>
+            <h2>Najbliższe mecze</h2>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Gospodarze</th>
+                  <th></th>
+                  <th>Goście</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {scheduledMatches.length > 0 ? (
+                  scheduledMatches.map((match, index) => (
+                    <tr key={index}>
+                      <td>{match.matchDate}</td>
+                      <td
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate(`/team/${match.homeTeam.id}`)}
+                      >
+                        <div
+                          style={{
+                            padding: "5px",
+                            alignItems: "center",
+                          }}
+                        >
+                          {match?.homeTeam?.name}
+                          {match.homeTeam.logo ? (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "right",
+                              }}
+                              src={`${MEDIA_URL}${match.homeTeam.logo}`}
+                              alt={`${match.homeTeam.logo} logo`}
+                            />
+                          ) : (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "right",
+                              }}
+                              src={noImage}
+                            />
+                          )}
+                        </div>
+                      </td>
+                      <td>-</td>
+                      <td
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate(`/team/${match.awayTeam.id}`)}
+                      >
+                        <div
+                          style={{
+                            padding: "5px",
+                            alignItems: "center",
+                          }}
+                        >
+                          {match.awayTeam.logo ? (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "left",
+                              }}
+                              src={`${MEDIA_URL}${match.awayTeam.logo}`}
+                              alt={`${match.awayTeam.logo} logo`}
+                            />
+                          ) : (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "left",
+                              }}
+                              src={noImage}
+                            />
+                          )}
+                          {match.awayTeam.name}
+                        </div>
+                      </td>
+                      {match?.homeTeam?.captain?.id === userId ||
+                      match?.awayTeam?.captain?.id === userId ? (
+                        <td
+                          style={{ cursor: "pointer" }}
+                          onClick={() => navigate(`/confirmMatch/${match.id}`)}
+                        >
+                          <FontAwesomeIcon icon={faCircleRight} />
+                        </td>
+                      ) : (
+                        <td></td>
+                      )}
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} style={{ textAlign: "center" }}>
+                      Brak meczy
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </section>
+
+          <section>
+            <h2>Ostatnie mecze</h2>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Gospodarze</th>
+                  <th>Wynik</th>
+                  <th>Goście</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {completedMatches.length > 0 ? (
+                  completedMatches.map((match, index) => (
+                    <tr key={index}>
+                      <td>{match.matchDate}</td>
+                      <td
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate(`/team/${match.homeTeam.id}`)}
+                      >
+                        <div
+                          style={{
+                            padding: "5px",
+                            alignItems: "center",
+                          }}
+                        >
+                          {match.homeTeam.name}
+                          {match.homeTeam.logo ? (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "right",
+                              }}
+                              src={`${MEDIA_URL}${match.homeTeam.logo}`}
+                              alt={`${match.homeTeam.logo} logo`}
+                            />
+                          ) : (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "right",
+                              }}
+                              src={noImage}
+                            />
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        {match.scoreHome} : {match.scoreAway}
+                      </td>
+                      <td
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate(`/team/${match.awayTeam.id}`)}
+                      >
+                        <div
+                          style={{
+                            padding: "5px",
+                            alignItems: "center",
+                          }}
+                        >
+                          {match.awayTeam.name}
+                          {match.awayTeam.logo ? (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "left",
+                              }}
+                              src={`${MEDIA_URL}${match.awayTeam.logo}`}
+                              alt={`${match.awayTeam.logo} logo`}
+                            />
+                          ) : (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "left",
+                              }}
+                              src={noImage}
+                            />
+                          )}
+                        </div>
+                      </td>
+                      <td></td>
+
+                      <td
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate(`/checkMatch/${match.id}`)}
+                      >
+                        <FontAwesomeIcon icon={faCircleRight} />
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} style={{ textAlign: "center" }}>
+                      Brak meczy
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </section>
+
+          <section>
+            <h2>Nieodbyte mecze</h2>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Gospodarze</th>
+                  <th></th>
+                  <th>Goście</th>
+                </tr>
+              </thead>
+              <tbody>
+                {canceledMatches.length > 0 ? (
+                  canceledMatches.map((match, index) => (
+                    <tr key={index}>
+                      <td>{match.matchDate}</td>
+                      <td
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate(`/team/${match.homeTeam.id}`)}
+                      >
+                        <div
+                          style={{
+                            padding: "5px",
+                            alignItems: "center",
+                          }}
+                        >
+                          {match.homeTeam.name}
+                          {match.homeTeam.logo ? (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "right",
+                              }}
+                              src={`${MEDIA_URL}${match.homeTeam.logo}`}
+                              alt={`${match.homeTeam.logo} logo`}
+                            />
+                          ) : (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "right",
+                              }}
+                              src={noImage}
+                            />
+                          )}
+                        </div>
+                      </td>
+                      <td>-</td>
+                      <td
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate(`/team/${match.awayTeam.id}`)}
+                      >
+                        <div
+                          style={{
+                            padding: "5px",
+                            alignItems: "center",
+                          }}
+                        >
+                          {match.awayTeam.name}
+                          {match.awayTeam.logo ? (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "left",
+                              }}
+                              src={`${MEDIA_URL}${match.awayTeam.logo}`}
+                              alt={`${match.awayTeam.logo} logo`}
+                            />
+                          ) : (
+                            <img
+                              style={{
+                                width: "20px",
+                                height: "auto",
+                                marginLeft: "0",
+                                float: "left",
+                              }}
+                              src={noImage}
+                            />
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: "center" }}>
+                      Brak meczy
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </section>
+          <div style={{ height: "100px" }}></div>
         </div>
       )}
     </div>

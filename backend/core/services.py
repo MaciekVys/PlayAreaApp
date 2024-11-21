@@ -1,5 +1,8 @@
+from datetime import timezone
 from core.models import Match, Notification
 from core.models import Ranking
+from core.models import PlayerTeamStatistics
+
 
 def send_match_invite(match):
     # Tworzymy powiadomienie dla kapitana drużyny wyzwanej
@@ -27,11 +30,15 @@ def send_match_confirmation(match):
     )
 
 
-
 def update_team_stats_after_match(match):
-    home_ranking = Ranking.objects.get(team=match.home_team, league=match.league)
-    away_ranking = Ranking.objects.get(team=match.away_team, league=match.league)
+    # Uzyskanie ligi powiązanej z miastem meczu
+    league = match.city.league  # Dostęp do ligi przez miasto meczu
 
+    # Pobranie rankingu drużyn w tej lidze
+    home_ranking = Ranking.objects.get(team=match.home_team, league=league)
+    away_ranking = Ranking.objects.get(team=match.away_team, league=league)
+
+    # Aktualizacja statystyk dla drużyn
     home_ranking.match_played += 1
     away_ranking.match_played += 1
 
@@ -55,5 +62,18 @@ def update_team_stats_after_match(match):
         home_ranking.points += 1
         away_ranking.points += 1
 
+    # Zapisanie zaktualizowanych wyników
     home_ranking.save()
     away_ranking.save()
+
+
+def update_player_team_statistics(player, team):
+    """
+    Tworzy lub aktualizuje obiekt PlayerTeamStatistics dla danego gracza i drużyny.
+    """
+
+    stats, created = PlayerTeamStatistics.objects.get_or_create(player=player, team=team)
+
+    if not created:
+        stats.updated_at = timezone.now() 
+        stats.save()

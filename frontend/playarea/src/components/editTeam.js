@@ -3,6 +3,7 @@ import { gql, useQuery, useMutation } from "@apollo/client";
 import { MY_TEAM_QUERY } from "../queries/queries";
 import "../styles/editTeam.scss";
 import { useNavigate } from "react-router-dom";
+import noImage from "../images/noImage.png";
 
 const DELETE_TEAM = gql`
   mutation deleteTeam($teamId: ID!) {
@@ -186,7 +187,9 @@ const EditTeam = () => {
           <div className="logo-preview-container">
             <img
               src={
-                `${MEDIA_URL}${teamData.logo}` || "placeholder-image-url.jpg"
+                teamData?.logo
+                  ? `${MEDIA_URL}${teamData.logo}`
+                  : noImage || "placeholder-image-url.jpg"
               }
               alt="Team Logo"
               className="logo-preview"

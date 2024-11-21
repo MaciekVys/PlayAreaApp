@@ -95,7 +95,7 @@ class UpdateTeam(graphene.Mutation):
         if remove_player_id:
             try:
                 player_to_remove = team.players_in_team.get(id=remove_player_id)
-                team.players_in_team.remove(player_to_remove)
+                player_to_remove.leave_team() 
             except team.players_in_team.model.DoesNotExist:
                 return UpdateTeam(success=False, errors="Player not found in this team.")
 
@@ -207,7 +207,7 @@ class LeaveTeam(graphene.Mutation):
                 team.save()
 
         # Usuń użytkownika z drużyny
-        team.players_in_team.remove(user)
+        user.leave_team()
 
         return LeaveTeam(success=True, message="Użytkownik został usunięty z drużyny.")
 

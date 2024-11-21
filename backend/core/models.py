@@ -1,7 +1,9 @@
+from gettext import translation
+from django.db import transaction
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
-
+from datetime import date
 
 class ExtendUser(AbstractUser):
     email = models.EmailField(blank=False, max_length=255, verbose_name='email')
@@ -11,6 +13,9 @@ class ExtendUser(AbstractUser):
     weight = models.IntegerField(default=0)
     height = models.IntegerField(default=0)
     number = models.IntegerField(default=0)
+    goals = models.IntegerField(default=0)
+    assists = models.IntegerField(default=0)
+    mvp = models.IntegerField(default=0)
     photo = models.ImageField(upload_to='users/', null=True, blank=True)
     is_member = models.BooleanField(default=False)
 
@@ -22,6 +27,52 @@ class ExtendUser(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+
+    def leave_team(self):
+        if self.team:
+            previous_team_id = self.team.id
+
+            # Zapisanie statystyk gracza dla poprzedniego okresu gry w drużynie
+            stats, created = PlayerTeamStatistics.objects.get_or_create(
+                player=self,
+                team_id=previous_team_id,
+                date_left__isnull=True  # Znajdź bieżący, otwarty okres dla tej drużyny
+            )
+
+            # Zaktualizuj dane statystyczne oraz ustaw datę opuszczenia drużyny
+            stats.goals += self.goals
+            stats.assists += self.assists
+            stats.mvp += self.mvp
+            stats.date_left = date.today()
+            stats.save()
+
+            # Resetowanie statystyk gracza
+            self.goals = 0
+            self.assists = 0
+            self.mvp = 0
+            self.team = None
+            self.save()
+
+
+    # def join_team(self, new_team):
+    #     # Jeśli gracz już jest w drużynie, najpierw musi ją opuścić
+    #     if self.team:
+    #         self.leave_team()
+
+    #     # Przypisanie nowej drużyny
+    #     self.team = new_team
+    #     self.save()
+
+    #     # Utwórz nowy rekord dla nowego okresu gry w tej drużynie
+    #     PlayerTeamStatistics.objects.create(
+    #         player=self,
+    #         team=new_team,
+    #         date_joined=date.today()  # Ustawienie daty dołączenia do drużyny
+    #     )
+
+    #     print(f"Gracz {self.username} dołączył do drużyny {new_team.name} od {date.today()}.")
+
 
 
 class League(models.Model):
@@ -83,6 +134,22 @@ class MatchResult(models.Model):
     def is_confirmed(self):
         return self.home_team_confirmed and self.away_team_confirmed
     
+
+class PlayerTeamStatistics(models.Model):
+    player = models.ForeignKey(ExtendUser, on_delete=models.CASCADE, related_name="team_stats")
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="player_stats")
+    goals = models.IntegerField(default=0)
+    assists = models.IntegerField(default=0)
+    mvp = models.IntegerField(default=0)
+    date_left = models.DateField(null=True, blank=True)
+    date_joined = models.DateField(null=True, blank=True)  # Data dołączenia do drużyny
+
+    class Meta:
+        unique_together = ('player', 'team', 'date_joined')  # Jeden rekord dla kombinacji gracza, drużyny i daty dołączenia
+
+    def __str__(self):
+        return f"{self.player.username} stats in {self.team.name} from {self.date_joined} to {self.date_left or 'present'}" 
+    
 class PlayerStatistics(models.Model):
     player = models.ForeignKey(ExtendUser, on_delete=models.CASCADE)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
@@ -104,12 +171,18 @@ class Ranking(models.Model):
     losses = models.IntegerField(default=0)
     goals_for = models.IntegerField(default=0)
     goals_against = models.IntegerField(default=0)
+    goal_difference = models.IntegerField(default=0)  # Nowe pole dla bilansu bramek
 
     class Meta:
         unique_together = ('league', 'team')
 
     def __str__(self):
         return f"{self.team.name} in {self.league.name} - Points: {self.points}"
+    
+    def save(self, *args, **kwargs):
+        # Automatyczne obliczanie goal_difference przed zapisaniem do bazy danych
+        self.goal_difference = self.goals_for - self.goals_against
+        super(Ranking, self).save(*args, **kwargs)
     
 
 class Notification(models.Model):

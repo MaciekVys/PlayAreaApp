@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ExtendUser, City, League, Team, Match,Ranking, Notification, PlayerStatistics, MatchResult
+from .models import ExtendUser, City, League, PlayerStatistics, Team, Match,Ranking, Notification, PlayerTeamStatistics, MatchResult
 from django.apps import apps
 
 admin.site.register(ExtendUser)
@@ -9,6 +9,7 @@ admin.site.register(Team)
 admin.site.register(Match)
 admin.site.register(Ranking)
 admin.site.register(Notification)
+admin.site.register(PlayerTeamStatistics)
 admin.site.register(PlayerStatistics)
 admin.site.register(MatchResult)
 

@@ -1,5 +1,5 @@
 import graphene
-from .models import City, MatchResult, Notification, PlayerStatistics, Ranking, Team, ExtendUser, League, Match
+from .models import City, MatchResult, Notification, PlayerStatistics, PlayerTeamStatistics, Ranking, Team, ExtendUser, League, Match
 from graphene_django import DjangoObjectType
 from graphene import Node
 
@@ -9,10 +9,18 @@ class CustomNode(Node):
         return cls._meta.model.objects.get(pk=id)
 
 
+class PlayerTeamStatisticsType(DjangoObjectType):
+    class Meta:
+        model = PlayerTeamStatistics
+        fields = "__all__"
+
+
 class ExtendUserType(DjangoObjectType):
     username = graphene.String()
     position = graphene.String()
     id = graphene.ID(required=True)
+    team_statistics = graphene.List(PlayerTeamStatisticsType)
+
 
     class Meta:
         model = ExtendUser
@@ -23,6 +31,9 @@ class ExtendUserType(DjangoObjectType):
     def resolve_id(self, info):
         return self.pk 
     
+    def resolve_team_statistics(self, info):
+        return PlayerTeamStatistics.objects.filter(player=self)
+
 
 class CityType(DjangoObjectType):
     class Meta:
@@ -100,50 +111,11 @@ class TeamType(DjangoObjectType):
         return self.pk
 
 
-
-class MatchType(DjangoObjectType):
-    class Meta:
-        model = Match
-        fields = "__all__"
-
-    winner = graphene.String()
-    home_team = graphene.Field(lambda: TeamType)  # Użycie lambda
-    away_team = graphene.Field(lambda: TeamType)
-    league = graphene.Field(LeagueType)
-
-    def resolve_home_team(self, info):
-        return self.home_team
-
-    def resolve_away_team(self, info):
-        return self.away_team
-
-    def resolve_league(self, info):
-        return self.league
-
-    def resolve_winner(self, info):
-        if self.score_home > self.score_away:
-            return self.home_team.name
-        elif self.score_home < self.score_away:
-            return self.away_team.name
-        else:
-            return "draw"
-
-
 class RankingType(DjangoObjectType):
     class Meta:
         model = Ranking
-        fields = (
-            'id',
-            'league',
-            'team',
-            'points',
-            'match_played',
-            'wins',
-            'draws',
-            'losses',
-            'goals_for',
-            'goals_against',
-        )
+        fields = "__all__"
+
 
 
 class NotificationType(DjangoObjectType):
@@ -195,6 +167,43 @@ class PlayerStatisticsType(DjangoObjectType):
         fields = "__all__"
 
 
+class MatchType(DjangoObjectType):
+    class Meta:
+        model = Match
+        fields = "__all__"
+
+    winner = graphene.String()
+    home_team = graphene.Field(lambda: TeamType)  # Użycie lambda
+    away_team = graphene.Field(lambda: TeamType)
+    league = graphene.Field(LeagueType)
+    home_team_statistics = graphene.List(PlayerStatisticsType)
+    away_team_statistics = graphene.List(PlayerStatisticsType)
+
+    def resolve_home_team_statistics(self, info):
+        return PlayerStatistics.objects.filter(match_id=self.id, player__team=self.home_team)
+
+    def resolve_away_team_statistics(self, info):
+        return PlayerStatistics.objects.filter(match_id=self.id, player__team=self.away_team)
+    
+    def resolve_home_team(self, info):
+        return self.home_team
+
+    def resolve_away_team(self, info):
+        return self.away_team
+
+    def resolve_league(self, info):
+        return self.league
+
+    def resolve_winner(self, info):
+        if self.score_home > self.score_away:
+            return self.home_team.name
+        elif self.score_home < self.score_away:
+            return self.away_team.name
+        else:
+            return "draw"
+
+
+
 class PlayerStatisticsSummaryType(graphene.ObjectType):
     user = graphene.Field(ExtendUserType)  # Typ użytkownika, jeśli masz go zdefiniowanego
     id = graphene.ID()
@@ -202,3 +211,4 @@ class PlayerStatisticsSummaryType(graphene.ObjectType):
     total_goals = graphene.Int()
     total_assists = graphene.Int()
     total_mvps = graphene.Int()
+

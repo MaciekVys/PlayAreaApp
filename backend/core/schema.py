@@ -44,17 +44,35 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
     search_users = DjangoFilterConnectionField(ExtendUserType, filterset_class=ExtendUserFilter)
     search_cities = DjangoFilterConnectionField(CityType, filterset_class=CityFilter)
     search_teams = DjangoFilterConnectionField(TeamType, filterset_class=TeamFilter)
+    user_statistics = graphene.Field(ExtendUserType, player_id=graphene.Int(required=True))
 
+
+    def resolve_user_statistics(self, info, username):
+        return ExtendUser.objects.get(username=username)
 
     def resolve_all_cities(root, info):
         return City.objects.all()
     
     def resolve_city_name(root, info, name):
         try:
-            return City.objects.get(name=name)
+            # Pobierz miasto na podstawie nazwy
+            city = City.objects.get(name=name)
+
+            # Jeśli miasto ma ligę, chcemy pobrać rankingi i posortować je
+            if city.league:
+                # Sortowanie rankingów: najpierw po punktach, a następnie po goal_difference
+                sorted_rankings = city.league.rankings.all().order_by('-points', '-goal_difference')
+
+                # Dodajemy posortowane rankingi do obiektu league
+                city.league.sorted_rankings = sorted_rankings
+
+            return city
+
         except City.DoesNotExist:
             return None
+
         
+
     def resolve_team_by_id(root, info, id):
         return Team.objects.get(pk=id)
     
@@ -151,57 +169,57 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
     def resolve_player_statistics_for_match(self, info,match_id):
         return PlayerStatistics.objects.filter(match_id=match_id)
     
-    @login_required
-    def resolve_player_statistics_summary(self, info, user_id):
-        # Upewniamy się, że gracz istnieje
-        try:
-            player = ExtendUser.objects.get(id=user_id)
-        except ExtendUser.DoesNotExist:
-            return None
+    # @login_required
+    # def resolve_player_statistics_summary(self, info, user_id):
+    #     # Upewniamy się, że gracz istnieje
+    #     try:
+    #         player = ExtendUser.objects.get(id=user_id)
+    #     except ExtendUser.DoesNotExist:
+    #         return None
         
-        # Agregacja statystyk
-        statistics = PlayerStatistics.objects.filter(player=player)
-        total_goals = sum(stat.goals for stat in statistics)
-        total_assists = sum(stat.assists for stat in statistics)
-        total_mvps = sum(1 for stat in statistics if stat.is_mvp)
+    #     # Agregacja statystyk
+    #     statistics = PlayerStatistics.objects.filter(player=player)
+    #     total_goals = sum(stat.goals for stat in statistics)
+    #     total_assists = sum(stat.assists for stat in statistics)
+    #     total_mvps = sum(1 for stat in statistics if stat.is_mvp)
 
-        # Zwracamy sumaryczne statystyki
-        return PlayerStatisticsSummaryType(
-            total_goals=total_goals,
-            total_assists=total_assists,
-            total_mvps=total_mvps
-        )
+    #     # Zwracamy sumaryczne statystyki
+    #     return PlayerStatisticsSummaryType(
+    #         total_goals=total_goals,
+    #         total_assists=total_assists,
+    #         total_mvps=total_mvps
+    #     )
 
-    def resolve_team_statistics_summary(self, info, team_id):
-        # Pobierz drużynę na podstawie team_id
-        try:
-            team = Team.objects.get(pk=team_id)
-        except Team.DoesNotExist:
-            raise GraphQLError("Team not found")
+    # def resolve_team_statistics_summary(self, info, team_id):
+    #     # Pobierz drużynę na podstawie team_id
+    #     try:
+    #         team = Team.objects.get(pk=team_id)
+    #     except Team.DoesNotExist:
+    #         raise GraphQLError("Team not found")
 
-        summaries = []
+    #     summaries = []
 
-        # Pobierz graczy z drużyny
-        players = ExtendUser.objects.filter(team=team)  # Używamy relacji z ExtendUser
+    #     # Pobierz graczy z drużyny
+    #     players = ExtendUser.objects.filter(team=team)  # Używamy relacji z ExtendUser
 
-        for player in players:
-            # Agregacja statystyk dla danego gracza
-            statistics = PlayerStatistics.objects.filter(player=player)
-            total_goals = sum(stat.goals for stat in statistics)
-            total_assists = sum(stat.assists for stat in statistics)
-            total_mvps = sum(1 for stat in statistics if stat.is_mvp)
+    #     for player in players:
+    #         # Agregacja statystyk dla danego gracza
+    #         statistics = PlayerStatistics.objects.filter(player=player)
+    #         total_goals = sum(stat.goals for stat in statistics)
+    #         total_assists = sum(stat.assists for stat in statistics)
+    #         total_mvps = sum(1 for stat in statistics if stat.is_mvp)
 
-            # Dodaj sumaryczne statystyki do listy
-            summaries.append(PlayerStatisticsSummaryType(
-                user=player,  # Przekazujemy instancję ExtendUser
-                id=player.id,
-                position=player.position,
-                total_goals=total_goals,
-                total_assists=total_assists,
-                total_mvps=total_mvps
-            ))
+    #         # Dodaj sumaryczne statystyki do listy
+    #         summaries.append(PlayerStatisticsSummaryType(
+    #             user=player,  # Przekazujemy instancję ExtendUser
+    #             id=player.id,
+    #             position=player.position,
+    #             total_goals=total_goals,
+    #             total_assists=total_assists,
+    #             total_mvps=total_mvps
+    #         ))
 
-        return summaries
+    #     return summaries
 
 
     def resolve_search_users(root, info, **kwargs):

@@ -12,6 +12,7 @@ const CreateTeam = () => {
   const [createTeam, refetch] = useMutation(CREATE_TEAM, {
     onCompleted: (data) => {
       if (data.createTeam.success) {
+        refetch();
         navigate("/team");
       } else if (data.createTeam.errors) {
         setErrorMessage(data.createTeam.errors);

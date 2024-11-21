@@ -7,6 +7,7 @@ import { faCheck, faRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import { ALL_CITIES, ME_QUERY } from "../queries/queries";
 import { UPDATE_USER_PROFILE } from "../queries/mutations";
 import { LOGOUT_MUTATION } from "../queries/mutations";
+import noImage from "../images/noImage.png";
 
 // Mutacja do usuwania konta
 const DELETE_ACCOUNT = gql`
@@ -145,10 +146,9 @@ const EditProfile = () => {
               <img
                 style={{ maxWidth: "200px", maxHeight: "200px" }}
                 src={
-                  `${MEDIA_URL}${meData?.me?.photo}` ||
-                  "placeholder-image-url.jpg"
+                  meData?.me?.photo ? `${MEDIA_URL}${meData.me.photo}` : noImage
                 }
-                alt="Team Logo"
+                alt="logo"
                 className="logo-preview"
               />
               <div

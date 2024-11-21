@@ -1,10 +1,9 @@
 import { gql } from "@apollo/client";
 export {
   CITY_QUERY,
-  GET_MATCH_STATISTICS,
+  GET_MATCH_DETAILS,
   ME_QUERY,
   ALL_CITIES,
-  GET_MATCH_PLAYERS,
   MY_TEAM_QUERY,
   GET_TEAMS_IN_USER_LEAGUE,
   USER_PROFILE,
@@ -47,6 +46,7 @@ const CITY_QUERY = gql`
           losses
           goalsFor
           goalsAgainst
+          goalDifference
           team {
             logo
             name
@@ -83,40 +83,70 @@ const CITY_QUERY = gql`
     }
   }
 `;
-
-const GET_MATCH_STATISTICS = gql`
-  query GetMatchStatistics($matchId: ID!) {
+const GET_MATCH_DETAILS = gql`
+  query GetMatchDetails($matchId: ID!) {
     match(id: $matchId) {
-      homeTeam {
-        name
-        logo
-        players {
-          username
-          playerstatisticsSet {
-            goals
-            assists
-            isMvp
-          }
-        }
-      }
-      awayTeam {
-        name
-        logo
-        players {
-          username
-          playerstatisticsSet {
-            goals
-            assists
-            isMvp
-          }
-        }
-      }
+      id
+      status
+      matchDate
       scoreHome
       scoreAway
-      matchDate
+      homeTeam {
+        id
+        name
+        logo
+        captain {
+          id
+        }
+        players {
+          id
+          username
+        }
+      }
+      homeTeamStatistics {
+        player {
+          id
+          username
+          goals
+          assists
+          mvp
+        }
+        goals
+        assists
+        isMvp
+      }
+      awayTeam {
+        id
+        name
+        logo
+        captain {
+          id
+        }
+        players {
+          id
+          username
+        }
+      }
+      awayTeamStatistics {
+        player {
+          id
+          username
+          goals
+          assists
+          mvp
+        }
+        goals
+        assists
+        isMvp
+      }
+      matchresultSet {
+        homeTeamConfirmed
+        awayTeamConfirmed
+      }
     }
   }
 `;
+
 const ME_QUERY = gql`
   query MeQuery {
     me {
@@ -151,39 +181,6 @@ const ALL_CITIES = gql`
   }
 `;
 
-const GET_MATCH_PLAYERS = gql`
-  query GetMatchPlayers($matchId: ID!) {
-    match(id: $matchId) {
-      id
-      status
-      homeTeam {
-        name
-        captain {
-          id
-        }
-        players {
-          id
-          username
-        }
-      }
-      awayTeam {
-        name
-        captain {
-          id
-        }
-        players {
-          id
-          username
-        }
-      }
-      matchresultSet {
-        homeTeamConfirmed
-        awayTeamConfirmed
-      }
-    }
-  }
-`;
-
 const MY_TEAM_QUERY = gql`
   query team {
     teamByUser {
@@ -204,6 +201,9 @@ const MY_TEAM_QUERY = gql`
         id
       }
       players {
+        goals
+        assists
+        mvp
         photo
         id
         username
@@ -244,6 +244,9 @@ const GET_TEAMS_IN_USER_LEAGUE = gql`
 const USER_PROFILE = gql`
   query userProfile {
     userProfile {
+      goals
+      assists
+      mvp
       username
       firstName
       lastName
@@ -258,6 +261,7 @@ const USER_PROFILE = gql`
         name
       }
       team {
+        id
         name
         captain {
           username
@@ -267,10 +271,19 @@ const USER_PROFILE = gql`
         }
         logo
       }
-      playerstatisticsSet {
+      teamStats {
+        team {
+          id
+          logo
+          name
+          league {
+            name
+          }
+        }
+        dateLeft
         goals
         assists
-        isMvp
+        mvp
       }
     }
   }
@@ -367,7 +380,11 @@ const PLAYER_BY_ID = gql`
       weight
       height
       number
+      goals
+      assists
+      mvp
       photo
+      position
       city {
         name
       }
@@ -382,10 +399,20 @@ const PLAYER_BY_ID = gql`
         }
         logo
       }
-      playerstatisticsSet {
+      teamStats {
+        team {
+          id
+          logo
+          name
+          league {
+            name
+          }
+        }
+        dateJoined
+        dateLeft
         goals
         assists
-        isMvp
+        mvp
       }
     }
   }
@@ -409,6 +436,9 @@ const TEAM_BY_ID = gql`
       }
       playersCount
       players {
+        goals
+        assists
+        mvp
         id
         position
         height
