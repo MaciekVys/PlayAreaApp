@@ -92,7 +92,8 @@ const PlayerProfile = () => {
         <table className="table">
           <thead>
             <tr>
-              <th></th>
+              <th>Data</th>
+              <th>Logo</th>
               <th>Drużyna</th>
               <th>Liga</th>
               <th>Gole</th>
@@ -102,6 +103,7 @@ const PlayerProfile = () => {
           </thead>
           <tbody>
             <tr>
+              <td>Obecnie</td>
               <td>
                 {user.team?.logo ? (
                   <img

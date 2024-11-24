@@ -90,26 +90,45 @@ class SendJoinRequest(graphene.Mutation):
     def mutate(self, info, team_id):
         user = info.context.user
         try:
-            # Pobranie drużyny na podstawie ID
+            # Retrieve the team by ID
             team = Team.objects.get(id=team_id)
 
-            # Sprawdzenie, czy użytkownik już należy do drużyny
-            if team.players.filter(id=user.id).exists():
+            # Check if the user is already a player in the team
+            if team.players_in_team.filter(id=user.id).exists():
                 return SendJoinRequest(success=False, message="Należysz już do drużyny!")
 
-            # Utworzenie powiadomienia dla kapitana drużyny
+            # Calculate the time one week ago
+            one_week_ago = timezone.now() - timedelta(weeks=1)
+
+            # Check if a join request was already sent in the last week
+            existing_notification = Notification.objects.filter(
+                sender=user,
+                recipient=team.captain,
+                notification_type='join_request',
+                created_at__gte=one_week_ago
+            ).exists()
+
+            if existing_notification:
+                return SendJoinRequest(
+                    success=False,
+                    message="Prośba o dołączenie została już wysłana w ciągu ostatniego tygodnia."
+                )
+
+            # Create a notification for the team captain
             notification_message = f"{user.username} wysłał prośbę o dołączenie do drużyny {team.name}."
+
             Notification.objects.create(
-                sender=user, 
-                recipient=team.captain, 
-                notification_type='join_request',  
-                message=notification_message
+                sender=user,
+                recipient=team.captain,
+                notification_type='join_request',
+                message=notification_message,
             )
 
             return SendJoinRequest(success=True, message="Prośba o dołączenie została pomyślnie wysłana")
 
         except Team.DoesNotExist:
             return SendJoinRequest(success=False, message="Nie znaleziono drużyny")
+
         
 
 class RespondToJoinRequest(graphene.Mutation):
@@ -249,26 +268,35 @@ class RespondToTeamInvite(graphene.Mutation):
         user = info.context.user
 
         try:
-            # Pobranie powiadomienia o zaproszeniu
-            notification = Notification.objects.get(id=notification_id, recipient=user, notification_type='team_invite')
+            # Retrieve the invitation notification
+            notification = Notification.objects.get(
+                id=notification_id,
+                recipient=user,
+                notification_type='team_invite'
+            )
 
             if notification.is_responded:
-                return RespondToTeamInvite(success=False, message="You have already responded to this invitation.")
+                return RespondToTeamInvite(
+                    success=False,
+                    message="You have already responded to this invitation."
+                )
 
-            # Sprawdzenie, czy użytkownik jest kapitanem jakiejkolwiek drużyny
-            if Team.objects.filter(captain=user).exists():
-                return RespondToTeamInvite(success=False, message="You are already a captain of another team and cannot join as a player.")
-            
-            # Pobranie drużyny związanej z powiadomieniem
+            # Retrieve the team associated with the invitation
             team = Team.objects.get(id=notification.sender.team.id)
 
             if accept:
-                # Jeżeli gracz jest już w jakiejś drużynie, opuszcza ją przed dołączeniem do nowej
+                # Check if the user is a captain of any team
+                if Team.objects.filter(captain=user).exists():
+                    return RespondToTeamInvite(
+                        success=False,
+                        message="You are already a captain of another team and cannot join as a player."
+                    )
+
+                # If the player is already in a team, leave it before joining the new one
                 if user.team:
                     user.leave_team()
 
-
-                # Dodanie gracza do drużyny
+                # Add the player to the team
                 team.players_in_team.add(user)
                 user.team = team
                 user.save()
@@ -278,11 +306,121 @@ class RespondToTeamInvite(graphene.Mutation):
                 message = "You have declined the team invitation."
                 notification.status = 'declined'
 
-            # Oznaczamy powiadomienie jako rozpatrzone
+            # Mark the notification as responded
             notification.is_responded = True
             notification.save()
 
             return RespondToTeamInvite(success=True, message=message)
 
         except Notification.DoesNotExist:
-            return RespondToTeamInvite(success=False, message="Invitation not found.")
+            return RespondToTeamInvite(
+                success=False,
+                message="Invitation not found."
+            )
+
+# import graphene
+# from graphql_jwt.decorators import login_required
+# from core.models import ExtendUser, Match, Notification, Team
+# from core.types import TeamType
+# from django.db.models import Q
+# from datetime import timedelta
+# from django.utils import timezone
+
+# # Existing mutations...
+
+import graphene
+from graphql_jwt.decorators import login_required
+from core.types import TeamType
+from core.models import ExtendUser, Match, Notification, Team
+from django.db.models import Q
+from datetime import timedelta
+from django.utils import timezone
+
+class ChallengeTeamToMatch(graphene.Mutation):
+    class Arguments:
+        away_team_id = graphene.ID(required=True)
+        match_date = graphene.Date(required=True)
+
+    success = graphene.Boolean()
+    message = graphene.String()
+
+    @login_required
+    def mutate(self, info, away_team_id, match_date):
+        user = info.context.user
+
+        try:
+            # Pobranie drużyny użytkownika (zakładając, że jest kapitanem)
+            home_team = Team.objects.get(captain=user)
+
+            # Pobranie drużyny przeciwnika
+            away_team = Team.objects.get(id=away_team_id)
+
+            if home_team.id == away_team.id:
+                return ChallengeTeamToMatch(
+                    success=False,
+                    message="Nie możesz wyzwać własnej drużyny."
+                )
+
+            if home_team.league != away_team.league:
+                return ChallengeTeamToMatch(
+                    success=False,
+                    message="Obie drużyny muszą być w tej samej lidze."
+                )
+
+            one_week_ago = timezone.now() - timedelta(weeks=1)
+
+            # Sprawdzenie, czy wyzwanie zostało już wysłane w ciągu ostatniego tygodnia
+            existing_notification = Notification.objects.filter(
+                sender=home_team.captain,
+                recipient=away_team.captain,
+                notification_type='match_invite',
+                created_at__gte=one_week_ago
+            ).exists()
+
+            if existing_notification:
+                return ChallengeTeamToMatch(
+                    success=False,
+                    message="Wyzwano już tę drużynę w ciągu ostatniego tygodnia."
+                )
+
+            # Tworzenie meczu
+            city = home_team.league.city
+
+            match = Match.objects.create(
+                home_team=home_team,
+                away_team=away_team,
+                match_date=match_date,
+                city=city,
+                status='pending'
+            )
+
+            # Definicja funkcji wewnątrz mutacji
+            def send_match_invite(match):
+                sender = info.context.user  # Pobranie aktualnego użytkownika
+                notification_message = f"{sender.username} wyzwał Twoją drużynę na mecz w dniu {match.match_date}."
+                Notification.objects.create(
+                    sender=sender,
+                    recipient=match.away_team.captain,
+                    notification_type='match_invite',
+                    message=notification_message,
+                    match=match  # Jeśli Twój model Notification ma to pole
+                )
+
+            # Wysłanie powiadomienia
+            send_match_invite(match)
+
+            return ChallengeTeamToMatch(
+                success=True,
+                message="Wyzwanie zostało pomyślnie wysłane."
+            )
+
+        except Team.DoesNotExist:
+            return ChallengeTeamToMatch(
+                success=False,
+                message="Jedna z drużyn nie istnieje."
+            )
+        except Exception as e:
+            return ChallengeTeamToMatch(
+                success=False,
+                message=str(e)
+            )

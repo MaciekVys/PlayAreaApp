@@ -1,5 +1,5 @@
 .notification-container {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+  background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.8)),
     url("../images/peach.jpg");
   background-size: cover;
   background-position: center;
@@ -19,7 +19,7 @@
 .notification-header {
   border-bottom: 3px #fafafa solid;
   padding: 20px;
-  font-size: 24px;
+  font-size: 36px;
   font-weight: bold;
   margin-bottom: 20px;
   color: #ffffff;

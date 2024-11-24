@@ -2,6 +2,8 @@ import graphene
 from .models import City, MatchResult, Notification, PlayerStatistics, PlayerTeamStatistics, Ranking, Team, ExtendUser, League, Match
 from graphene_django import DjangoObjectType
 from graphene import Node
+from django.db.models import Q
+
 
 class CustomNode(Node):
     @classmethod
@@ -82,6 +84,32 @@ class TeamType(DjangoObjectType):
     matches = graphene.List(lambda: MatchType)
     id = graphene.ID(required=True)
     players = graphene.List(ExtendUserType)
+    wins = graphene.Int()
+    matches_played = graphene.Int()
+
+    def resolve_wins(self, info):
+        # Pobieramy wszystkie mecze, w których drużyna uczestniczyła jako gospodarz lub gość i mecz został zakończony
+        matches = Match.objects.filter(
+            Q(home_team=self, status='completed') |
+            Q(away_team=self, status='completed')
+        )
+        # Inicjalizujemy licznik wygranych
+        wins = 0
+        # Iterujemy przez mecze i sprawdzamy zwycięzcę
+        for match in matches:
+            if match.score_home > match.score_away and match.home_team == self:
+                wins += 1
+            elif match.score_away > match.score_home and match.away_team == self:
+                wins += 1
+        return wins
+
+    def resolve_matches_played(self, info):
+        # Liczymy wszystkie mecze zakończone, w których drużyna brała udział
+        matches_played = Match.objects.filter(
+            Q(home_team=self, status='completed') |
+            Q(away_team=self, status='completed')
+        ).count()
+        return matches_played
 
     def resolve_players_count(self, info):
         return self.players_in_team.count()
@@ -173,7 +201,7 @@ class MatchType(DjangoObjectType):
         fields = "__all__"
 
     winner = graphene.String()
-    home_team = graphene.Field(lambda: TeamType)  # Użycie lambda
+    home_team = graphene.Field(lambda: TeamType)
     away_team = graphene.Field(lambda: TeamType)
     league = graphene.Field(LeagueType)
     home_team_statistics = graphene.List(PlayerStatisticsType)

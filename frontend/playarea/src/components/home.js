@@ -1,11 +1,10 @@
 import React from "react";
 import { useQuery } from "@apollo/client";
-import gql from "graphql-tag";
-import "../styles/home.scss"; // Import pliku CSS do stylizacji
 import { useNavigate } from "react-router-dom";
+import "../styles/home.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserPlus, faFileSignature } from "@fortawesome/free-solid-svg-icons";
-import { ALL_CITIES } from "../queries/queries";
+import { GET_TOP_TEAMS, GET_TOP_PLAYERS } from "../queries/queries";
 import noImage from "../images/noImage.png";
 
 const Home = () => {
@@ -13,16 +12,38 @@ const Home = () => {
   const MEDIA_URL = process.env.REACT_APP_MEDIA_URL;
 
   const {
-    data: citiesData,
-    loading: citiesLoading,
-    error: citiesError,
-  } = useQuery(ALL_CITIES);
+    data: teamsData,
+    loading: teamsLoading,
+    error: teamsError,
+  } = useQuery(GET_TOP_TEAMS);
 
-  if (citiesLoading) return <p>Ładowanie danych...</p>;
-  if (citiesError)
-    return <p>Błąd podczas ładowania miast: {citiesError.message}</p>;
+  const {
+    data: playersData,
+    loading: playersLoading,
+    error: playersError,
+  } = useQuery(GET_TOP_PLAYERS);
 
-  const rankCities = citiesData.allCities;
+  if (teamsLoading || playersLoading) return <p>Ładowanie danych...</p>;
+  if (teamsError)
+    return <p>Błąd podczas ładowania drużyn: {teamsError.message}</p>;
+  if (playersError)
+    return <p>Błąd podczas ładowania graczy: {playersError.message}</p>;
+
+  const topPlayers = playersData.topPlayers;
+
+  let teams = [...teamsData.topTeams];
+
+  // Sortujemy drużyny według liczby rozegranych meczów i wygranych
+  teams.sort((a, b) => {
+    if (b.matchesPlayed !== a.matchesPlayed) {
+      return b.matchesPlayed - a.matchesPlayed;
+    } else {
+      return b.wins - a.wins;
+    }
+  });
+
+  // Pobieramy top 10 drużyn
+  const topTeams = teams.slice(0, 10);
 
   return (
     <div className="home-container">
@@ -79,26 +100,28 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Sekcja z rejestracją */}
+      {/* Sekcja z rankingiem drużyn */}
       <section className="rankings">
         <div>
-          <h2>Ranking miast</h2>
+          <h2>Top 10 drużyn w Polsce</h2>
           <table className="table">
             <thead>
               <tr>
                 <th></th>
-                <th>Nazwa miasta</th>
+                <th>Nazwa drużyny</th>
                 <th>Liga</th>
+                <th>Mecze</th>
+                <th>Wygrane</th>
               </tr>
             </thead>
             <tbody>
-              {citiesData?.allCities?.map((city, index) => (
+              {topTeams.map((team, index) => (
                 <tr key={index}>
                   <td style={{ maxWidth: "30px" }}>
-                    {city.image ? (
+                    {team.logo ? (
                       <img
-                        src={`${MEDIA_URL}${city.image}`}
-                        alt={`${city.image} logo`}
+                        src={`${MEDIA_URL}${team.logo}`}
+                        alt={`${team.name} logo`}
                         style={{
                           width: "50px",
                           height: "auto",
@@ -111,22 +134,126 @@ const Home = () => {
                           height: "auto",
                         }}
                         src={noImage}
+                        alt="No logo"
                       />
                     )}
                   </td>
                   <td
                     style={{ cursor: "pointer", fontWeight: "bold" }}
-                    onClick={() => navigate(`/city/${city.name}`)}
+                    onClick={() => navigate(`/team/${team.id}`)}
                   >
-                    {city.name}
+                    {team.name}
                   </td>
-                  <td>{city.league?.name || "Brak ligi"}</td>
+                  <td
+                    style={{ cursor: "pointer", fontWeight: "bold" }}
+                    onClick={() =>
+                      navigate(`/city/${team?.league?.city?.name}`)
+                    }
+                  >
+                    {team.league?.name || "Brak ligi"}
+                  </td>
+                  <td>{team.matchesPlayed}</td>
+                  <td>{team.wins}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <br />
+
+          {/* Sekcja z top graczami */}
+          <h2>Top 20 Graczy</h2>
+          <table className="table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Użytkownik</th>
+                <th>Drużyna</th>
+                <th>Gole</th>
+                <th>Asysty</th>
+                <th>MVP</th>
+              </tr>
+            </thead>
+            <tbody>
+              {topPlayers.map((player, index) => (
+                <tr key={index}>
+                  <td>
+                    {player.photo ? (
+                      <img
+                        src={`${MEDIA_URL}${player.photo}`}
+                        alt={`${player.username}`}
+                        className="player-photo"
+                        style={{
+                          width: "50px",
+                          height: "auto",
+                        }}
+                      />
+                    ) : (
+                      <img
+                        style={{
+                          width: "50px",
+                          height: "auto",
+                        }}
+                        src={noImage}
+                        alt="Brak zdjęcia"
+                        className="player-photo"
+                      />
+                    )}
+                  </td>
+                  <td
+                    style={{ cursor: "pointer", fontWeight: "bold" }}
+                    onClick={() => navigate(`/profile/${player.id}`)}
+                  >
+                    {player.username}
+                  </td>
+                  <td
+                    style={{ cursor: player.team ? "pointer" : "default" }}
+                    onClick={() =>
+                      player.team && navigate(`/team/${player.team.id}`)
+                    }
+                  >
+                    {player.team ? (
+                      <>
+                        {player.team.name}
+
+                        {player.team.logo ? (
+                          <img
+                            src={`${MEDIA_URL}${player.team.logo}`}
+                            alt={`${player.team.name} logo`}
+                            style={{
+                              width: "30px",
+                              height: "auto",
+                              marginLeft: "5px",
+                              verticalAlign: "middle",
+                            }}
+                          />
+                        ) : (
+                          <img
+                            style={{
+                              width: "30px",
+                              height: "auto",
+                              marginLeft: "5px",
+                              verticalAlign: "middle",
+                            }}
+                            src={noImage}
+                            alt="No logo"
+                          />
+                        )}
+                      </>
+                    ) : (
+                      "Brak drużyny"
+                    )}
+                  </td>
+
+                  <td>{player.goals}</td>
+                  <td>{player.assists}</td>
+                  <td>{player.mvp}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </section>
+      <div style={{ height: "50px" }}></div>
     </div>
   );
 };

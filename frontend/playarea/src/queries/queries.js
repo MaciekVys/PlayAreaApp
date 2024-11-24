@@ -15,6 +15,8 @@ export {
   PLAYER_BY_ID,
   TEAM_BY_ID,
   TEAM_STATISTICS_SUMMARY_QUERY,
+  GET_TOP_TEAMS,
+  GET_TOP_PLAYERS,
 };
 const TEAM_STATISTICS_SUMMARY_QUERY = gql`
   query teamStatisticsSummary($teamId: ID!) {
@@ -99,12 +101,14 @@ const GET_MATCH_DETAILS = gql`
           id
         }
         players {
+          photo
           id
           username
         }
       }
       homeTeamStatistics {
         player {
+          photo
           id
           username
           goals
@@ -123,12 +127,14 @@ const GET_MATCH_DETAILS = gql`
           id
         }
         players {
+          photo
           id
           username
         }
       }
       awayTeamStatistics {
         player {
+          photo
           id
           username
           goals
@@ -309,6 +315,7 @@ const MY_NOTIFICATIONS = gql`
         username
       }
       sender {
+        id
         username
       }
       message
@@ -467,6 +474,44 @@ const TEAM_BY_ID = gql`
         status
         winner
       }
+    }
+  }
+`;
+const GET_TOP_TEAMS = gql`
+  query GetTopTeams {
+    topTeams {
+      id
+      name
+      matchesPlayed
+      wins
+      logo
+      league {
+        name
+        city {
+          name
+          id
+        }
+      }
+    }
+  }
+`;
+
+const GET_TOP_PLAYERS = gql`
+  query GetTopPlayers {
+    topPlayers {
+      id
+      username
+      firstName
+      lastName
+      team {
+        logo
+        id
+        name
+      }
+      goals
+      assists
+      mvp
+      photo
     }
   }
 `;

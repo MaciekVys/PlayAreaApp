@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@apollo/client";
 import gql from "graphql-tag";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // Added useEffect
 import { useParams } from "react-router-dom";
 import "../styles/confirmMatch.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,16 +21,54 @@ const ConfirmMatchResult = () => {
   const [homeTeamScore, setHomeTeamScore] = useState(0);
   const [awayTeamScore, setAwayTeamScore] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true); // New state variable
+  const match = data?.match;
+
+  const isAwayTeamCaptain = match?.awayTeam?.captain?.id === currentUserId;
+  const isHomeTeamCaptain = match?.homeTeam?.captain?.id === currentUserId;
+  useEffect(() => {
+    let totalGoals = 0;
+    let teamScore = 0;
+
+    if (isHomeTeamCaptain) {
+      totalGoals = homeTeamStats.reduce(
+        (sum, stat) => sum + parseInt(stat.goals || 0),
+        0
+      );
+      teamScore = parseInt(homeTeamScore);
+    } else if (isAwayTeamCaptain) {
+      totalGoals = awayTeamStats.reduce(
+        (sum, stat) => sum + parseInt(stat.goals || 0),
+        0
+      );
+      teamScore = parseInt(awayTeamScore);
+    }
+
+    if (isNaN(teamScore) || teamScore < 0) {
+      setErrorMessage("Wprowadź prawidłowy wynik drużyny.");
+      setIsSubmitDisabled(true);
+    } else if (totalGoals !== teamScore) {
+      setErrorMessage(
+        `Suma goli przypisanych zawodnikom (${totalGoals}) nie zgadza się z wynikiem drużyny (${teamScore}).`
+      );
+      setIsSubmitDisabled(true);
+    } else {
+      setErrorMessage("");
+      setIsSubmitDisabled(false);
+    }
+  }, [
+    homeTeamStats,
+    awayTeamStats,
+    homeTeamScore,
+    awayTeamScore,
+    isHomeTeamCaptain,
+    isAwayTeamCaptain,
+  ]);
 
   if (loading) return <p>Ładowanie danych...</p>;
   if (error) return <p>Błąd: {error.message}</p>;
 
-  const match = data?.match;
-
-  const isAwayTeamCaptain = match.awayTeam.captain.id === currentUserId;
-  const isHomeTeamCaptain = match.homeTeam.captain.id === currentUserId;
-
-  // Sprawdzamy, czy wynik drużyny przeciwnej został już potwierdzony
+  // Check if the opponent's team result has already been confirmed
   const isAwayTeamConfirmed = match.matchresultSet[0]?.awayTeamConfirmed;
   const isHomeTeamConfirmed = match.matchresultSet[0]?.homeTeamConfirmed;
 
@@ -38,6 +76,7 @@ const ConfirmMatchResult = () => {
     (isHomeTeamCaptain && isHomeTeamConfirmed) ||
     (isAwayTeamCaptain && isAwayTeamConfirmed);
 
+  // Function to handle input changes
   const handleInputChange = (team, playerId, field, value) => {
     const updateStats = (stats) => {
       const existingStat = stats.find((stat) => stat.playerId === playerId);
@@ -66,7 +105,9 @@ const ConfirmMatchResult = () => {
         goals: parseInt(stat.goals || 0),
         assists: parseInt(stat.assists || 0),
         isMvp: Boolean(stat.isMvp || false),
-        teamScore: isHomeTeam ? homeTeamScore : awayTeamScore,
+        teamScore: isHomeTeam
+          ? parseInt(homeTeamScore)
+          : parseInt(awayTeamScore),
       })
     );
 
@@ -211,7 +252,6 @@ const ConfirmMatchResult = () => {
           {isAwayTeamConfirmed ? (
             <h1 style={{ color: "black" }}>{match.scoreAway} ⚽</h1>
           ) : (
-            // Jeśli wynik nie został zatwierdzony, wyświetlamy pole do wprowadzenia wyniku
             <input
               type="number"
               className="input-field"
@@ -223,7 +263,6 @@ const ConfirmMatchResult = () => {
             />
           )}
           {isAwayTeamConfirmed ? (
-            // Wyświetlanie statystyk drużyny gości, jeśli wynik jest potwierdzony
             <table className="table">
               <thead>
                 <tr>
@@ -310,7 +349,7 @@ const ConfirmMatchResult = () => {
       <button
         className="submit-button"
         onClick={handleSubmit}
-        disabled={isFormDisabled}
+        disabled={isFormDisabled || isSubmitDisabled}
       >
         Zatwierdź wynik <FontAwesomeIcon icon={faCheck} />
       </button>

@@ -1,8 +1,10 @@
+from datetime import timedelta
+from django.utils import timezone
 from django.db import IntegrityError, transaction
 import graphene
 from graphql import GraphQLError # type: ignore
 from ..types import TeamType
-from ..models import City, League, Ranking, Team
+from ..models import City, League, Notification, Ranking, Team
 from graphql_jwt.decorators import login_required # type: ignore
 from core.models import Match, Team
 from core.services import send_match_invite
@@ -119,60 +121,87 @@ class UpdateTeam(graphene.Mutation):
         team.save()
         return UpdateTeam(success=True, team=team, errors=None)
 
+# class ChallengeTeamToMatch(graphene.Mutation):
+#     class Arguments:
+#         away_team_id = graphene.ID(required=True)
+#         match_date = graphene.Date(required=True)
 
+#     success = graphene.Boolean()
+#     message = graphene.String()
 
+#     def mutate(self, info, away_team_id, match_date):
+#         user = info.context.user
 
+#         if not user.is_authenticated:
+#             return ChallengeTeamToMatch(
+#                 success=False,
+#                 message="Musisz być zalogowany, aby wyzwać drużynę do meczu."
+#             )
 
-class ChallengeTeamToMatch(graphene.Mutation):
-    class Arguments:
-        away_team_id = graphene.ID(required=True)
-        match_date = graphene.Date(required=True)
+#         try:
+#             # Retrieve the user's team (assuming the user is the captain)
+#             home_team = Team.objects.get(captain=user)
 
-    success = graphene.Boolean()
-    message = graphene.String()
+#             # Retrieve the opponent's team
+#             away_team = Team.objects.get(id=away_team_id)
 
-    def mutate(self, info, away_team_id, match_date):
-        user = info.context.user
+#             if home_team.id == away_team.id:
+#                 return ChallengeTeamToMatch(
+#                     success=False,
+#                     message="Nie możesz wyzwać własnej drużyny."
+#                 )
 
-        # Upewniamy się, że użytkownik jest zalogowany
-        if not user.is_authenticated:
-            return ChallengeTeamToMatch(success=False, message="You must be logged in to challenge a team.")
+#             if home_team.league != away_team.league:
+#                 return ChallengeTeamToMatch(
+#                     success=False,
+#                     message="Obie drużyny muszą być w tej samej lidze."
+#                 )
 
-        try:
-            # Pobieramy drużynę użytkownika (zakładając, że użytkownik jest kapitanem)
-            home_team = Team.objects.get(captain=user)
+#             one_week_ago = timezone.now() - timedelta(weeks=1)
 
-            # Pobieramy drużynę przeciwnika
-            away_team = Team.objects.get(id=away_team_id)
+#             # Check if a match invite was already sent in the last week
+#             existing_notification = Notification.objects.filter(
+#                 sender=home_team.captain,
+#                 recipient=away_team.captain,
+#                 notification_type='match_invite',
+#                 created_at__gte=one_week_ago
+#             ).exists()
 
-            # Sprawdzamy, czy użytkownik nie próbuje wyzwać swojej własnej drużyny
-            if home_team.id == away_team.id:
-                return ChallengeTeamToMatch(success=False, message="You cannot challenge your own team.")
+#             if existing_notification:
+#                 return ChallengeTeamToMatch(
+#                     success=False,
+#                     message="Wyzwano już tę drużynę w ciągu ostatniego tygodnia."
+#                 )
 
-            # Sprawdzamy, czy obie drużyny są w tej samej lidze
-            if home_team.league != away_team.league:
-                return ChallengeTeamToMatch(success=False, message="Both teams must be in the same league.")
+#             # Create the match without the 'sender' field
+#             city = home_team.league.city
 
-            city = home_team.league.city
+#             match = Match.objects.create(
+#                 home_team=home_team,
+#                 away_team=away_team,
+#                 match_date=match_date,
+#                 city=city,
+#                 status='pending'
+#             )
 
-            # Tworzymy mecz
-            match = Match.objects.create(
-                home_team=home_team,
-                away_team=away_team,
-                match_date=match_date,
-                city=city,
-                status='pending'  # Możesz zmienić status w zależności od logiki
-            )
+#             # Send a notification to the opponent team's captain, including the sender
+#             send_match_invite(match, sender=home_team.captain)
 
-            # Wysyłamy powiadomienie do kapitana drużyny przeciwnika
-            send_match_invite(match)
+#             return ChallengeTeamToMatch(
+#                 success=True,
+#                 message="Wyzwanie zostało pomyślnie wysłane."
+#             )
 
-            return ChallengeTeamToMatch(success=True, message="Challenge sent successfully.")
-
-        except Team.DoesNotExist:
-            return ChallengeTeamToMatch(success=False, message="One of the teams does not exist.")
-        except Exception as e:
-            return ChallengeTeamToMatch(success=False, message=str(e))
+#         except Team.DoesNotExist:
+#             return ChallengeTeamToMatch(
+#                 success=False,
+#                 message="Jedna z drużyn nie istnieje."
+#             )
+#         except Exception as e:
+#             return ChallengeTeamToMatch(
+#                 success=False,
+#                 message=str(e)
+#             )
 
 class LeaveTeam(graphene.Mutation):
     class Arguments:

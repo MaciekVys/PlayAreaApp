@@ -14,6 +14,7 @@ import {
   RESPOND_TO_MATCH_INVITE,
   DELETE_NOTIFICATION,
 } from "../queries/mutations";
+import { useNavigate } from "react-router-dom";
 
 export const RESPOND_TO_INVITE_TEAM = gql`
   mutation RespondToInviteTeam($accept: Boolean!, $notificationId: ID!) {
@@ -25,6 +26,7 @@ export const RESPOND_TO_INVITE_TEAM = gql`
 `;
 
 const Notification = () => {
+  const navigate = useNavigate();
   const { loading, error, data, refetch } = useQuery(MY_NOTIFICATIONS, {
     variables: { unread: true },
   });
@@ -125,7 +127,7 @@ const Notification = () => {
         {data.myNotifications.length === 0 ? (
           <p>Brak nowych powiadomień</p>
         ) : (
-          <ul className="notification-list">
+          <ul style={{ color: "white" }} className="notification-list">
             {data.myNotifications.map((notification) => (
               <li
                 key={notification.id}
@@ -142,7 +144,13 @@ const Notification = () => {
                   <h2>Zaproszenie do drużyny</h2>
                 )}
 
-                <p className="notification-username">
+                <p
+                  style={{ cursor: "pointer" }}
+                  onClick={() =>
+                    navigate(`/profile/${notification?.sender?.id}`)
+                  }
+                  className="notification-username"
+                >
                   {"Od: "}
                   {notification?.sender?.username || "Nieznany"}
                   <br />

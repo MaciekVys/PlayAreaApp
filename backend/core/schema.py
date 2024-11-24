@@ -3,13 +3,15 @@ from graphql import GraphQLError
 from graphql_auth.schema import UserQuery, MeQuery
 from graphql_auth import mutations
 from graphql_jwt.decorators import login_required
+from django.db.models import Count, F, Q, Sum, Case, When, IntegerField, Value
+from django.db.models.expressions import RawSQL
 
 from .mutations.uploads import UploadPhotoMutation, UploadTeamLogo
 from .types import CityType, ExtendUserType, PlayerStatisticsSummaryType, PlayerStatisticsType, RankingType, TeamType,  MatchType, NotificationType
 from .models import City, ExtendUser, MatchResult, PlayerStatistics, Ranking, Team,  Match, Notification
-from .mutations.team import ChallengeTeamToMatch, CreateTeam, DeleteTeam, LeaveTeam, UpdateTeam
+from .mutations.team import  CreateTeam, DeleteTeam, LeaveTeam, UpdateTeam
 from .mutations.users import DeleteAccount, Logout, LoginMutation, UpdateUserProfile
-from .mutations.notification import DeleteNotification, InvitePlayerToTeam, RespondToJoinRequest, RespondToMatchInvite, RespondToTeamInvite, SendJoinRequest
+from .mutations.notification import DeleteNotification, ChallengeTeamToMatch,InvitePlayerToTeam, RespondToJoinRequest, RespondToMatchInvite, RespondToTeamInvite, SendJoinRequest
 from .mutations.matches import ConfirmMatchResult
 from graphene_django.filter import DjangoFilterConnectionField
 from .filters import ExtendUserFilter, CityFilter, TeamFilter
@@ -45,7 +47,21 @@ class Query(UserQuery, MeQuery, graphene.ObjectType):
     search_cities = DjangoFilterConnectionField(CityType, filterset_class=CityFilter)
     search_teams = DjangoFilterConnectionField(TeamType, filterset_class=TeamFilter)
     user_statistics = graphene.Field(ExtendUserType, player_id=graphene.Int(required=True))
+    top_teams = graphene.List(TeamType)
+    top_players = graphene.List(ExtendUserType)
 
+    def resolve_top_players(self, info):
+        players = ExtendUser.objects.annotate(
+            total_goals=F('goals'),
+            total_assists=F('assists'),
+            total_mvp=F('mvp'),
+        ).order_by('-total_goals', '-total_assists', '-total_mvp')[:20]
+        return players
+
+    def resolve_top_teams(self, info):
+        teams = Team.objects.all()
+        # Nie możemy tutaj posortować drużyn, ponieważ liczba wygranych i rozegranych meczów jest obliczana w resolverach
+        return teams    
 
     def resolve_user_statistics(self, info, username):
         return ExtendUser.objects.get(username=username)
