@@ -29,7 +29,7 @@ import JoinToTeam from "./components/joinToTeam";
 import EditTeam from "./components/editTeam";
 
 const httpLink = createUploadLink({
-  uri: "http://localhost:8000/graphql/",
+  uri: "https://playarea-hky7.onrender.com/graphql/",
   credentials: "include",
 });
 

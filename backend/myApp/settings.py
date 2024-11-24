@@ -80,7 +80,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myApp.wsgi.application'
 
-
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
@@ -91,6 +91,7 @@ CORS_ORIGIN_WHITELIST = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://playarea-hky7.onrender.com",
+    "https://playarea-dumw.onrender.com",
 
 ]
 
@@ -222,5 +223,3 @@ DEFAULT_FROM_EMAIL = 'Play Area <playarea.football@gmail.com>'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
