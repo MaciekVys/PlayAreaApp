@@ -13,8 +13,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-(2vd$qzibw2&_3bli^#ecy!xa5wlvkg08*4=8avfn#)(f5q*c='
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
 
 ALLOWED_HOSTS = [
     "playarea-hky7.onrender.com",
@@ -47,7 +45,6 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -55,10 +52,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.RefreshTokenMiddleware",
-      # Dodaj to middleware
-
-    # 'graphene_file_upload.django.FileUploadMiddleware',
-
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 
@@ -86,15 +80,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'myApp.wsgi.application'
 
 
-CORS_ALLOW_CREDENTIALS = True
 SESSION_COOKIE_SECURE = False
+CORS_ALLOW_CREDENTIALS = True
 CSRF_COOKIE_SECURE = False
+CORS_ALLOW_ALL_ORIGINS = True
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://playarea-hky7.onrender.com",
-    "https://playarea-dumw.onrender.com",
-    "http://localhost:3000",
-]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",

@@ -1,7 +1,5 @@
 import "./App.css";
 import { REFRESH_TOKEN_MUTATION } from "./queries/mutations";
-import { setContext } from "@apollo/client/link/context";
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import {
   useApolloClient,
@@ -35,18 +33,10 @@ const httpLink = createUploadLink({
   credentials: "include",
 });
 
-const authLink = setContext((_, { headers }) => {
-  return {
-    headers: {
-      ...headers,
-      "Access-Control-Allow-Origin": process.env.REACT_APP_API_URL,
-    },
-  };
-});
-
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link: authLink.concat(httpLink),
+  link: httpLink,
+  credentials: "include",
 });
 
 function App() {
