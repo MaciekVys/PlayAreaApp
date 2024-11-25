@@ -42,7 +42,6 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Dodaj to middleware
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -50,6 +49,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.RefreshTokenMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Dodaj to middleware
 
     # 'graphene_file_upload.django.FileUploadMiddleware',
 
@@ -79,23 +79,30 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'myApp.wsgi.application'
+if DEBUG:
+    SESSION_COOKIE_DOMAIN = None
+else:
+    SESSION_COOKIE_DOMAIN = ".onrender.com"
 
 
 CORS_ALLOW_CREDENTIALS = True
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax' 
 
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:3000",
-]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://playarea-hky7.onrender.com",
     "https://playarea-dumw.onrender.com",
 
 ]
+CSRF_TRUSTED_ORIGINS = [
+    "https://playarea-hky7.onrender.com",
+    "https://playarea-dumw.onrender.com",
+    "http://localhost:3000",
+]
 
-SESSION_COOKIE_SAMESITE = 'Lax'
 HTTP_ONLY = True
 SESSION_COOKIE_NAME = "admin_sessionid"
 
