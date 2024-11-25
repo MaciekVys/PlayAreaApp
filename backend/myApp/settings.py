@@ -14,9 +14,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(2vd$qzibw2&_3bli^#ecy!xa5wlvkg08*4=8avfn#)(f5q*c='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['playarea-hky7.onrender.com', 'localhost','127.0.0.1']
+ALLOWED_HOSTS = [
+    "playarea-hky7.onrender.com",
+    "playarea-dumw.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition
@@ -42,6 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -49,7 +55,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.RefreshTokenMiddleware",
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Dodaj to middleware
+      # Dodaj to middleware
 
     # 'graphene_file_upload.django.FileUploadMiddleware',
 
@@ -57,7 +63,6 @@ MIDDLEWARE = [
 
 
 ROOT_URLCONF = 'myApp.urls'
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -80,10 +85,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myApp.wsgi.application'
 
-if DEBUG:
-    SESSION_COOKIE_DOMAIN = None
-else:
-    SESSION_COOKIE_DOMAIN = ".onrender.com"
 
 CORS_ALLOW_CREDENTIALS = True
 SESSION_COOKIE_SECURE = False
@@ -101,10 +102,12 @@ CORS_ALLOWED_ORIGINS = [
     "https://playarea-dumw.onrender.com",
 
 ]
-
 SESSION_COOKIE_SAMESITE = 'Lax'
 HTTP_ONLY = True
 SESSION_COOKIE_NAME = "admin_sessionid"
+
+
+
 
 DATABASES = {
     'default': {
@@ -131,7 +134,6 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
 
-# Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -230,5 +232,3 @@ DEFAULT_FROM_EMAIL = 'Play Area <playarea.football@gmail.com>'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
