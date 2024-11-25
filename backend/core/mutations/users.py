@@ -18,8 +18,6 @@ from graphql_jwt.decorators import login_required
 
 
 
-from django.http import JsonResponse
-from graphql_jwt.shortcuts import get_token, create_refresh_token
 
 class LoginMutation(graphene.Mutation):
     # Define mutation fields
@@ -36,7 +34,7 @@ class LoginMutation(graphene.Mutation):
     @classmethod
     def mutate(cls, root, info, password, username, **kwargs):
         try:
-            request = info.context
+            context = info.context
             try:
                 # If the username is actually an email, convert it to a username
                 username = ExtendUser.objects.get(email=username).username
@@ -46,60 +44,27 @@ class LoginMutation(graphene.Mutation):
 
             if user is not None:
                 if user.status.verified:
-                    # Generate tokens
-                    access_token = get_token(user)
-                    refresh_token = create_refresh_token(user)
-
-                    # Create the response
-                    response = JsonResponse({
-                        "user": {"username": user.username, "id": user.id},
-                        "success": True,
-                        "errors": None,
-                        "user_id": user.id
-                    })
-
-                    # Set cookies
-                    response.set_cookie(
-                        key="JWT",
-                        value=access_token,
-                        httponly=True,
-                        secure=True,  # Ensure Secure for production
-                        samesite="None",
-                        domain=".onrender.com",  # Set to your domain
-                        max_age=300  # 5 minutes
+                    context.jwt_cookie = True
+                    context.jwt_refresh_token = create_refresh_token(user)
+                    context.jwt_token = get_token(user)
+                    context.user = user
+                    return cls(
+                        user=user,
+                        success=True,
+                        errors=None,
+                        user_id=user.id  # Return user ID here
                     )
-                    response.set_cookie(
-                        key="JWT-Refresh-token",
-                        value=refresh_token,
-                        httponly=True,
-                        secure=True,  # Ensure Secure for production
-                        samesite="None",
-                        domain=".onrender.com",  # Set to your domain
-                        max_age=7 * 24 * 60 * 60  # 7 days
-                    )
-
-                    # Return the response
-                    return response
                 else:
-                    return JsonResponse({
-                        "user": None,
-                        "success": False,
-                        "errors": "Please verify your email address",
-                        "user_id": None
-                    })
+                    return cls(
+                        user=None,
+                        success=False,
+                        errors="Please verify your email address",
+                        user_id=None
+                    )
             else:
-                return JsonResponse({
-                    "user": None,
-                    "success": False,
-                    "errors": "Invalid credentials",
-                    "user_id": None
-                })
+                return cls(user=None, success=False, errors="Invalid credentials", user_id=None)
         except Exception as e:
-            return JsonResponse({
-                "success": False,
-                "errors": str(e),
-                "user_id": None
-            })
+            return cls(success=False, errors=str(e), user_id=None)
 
 
 class Logout(graphene.Mutation):
