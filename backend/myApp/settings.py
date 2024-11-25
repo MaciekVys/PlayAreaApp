@@ -18,6 +18,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['playarea-hky7.onrender.com', 'localhost','127.0.0.1']
 
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 # Application definition
 
