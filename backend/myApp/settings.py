@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -50,10 +51,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.RefreshTokenMiddleware",
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Dodaj to middleware
-
-    # 'graphene_file_upload.django.FileUploadMiddleware',
-
 ]
 
 
@@ -81,14 +78,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myApp.wsgi.application'
 
-# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:3000",
-]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://playarea-hky7.onrender.com",
@@ -209,11 +203,12 @@ GRAPHQL_JWT = {
     "JWT_LONG_RUNNING_REFRESH_TOKEN": True,
     "JWT_AUTH_TOKEN_EXPIRATION_DELTA": timedelta(minutes=5),
     "JWT_REFRESH_TOKEN_EXPIRATION_DELTA": timedelta(days=7),
-    "JWT_COOKIE":False,
-    "JWT_REFRESH_TOKEN_COOKIE": False,
+    "JWT_COOKIE": True,  # Ustawione na True
+    "JWT_REFRESH_TOKEN_COOKIE": True,  # Ustawione na True
     "JWT_COOKIE_NAME": "JWT",
     "JWT_REFRESH_TOKEN_COOKIE_NAME": "JWT-Refresh-token",
 }
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
