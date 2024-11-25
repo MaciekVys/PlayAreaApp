@@ -18,5 +18,6 @@ urlpatterns = [
     path('api/status/', status_view, name='status'),
 ]
 
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
