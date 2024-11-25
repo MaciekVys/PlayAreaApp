@@ -4,15 +4,24 @@ from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-(2vd$qzibw2&_3bli^#ecy!xa5wlvkg08*4=8avfn#)(f5q*c='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['playarea-hky7.onrender.com', 'localhost','127.0.0.1']
 
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
 # Application definition
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -30,6 +39,7 @@ INSTALLED_APPS = [
     'graphene_file_upload',
 ]
 
+
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -43,10 +53,12 @@ MIDDLEWARE = [
     "core.middleware.RefreshTokenMiddleware",
 ]
 
+
 ROOT_URLCONF = 'myApp.urls'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 TEMPLATES = [
     {
@@ -66,18 +78,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myApp.wsgi.application'
 
-# CORS Configuration
-CORS_ALLOW_ALL_ORIGINS = False
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3000",
+]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://playarea-hky7.onrender.com",
     "https://playarea-dumw.onrender.com",
-]
-CORS_ALLOW_CREDENTIALS = True
 
-# Cookie settings
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+]
+
 SESSION_COOKIE_SAMESITE = 'Lax'
 HTTP_ONLY = True
 SESSION_COOKIE_NAME = "admin_sessionid"
@@ -94,12 +109,12 @@ if not DEBUG:
     # Zabezpieczenie przed CSRF
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_HTTPONLY = True
-    CSRF_COOKIE_SAMESITE = 'None'  # Zmień na 'None' dla cross-site cookies
+    CSRF_COOKIE_SAMESITE = 'Strict'
 
     # Zabezpieczenie przed sesjami na niezabezpieczonym połączeniu
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'None'  # Zmień na 'None' dla cross-site cookies
+    SESSION_COOKIE_SAMESITE = 'Strict'
 
     # Używanie HTTPS w produkcji
     SECURE_SSL_REDIRECT = True
@@ -108,6 +123,8 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
 
 # Password validation
+# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -123,7 +140,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 # Internationalization
+# https://docs.djangoproject.com/en/3.2/topics/i18n/
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -134,15 +154,19 @@ USE_L10N = True
 
 USE_TZ = True
 
+
+
 STATIC_URL = '/static/'
 
 # Ustawienia w produkcji dla zbierania plików statycznych
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Dodajemy miejsce, gdzie pliki statyczne aplikacji będą trzymane
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    BASE_DIR / "static",  # Zbiera pliki statyczne z katalogu 'static' w głównym katalogu projektu
 ]
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -155,17 +179,21 @@ GRAPHENE = {
     ],
 }
 
+
 AUTHENTICATION_BACKENDS = [
     "graphql_auth.backends.GraphQLAuthBackend",
     "django.contrib.auth.backends.ModelBackend",
     'graphql_jwt.backends.JSONWebTokenBackend',
 ]
 
+
+
 GRAPHQL_AUTH = {
     'ACTIVATION_PATH_ON_EMAIL': '/activate/',
     'EMAIL_TEMPLATE_ACTIVATION': 'activation_email.html',
     'SITE_URL': os.getenv('SITE_URL', 'https://playarea-hky7.onrender.com'),
 }
+
 
 GRAPHQL_JWT = {
     "JWT_ALLOW_ANY_CLASSES": [
@@ -178,8 +206,8 @@ GRAPHQL_JWT = {
     "JWT_LONG_RUNNING_REFRESH_TOKEN": True,
     "JWT_AUTH_TOKEN_EXPIRATION_DELTA": timedelta(minutes=5),
     "JWT_REFRESH_TOKEN_EXPIRATION_DELTA": timedelta(days=7),
-    "JWT_COOKIE": True,
-    "JWT_REFRESH_TOKEN_COOKIE": True,
+    "JWT_COOKIE":False,
+    "JWT_REFRESH_TOKEN_COOKIE": False,
     "JWT_COOKIE_NAME": "JWT",
     "JWT_REFRESH_TOKEN_COOKIE_NAME": "JWT-Refresh-token",
 }
@@ -192,3 +220,4 @@ EMAIL_HOST_PASSWORD = 'cacx olzc wwrx nzzk'
 DEFAULT_FROM_EMAIL = 'Play Area <playarea.football@gmail.com>'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+
