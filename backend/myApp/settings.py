@@ -90,7 +90,7 @@ CORS_ORIGIN_WHITELIST = [
 ]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://playarea-hky7.onrender.com",
+    # "https://playarea-hky7.onrender.com",
 
 ]
 
@@ -222,5 +222,5 @@ DEFAULT_FROM_EMAIL = 'Play Area <playarea.football@gmail.com>'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]

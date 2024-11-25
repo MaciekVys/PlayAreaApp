@@ -44,6 +44,7 @@ const Home = () => {
 
   // Pobieramy top 10 drużyn
   const topTeams = teams.slice(0, 10);
+  console.log(process.env.REACT_APP_MEDIA_URL);
 
   return (
     <div className="home-container">

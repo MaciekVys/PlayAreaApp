@@ -1,5 +1,4 @@
 import "./App.css";
-import { REFRESH_TOKEN_MUTATION } from "./queries/mutations";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import {
   useApolloClient,
@@ -15,7 +14,6 @@ import Home from "./components/home";
 import Team from "./components/myTeam";
 import PlayerProfile from "./components/myProfile";
 import CreateTeam from "./components/createTeam";
-import StartPage from "./components/startPage";
 import City from "./components/city";
 import UserTeam from "./components/userTeam";
 import UserProfile from "./components/userProfile";
