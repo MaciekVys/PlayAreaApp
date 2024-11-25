@@ -29,7 +29,7 @@ import JoinToTeam from "./components/joinToTeam";
 import EditTeam from "./components/editTeam";
 
 const httpLink = createUploadLink({
-  uri: "https://playarea-dumw.onrender.com/graphql/",
+  uri: process.env.REACT_APP_API_URL,
   credentials: "include",
 });
 

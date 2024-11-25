@@ -80,7 +80,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myApp.wsgi.application'
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
@@ -193,7 +193,7 @@ AUTHENTICATION_BACKENDS = [
 GRAPHQL_AUTH = {
     'ACTIVATION_PATH_ON_EMAIL': '/activate/',
     'EMAIL_TEMPLATE_ACTIVATION': 'activation_email.html',
-    'SITE_URL': 'http://localhost:8000',
+    'SITE_URL': os.getenv('SITE_URL', 'https://playarea-hky7.onrender.com'),
 }
 
 
