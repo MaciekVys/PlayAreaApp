@@ -86,10 +86,17 @@ else:
 
 
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'authorization',
+    'content-type',
+    'x-csrftoken',
+    'x-requested-with',
+]
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax' 
+CORS_ALLOW_ALL_METHODS = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
