@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Dodaj to middleware
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -49,7 +50,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.RefreshTokenMiddleware",
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Dodaj to middleware
 
     # 'graphene_file_upload.django.FileUploadMiddleware',
 
@@ -208,8 +208,8 @@ GRAPHQL_JWT = {
     "JWT_LONG_RUNNING_REFRESH_TOKEN": True,
     "JWT_AUTH_TOKEN_EXPIRATION_DELTA": timedelta(minutes=5),
     "JWT_REFRESH_TOKEN_EXPIRATION_DELTA": timedelta(days=7),
-    "JWT_COOKIE":False,
-    "JWT_REFRESH_TOKEN_COOKIE": False,
+    "JWT_COOKIE":True,
+    "JWT_REFRESH_TOKEN_COOKIE": True,
     "JWT_COOKIE_NAME": "JWT",
     "JWT_REFRESH_TOKEN_COOKIE_NAME": "JWT-Refresh-token",
 }
@@ -223,5 +223,4 @@ DEFAULT_FROM_EMAIL = 'Play Area <playarea.football@gmail.com>'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
-CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
