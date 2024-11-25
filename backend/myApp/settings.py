@@ -212,6 +212,9 @@ GRAPHQL_JWT = {
     "JWT_REFRESH_TOKEN_COOKIE": False,
     "JWT_COOKIE_NAME": "JWT",
     "JWT_REFRESH_TOKEN_COOKIE_NAME": "JWT-Refresh-token",
+    "JWT_COOKIE_DOMAIN": ".onrender.com",  # Kluczowe ustawienie
+    "JWT_COOKIE_SECURE": True,
+    "JWT_COOKIE_SAMESITE": "None",
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

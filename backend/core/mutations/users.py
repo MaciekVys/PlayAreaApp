@@ -18,7 +18,6 @@ from graphql_jwt.decorators import login_required
 
 
 
-
 class LoginMutation(graphene.Mutation):
     # Define mutation fields
     class Arguments:
@@ -44,10 +43,30 @@ class LoginMutation(graphene.Mutation):
 
             if user is not None:
                 if user.status.verified:
-                    context.jwt_cookie = True
-                    context.jwt_refresh_token = create_refresh_token(user)
-                    context.jwt_token = get_token(user)
-                    context.user = user
+                    # Generate tokens
+                    access_token = get_token(user)
+                    refresh_token = create_refresh_token(user)
+
+                    # Set tokens as cookies
+                    context.response.set_cookie(
+                        key="JWT",
+                        value=access_token,
+                        httponly=True,
+                        secure=True,  # Ensure Secure for production
+                        samesite="None",
+                        domain=".onrender.com",  # Set to your domain
+                        max_age=300  # 5 minutes
+                    )
+                    context.response.set_cookie(
+                        key="JWT-Refresh-token",
+                        value=refresh_token,
+                        httponly=True,
+                        secure=True,  # Ensure Secure for production
+                        samesite="None",
+                        domain=".onrender.com",  # Set to your domain
+                        max_age=7 * 24 * 60 * 60  # 7 days
+                    )
+
                     return cls(
                         user=user,
                         success=True,
@@ -65,6 +84,7 @@ class LoginMutation(graphene.Mutation):
                 return cls(user=None, success=False, errors="Invalid credentials", user_id=None)
         except Exception as e:
             return cls(success=False, errors=str(e), user_id=None)
+
 
 
 class Logout(graphene.Mutation):
