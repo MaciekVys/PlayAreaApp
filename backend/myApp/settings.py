@@ -79,24 +79,21 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'myApp.wsgi.application'
+
 if DEBUG:
     SESSION_COOKIE_DOMAIN = None
 else:
     SESSION_COOKIE_DOMAIN = ".onrender.com"
 
-
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = [
-    'authorization',
-    'content-type',
-    'x-csrftoken',
-    'x-requested-with',
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://playarea-hky7.onrender.com",
+    "https://playarea-dumw.onrender.com",
+    "http://localhost:3000",
 ]
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SAMESITE = 'Lax' 
-CORS_ALLOW_ALL_METHODS = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -104,12 +101,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://playarea-dumw.onrender.com",
 
 ]
-CSRF_TRUSTED_ORIGINS = [
-    "https://playarea-hky7.onrender.com",
-    "https://playarea-dumw.onrender.com",
-    "http://localhost:3000",
-]
 
+SESSION_COOKIE_SAMESITE = 'Lax'
 HTTP_ONLY = True
 SESSION_COOKIE_NAME = "admin_sessionid"
 
@@ -207,7 +200,7 @@ AUTHENTICATION_BACKENDS = [
 GRAPHQL_AUTH = {
     'ACTIVATION_PATH_ON_EMAIL': '/activate/',
     'EMAIL_TEMPLATE_ACTIVATION': 'activation_email.html',
-    'SITE_URL': os.getenv('SITE_URL', 'https://playarea-hky7.onrender.com'),
+    'SITE_URL': 'http://localhost:8000',
 }
 
 
@@ -222,8 +215,8 @@ GRAPHQL_JWT = {
     "JWT_LONG_RUNNING_REFRESH_TOKEN": True,
     "JWT_AUTH_TOKEN_EXPIRATION_DELTA": timedelta(minutes=5),
     "JWT_REFRESH_TOKEN_EXPIRATION_DELTA": timedelta(days=7),
-    "JWT_COOKIE":True,
-    "JWT_REFRESH_TOKEN_COOKIE": True,
+    "JWT_COOKIE":False,
+    "JWT_REFRESH_TOKEN_COOKIE": False,
     "JWT_COOKIE_NAME": "JWT",
     "JWT_REFRESH_TOKEN_COOKIE_NAME": "JWT-Refresh-token",
 }
@@ -237,4 +230,5 @@ DEFAULT_FROM_EMAIL = 'Play Area <playarea.football@gmail.com>'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
