@@ -12,10 +12,10 @@ from graphene_file_upload.django import FileUploadGraphQLView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/graphql/', jwt_cookie(csrf_exempt(
+    path('graphql/', jwt_cookie(csrf_exempt(
         FileUploadGraphQLView.as_view(graphiql=True, schema=schema)))),
-    path('api/activate/<str:token>/', activate_account, name='activate_account'),
-    path('api/status/', status_view, name='status'),
+    path('activate/<str:token>/', activate_account, name='activate_account'),
+    path('status/', status_view, name='status'),
 ]
 
 
