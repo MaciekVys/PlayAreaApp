@@ -12,6 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-(2vd$qzibw2&_3bli^#ecy!xa5wlvkg08*4=8avfn#)(f5q*c='
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 
 ALLOWED_HOSTS = [
@@ -192,7 +193,7 @@ AUTHENTICATION_BACKENDS = [
 GRAPHQL_AUTH = {
     'ACTIVATION_PATH_ON_EMAIL': '/activate/',
     'EMAIL_TEMPLATE_ACTIVATION': 'activation_email.html',
-    'SITE_URL': 'http://localhost:8000',
+    'SITE_URL': os.getenv('SITE_URL', 'https://playarea-hky7.onrender.com'),
 }
 
 
