@@ -212,9 +212,6 @@ GRAPHQL_JWT = {
     "JWT_REFRESH_TOKEN_COOKIE": False,
     "JWT_COOKIE_NAME": "JWT",
     "JWT_REFRESH_TOKEN_COOKIE_NAME": "JWT-Refresh-token",
-    "JWT_COOKIE_DOMAIN": ".onrender.com",  # Kluczowe ustawienie
-    "JWT_COOKIE_SECURE": True,
-    "JWT_COOKIE_SAMESITE": "None",
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -225,10 +222,3 @@ EMAIL_HOST_PASSWORD = 'cacx olzc wwrx nzzk'
 DEFAULT_FROM_EMAIL = 'Play Area <playarea.football@gmail.com>'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-
-SESSION_COOKIE_DOMAIN = ".onrender.com"
-CSRF_COOKIE_DOMAIN = ".onrender.com"
-SESSION_COOKIE_SAMESITE = 'None'  # Możesz zmienić na 'None' dla pełnego wsparcia cross-origin
-CSRF_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
