@@ -1,0 +1,12 @@
+{
+  "routes": [
+    {
+      "src": "^/api/.*",
+      "status": 200
+    },
+    {
+      "src": ".*",
+      "dest": "/index.html"
+    }
+  ]
+}
